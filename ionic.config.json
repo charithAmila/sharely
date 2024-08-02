@@ -1,0 +1,7 @@
+{
+  "name": "Sharely",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "react-vite"
+}
