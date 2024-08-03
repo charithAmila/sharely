@@ -7,8 +7,11 @@ import {
   SignInWithAppleResponse,
   SignInWithAppleOptions,
 } from '@capacitor-community/apple-sign-in';
+import useSecureStorage from '../hooks/useSecureStorage';
+
 
 const Tab1: React.FC = () => {
+  const { setItem, getItem, removeItem } = useSecureStorage('sharely-secure-storage');
 
   
 
@@ -23,11 +26,16 @@ const Tab1: React.FC = () => {
     };
 
     SignInWithApple.authorize(options)
-    .then((result: SignInWithAppleResponse) => {
+    .then(async (result: SignInWithAppleResponse) => {
+      await setItem('identityToken', result.response.identityToken)
       // Handle user information
       // Validate token with server and create new session
+      console.log('+++ successfully saved to keychain');
+      
     })
     .catch(error => {
+      console.log('+++ error', error);
+      
       // Handle error
     });
   }
