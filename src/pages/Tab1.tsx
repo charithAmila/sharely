@@ -8,14 +8,29 @@ import {
   SignInWithAppleOptions,
 } from '@capacitor-community/apple-sign-in';
 import useSecureStorage from '../hooks/useSecureStorage';
+import { appleSignIn, auth } from '../firebase';
+import { useEffect, useState } from 'react';
 
 
 const Tab1: React.FC = () => {
+  const [authenticated, setAuthenticated] = useState(false)
   const { setItem, getItem, removeItem } = useSecureStorage('sharely-secure-storage');
 
-  
+  useEffect(()=> {
+    const unsubscribe = auth.onAuthStateChanged(async (user)=>{
+      if(user) {
+          const token = await user?.getIdToken()
+          await setItem('firebaseAuth', token)
+          console.log('+++ user',user);
+          console.log('+++ token', token);
+          setAuthenticated(true)
+      }
+    })
 
-  const appleSignIn = () => {
+    return () => unsubscribe();
+  })
+
+  const signIn = () => {
 
     let options: SignInWithAppleOptions = {
       clientId: 'io.sharely.app',
@@ -27,16 +42,12 @@ const Tab1: React.FC = () => {
 
     SignInWithApple.authorize(options)
     .then(async (result: SignInWithAppleResponse) => {
-      await setItem('identityToken', result.response.identityToken)
-      // Handle user information
-      // Validate token with server and create new session
-      console.log('+++ successfully saved to keychain');
+     const userData = appleSignIn(result.response.identityToken)
+      console.log('+++ successfully saved to keychain', userData);
       
     })
     .catch(error => {
       console.log('+++ error', error);
-      
-      // Handle error
     });
   }
 
@@ -53,7 +64,7 @@ const Tab1: React.FC = () => {
             <IonTitle size="large">Tab 1</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonButton onClick={appleSignIn}>Sign In</IonButton>
+        {authenticated === false ?<IonButton onClick={signIn}>Sign In</IonButton> : 'Authenticated'}
       </IonContent>
     </IonPage>
   );
