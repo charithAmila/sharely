@@ -26,7 +26,7 @@ const Tab1: React.FC = () => {
     })
 
     return () => unsubscribe();
-  })
+  },[])
 
   const signIn = () => {
 
