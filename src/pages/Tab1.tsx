@@ -7,21 +7,25 @@ import {
   SignInWithAppleResponse,
   SignInWithAppleOptions,
 } from '@capacitor-community/apple-sign-in';
-import { appleSignIn, auth } from '../firebase';
+import { appleSignIn, auth, signInWithToken } from '../firebase';
 import { useEffect, useState } from 'react';
+import Echo from '../plugins/Echo';
 
 
 const Tab1: React.FC = () => {
   const [authenticated, setAuthenticated] = useState(false)
 
   useEffect(()=> {
-    const unsubscribe = auth.onAuthStateChanged(async (user)=>{
+    const unsubscribe = auth.onAuthStateChanged(async (user)=> {
       if(user) {
-          const token = await user?.getIdToken()
-          // await setItem('firebaseAuth', token)
-          console.log('+++ user',user);
-          console.log('+++ token', token);
           setAuthenticated(true)
+          const token = await user.getIdToken()
+          Echo.saveToKeyChain({key: 'firebaseAuthToken', value: token}).then(res=>{
+            console.log('++++++ res',res);
+          }).catch((error)=>{
+            console.log('++++ ++++++ error',error);
+            
+          })
       }
     })
 
@@ -40,9 +44,7 @@ const Tab1: React.FC = () => {
 
     SignInWithApple.authorize(options)
     .then(async (result: SignInWithAppleResponse) => {
-     const userData = appleSignIn(result.response.identityToken)
-      console.log('+++ successfully saved to keychain', userData);
-      
+      appleSignIn(result.response.identityToken)
     })
     .catch(error => {
       console.log('+++ error', error);
@@ -62,7 +64,19 @@ const Tab1: React.FC = () => {
             <IonTitle size="large">Tab 1</IonTitle>
           </IonToolbar>
         </IonHeader>
-        {authenticated === false ?<IonButton onClick={signIn}>Sign In</IonButton> : 'Authenticated'}
+        {authenticated === false ? <IonButton onClick={signIn}>Sign In</IonButton> : 'Authenticated'}
+
+        <IonButton onClick={()=>{
+          Echo.readFromKeyChain({key: 'firebaseAuthToken'}).then( async (res)=>{
+            console.log('++++ res',res);
+
+          await signInWithToken(res.value)
+            
+          }).catch(error=>{
+            console.log('+ error',error);
+            
+          })
+        }}>Click me</IonButton>
       </IonContent>
     </IonPage>
   );
