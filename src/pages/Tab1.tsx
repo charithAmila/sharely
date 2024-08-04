@@ -7,20 +7,18 @@ import {
   SignInWithAppleResponse,
   SignInWithAppleOptions,
 } from '@capacitor-community/apple-sign-in';
-import useSecureStorage from '../hooks/useSecureStorage';
 import { appleSignIn, auth } from '../firebase';
 import { useEffect, useState } from 'react';
 
 
 const Tab1: React.FC = () => {
   const [authenticated, setAuthenticated] = useState(false)
-  const { setItem, getItem, removeItem } = useSecureStorage('sharely-secure-storage');
 
   useEffect(()=> {
     const unsubscribe = auth.onAuthStateChanged(async (user)=>{
       if(user) {
           const token = await user?.getIdToken()
-          await setItem('firebaseAuth', token)
+          // await setItem('firebaseAuth', token)
           console.log('+++ user',user);
           console.log('+++ token', token);
           setAuthenticated(true)
