@@ -21,6 +21,8 @@
 		CB1FD5932C5C8FE400568BC5 /* SharelyShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CB1FD5892C5C8FE400568BC5 /* SharelyShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CB1FD5992C5C929800568BC5 /* ShareExtensionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1FD5982C5C929800568BC5 /* ShareExtensionView.swift */; };
 		CB1FD59B2C5C967E00568BC5 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CB1FD59A2C5C967E00568BC5 /* GoogleService-Info.plist */; };
+		CB83FC1E2C5F0D6C00AAE326 /* EchoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB83FC1D2C5F0D6C00AAE326 /* EchoPlugin.swift */; };
+		CB83FC242C5F181400AAE326 /* MyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB83FC232C5F181400AAE326 /* MyViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,6 +72,8 @@
 		CB1FD59A2C5C967E00568BC5 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CB5814B62C5EA96400BBD9C2 /* App.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 		CB5814B72C5EA9AA00BBD9C2 /* SharelyShareExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SharelyShareExtension.entitlements; sourceTree = "<group>"; };
+		CB83FC1D2C5F0D6C00AAE326 /* EchoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPlugin.swift; sourceTree = "<group>"; };
+		CB83FC232C5F181400AAE326 /* MyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyViewController.swift; sourceTree = "<group>"; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -134,6 +138,8 @@
 				504EC3131FED79650016851F /* Info.plist */,
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
+				CB83FC1D2C5F0D6C00AAE326 /* EchoPlugin.swift */,
+				CB83FC232C5F181400AAE326 /* MyViewController.swift */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -332,6 +338,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
+				CB83FC242C5F181400AAE326 /* MyViewController.swift in Sources */,
+				CB83FC1E2C5F0D6C00AAE326 /* EchoPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { OAuthProvider, signInWithCredential, getAuth, UserCredential, indexedDBLocalPersistence, initializeAuth } from "firebase/auth"
+import { OAuthProvider, signInWithCredential, getAuth, UserCredential, indexedDBLocalPersistence, initializeAuth, signInWithCustomToken } from "firebase/auth"
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
@@ -30,4 +30,21 @@ const appleSignIn = async (idToken:string): Promise<UserCredential> => {
     return await signInWithCredential(auth, credential)
 }
 
-export { app, db, auth, appleSignIn}
+const signInWithToken = async (token:string) => {
+    signInWithCustomToken(auth,token)
+      .then((userCredential) => {
+        // Signed in
+        const user = userCredential.user;
+        // ...
+        console.log('+++ user',user);
+        
+      })
+      .catch((error) => {
+        const errorCode = error.code;
+        const errorMessage = error.message;
+        console.log('Error message',errorMessage );
+        
+      });
+}
+
+export { app, db, auth, appleSignIn, signInWithToken}

@@ -17,14 +17,22 @@ enum ContentType {
 struct ShareExtensionView: View {
     @State private var contentType: ContentType
     var onSave: ([String: Any]) -> Void
+    var isUserAuthenticated: Bool
     
-    init(contentType: ContentType, onSave: @escaping ([String: Any]) -> Void) {
+    init(contentType: ContentType, onSave: @escaping ([String: Any]) -> Void, isUserAuthenticated: Bool) {
         self._contentType = State(initialValue: contentType)
         self.onSave = onSave
+        self.isUserAuthenticated = isUserAuthenticated
     }
     
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
+            if !isUserAuthenticated {
+                Text("User not authenticated")
+                    .foregroundColor(.red)
+                    .padding()
+            }
+            
             switch contentType {
             case .text(let text):
                 TextField("Enter text here...", text: Binding(get: { text }, set: { self.contentType = .text($0) }))
@@ -104,10 +112,10 @@ extension URL {
 
 struct ShareExtensionView_Previews: PreviewProvider {
     static var previews: some View {
-        ShareExtensionView(contentType: .text("example content"), onSave: { _ in })
+        ShareExtensionView(contentType: .text("example content"), onSave: { _ in }, isUserAuthenticated: true)
     }
 }
 
 //#Preview {
-//    ShareExtensionView(contentType: <#ContentType#>, onSave: <#([String : Any]) -> Void#>)
+//    ShareExtensionView(contentType: <#ContentType#>, onSave: <#([String : Any]) -> Void#>, isUserAuthenticated: <#Bool#>)
 //}

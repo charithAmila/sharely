@@ -29,6 +29,7 @@ target 'SharelyShareExtension' do
   # Your Share Extension dependencies
   pod 'Firebase/Firestore'
   pod 'Firebase/Core'
+  pod 'FirebaseAuth'
 end
 
 post_install do |installer|
