@@ -123,19 +123,19 @@ class ShareViewController: SLComposeServiceViewController {
         if isUserAuthenticated {
             switch typeIdentifier {
             case UTType.plainText.identifier:
-                view = ShareExtensionView(contentType: .text(content as? String ?? ""), onSave: self.saveToFirestore, isUserAuthenticated: true)
+                view = ShareExtensionView(contentType: .text(content as? String ?? ""), onSave: self.saveToFirestore, isUserAuthenticated: true, userId: self.userId ?? "")
             case UTType.image.identifier:
-                view = ShareExtensionView(contentType: .image(content as? URL), onSave: self.saveToFirestore, isUserAuthenticated: true)
+                view = ShareExtensionView(contentType: .image(content as? URL), onSave: self.saveToFirestore, isUserAuthenticated: true, userId: self.userId ?? "")
             case UTType.url.identifier:
-                view = ShareExtensionView(contentType: .url(content as? URL), onSave: self.saveToFirestore, isUserAuthenticated: true)
+                view = ShareExtensionView(contentType: .url(content as? URL), onSave: self.saveToFirestore, isUserAuthenticated: true, userId: self.userId ?? "")
             case UTType.movie.identifier:
-                view = ShareExtensionView(contentType: .video(content as? URL), onSave: self.saveToFirestore, isUserAuthenticated: true)
+                view = ShareExtensionView(contentType: .video(content as? URL), onSave: self.saveToFirestore, isUserAuthenticated: true, userId: self.userId ?? "")
             default:
                 close()
                 return
             }
         } else {
-            view = ShareExtensionView(contentType: .text("User not authenticated"), onSave: self.saveToFirestore, isUserAuthenticated: false)
+            view = ShareExtensionView(contentType: .text("User not authenticated"), onSave: self.saveToFirestore, isUserAuthenticated: false, userId: self.userId ?? "")
         }
         
         let contentView = UIHostingController(rootView: view)
@@ -151,28 +151,19 @@ class ShareViewController: SLComposeServiceViewController {
     }
     
     func retrieveAuthStateAndReauthenticate() {
-        guard let token = getAuthTokenFromKeychain() else {
+        // This moment token is user uid. I will implement proper authentication macanism later
+        guard let uid = getAuthUidFromKeychain() else {
             print("No auth token found")
             return
         }
-
-        print("Token for re-authentication: \(token)")
-
-        Auth.auth().signIn(withCustomToken: token) { (authResult, error) in
-            if let error = error {
-                print("Error re-authenticating: \(error)")
-                self.isUserAuthenticated = false
-                return
-            }
-            self.isUserAuthenticated = true
-            self.userId = authResult?.user.uid
-            print("Successfully re-authenticated")
-        }
+        
+        self.isUserAuthenticated = true
+        self.userId = uid
     }
     
-    func getAuthTokenFromKeychain() -> String? {
+    func getAuthUidFromKeychain() -> String? {
         
-        let key = "firebaseAuthToken"
+        let key = "uid"
         
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
@@ -190,11 +181,11 @@ class ShareViewController: SLComposeServiceViewController {
             return nil
         }
 
-        guard let data = item as? Data, let token = String(data: data, encoding: .utf8) else {
+        guard let data = item as? Data, let uid = String(data: data, encoding: .utf8) else {
             print("Error decoding token from Keychain data")
             return nil
         }
         
-        return token
+        return uid
     }
 }

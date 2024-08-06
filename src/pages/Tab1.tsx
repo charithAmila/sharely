@@ -19,13 +19,11 @@ const Tab1: React.FC = () => {
     const unsubscribe = auth.onAuthStateChanged(async (user)=> {
       if(user) {
           setAuthenticated(true)
-          const token = await user.getIdToken()
-          Echo.saveToKeyChain({key: 'firebaseAuthToken', value: token}).then(res=>{
-            console.log('++++++ res',res);
-          }).catch((error)=>{
-            console.log('++++ ++++++ error',error);
-            
-          })
+          const savedUserId = await Echo.readFromKeyChain({key: 'uid'})
+
+          if(savedUserId.value !== user.uid) {
+              Echo.saveToKeyChain({key: 'uid', value: user.uid})
+          }
       }
     })
 
