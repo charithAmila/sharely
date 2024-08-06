@@ -22,6 +22,28 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+		<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSExtensionActivationRule</key>
+	<dict>
+		<key>NSExtensionActivationSupportsFileWithMaxCount</key>
+		<integer>5</integer>
+		<key>NSExtensionActivationSupportsImageWithMaxCount</key>
+		<integer>5</integer>
+		<key>NSExtensionActivationSupportsMovieWithMaxCount</key>
+		<integer>5</integer>
+		<key>NSExtensionActivationSupportsText</key>
+		<true/>
+		<key>NSExtensionActivationSupportsWebPageWithMaxCount</key>
+		<integer>1</integer>
+		<key>NSExtensionActivationSupportsWebURLWithMaxCount</key>
+		<integer>1</integer>
+		<key>NSExtensionActivationUsesStrictMatching</key>
+		<false/>
+	</dict>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -32,16 +54,10 @@
 	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
-		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
 		<string>UIInterfaceOrientationPortrait</string>
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
