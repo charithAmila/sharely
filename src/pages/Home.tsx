@@ -1,12 +1,73 @@
-import { IonCard, IonCardContent, IonCardHeader, IonCardSubtitle, IonCardTitle, IonChip, IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/react';
+import {
+  IonBadge,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonItemDivider,
+  IonModal,
+  IonPage,
+  IonSearchbar,
+  IonText,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
+import LinkPreview from "../components/LinkPreview";
+import { useAppContext } from "../context/MainContext";
+import { add, filter } from "ionicons/icons";
+import { useMemo, useRef, useState } from "react";
 
 const Home: React.FC = () => {
+  const { items, tags } = useAppContext();
 
+  const modal = useRef<HTMLIonModalElement>(null);
+
+  const [selectedTags, setSelectedTags] = useState<
+    { id: string; name: string }[]
+  >([]);
+
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
+
+  const listArray = useMemo(() => {
+    if (!selectedTags || selectedTags.length === 0) {
+      return items; // Return all items if no tags are selected
+    }
+  
+    const selectedTagNames = selectedTags.map(tag => tag.name);
+  
+    return items.map(item => ({
+      ...item,
+      data: item.data.filter((dataItem: any) =>
+        (dataItem.tags || []).some((tag: any) => selectedTagNames.includes(tag))
+      ),
+    })).filter(item => item.data.length > 0);
+  
+  }, [items, selectedTags]);
+  
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
           <IonTitle>Collection</IonTitle>
+          <IonButtons slot="end">
+            <IonButton id="open-modal">
+              <IonIcon slot="icon-only" icon={filter}></IonIcon>
+            </IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent forceOverscroll={false} scrollY={true} fullscreen>
@@ -15,39 +76,97 @@ const Home: React.FC = () => {
             <IonTitle size="large">Collection</IonTitle>
           </IonToolbar>
         </IonHeader>
-        <IonCard>
-          <img alt="Silhouette of mountains" src="https://images.ctfassets.net/0k812o62ndtw/kOozcyS9Qi9DCwrfoEWfM/40cdd85bdf0711fd2d3de3e84b32fd50/BackToGymSWEATf1f07a7f6f79e7b8807d2436a6ae8e8b.jpg" />
-          <IonCardHeader>
-            <IonCardTitle>How To Smash Your First Back-To-Gym Workout - Sweat</IonCardTitle>
-            <IonCardSubtitle>Back-To-Gym</IonCardSubtitle>
-          </IonCardHeader>
-          <IonCardContent>
-            Gyms are re-opening, and that means you may be considering swapping some of your at-home workouts for gym workouts. Whether you’ve been eagerly awaiting this moment for months or feeling a little daunted post-lockdown, it’s important to take your time preparing to get back into a gym routine, both physically and mentally.
-            <div className='flex gap-2 justify-content-end pt-10'>
-              <IonChip color="primary">Gym</IonChip>
-              <IonChip color="primary">Sport</IonChip>
-              <IonChip color="primary">Article</IonChip>
-            </div>
-          </IonCardContent>
-        </IonCard>
-
-        <IonCard>
-          <img alt="Silhouette of mountains" src="https://media.geeksforgeeks.org/wp-content/uploads/20240319155102/what-is-ai-artificial-intelligence.webp" />
-          <IonCardHeader>
-            <IonCardTitle>
-              What is Artificial Intelligence?
-            </IonCardTitle>
-            <IonCardSubtitle>Back-To-Gym</IonCardSubtitle>
-          </IonCardHeader>
-          <IonCardContent>
-          Artificial Intelligence (AI) has become a discussed subject, in today’s fast-moving world. It has transitioned from being a concept in science fiction to a reality that impacts our daily lives. People all over the world are fascinated by AI and its ability to bring their imaginations to work in their daily lives.
-            <div className='flex gap-2 justify-content-end pt-10'>
-              <IonChip color="primary">AI</IonChip>
-              <IonChip color="primary">Computer Science</IonChip>
-              <IonChip color="primary">Article</IonChip>
-            </div>
-          </IonCardContent>
-        </IonCard>
+        <div className="">
+          <IonSearchbar />
+        </div>
+        {listArray &&
+          listArray.map((item) => (
+            <>
+              <div className="flex">
+                <div
+                  className="w-2 flex justify-content-center"
+                  style={{ marginTop: "20px" }}
+                >
+                  <div
+                    className="flex flex-column"
+                    style={{
+                      width: "50px",
+                      height: "50px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: "50%",
+                    }}
+                  >
+                    <IonText color="primary font-24 font-bold">
+                      {new Date(item.createdAt).getDate()}
+                    </IonText>
+                    <IonText color="primary font-12 font-bold">
+                      {months[new Date(item.createdAt).getMonth()]}
+                    </IonText>
+                  </div>
+                </div>
+                <div className="w-10">
+                  {item.data.map((_d: any) => (
+                    <div key={_d.id} className="w-full">
+                      {_d.url && <LinkPreview selectedTags={selectedTags} item={_d} />}
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <IonItemDivider />
+            </>
+          ))}
+        <IonModal
+          ref={modal}
+          trigger="open-modal"
+          initialBreakpoint={1}
+          breakpoints={[0, 1]}
+        >
+          <div className="h-50vh ion-padding">
+            {tags.length > 0 ? (
+              tags.map((tag: { id: string; name: string }) => (
+                <IonButton
+                  key={tag.id}
+                  shape="round"
+                  fill={
+                    selectedTags.map((t) => t.id).includes(tag.id)
+                      ? "solid"
+                      : "outline"
+                  }
+                  onClick={() =>
+                    setSelectedTags(
+                      selectedTags.map((t) => t.id).includes(tag.id)
+                        ? selectedTags.filter((t) => t.id !== tag.id)
+                        : [...selectedTags, tag]
+                    )
+                  }
+                >
+                  {tag.name}
+                </IonButton>
+              ))
+            ) : (
+              <>
+                <div className="flex flex-column gap-4">
+                <IonText>No Tags</IonText>
+                  <IonButton
+                    expand="full"
+                    shape="round"
+                    fill="outline"
+                    routerLink="/add-tags"
+                  >
+                    Add Tags
+                  </IonButton>
+                </div>
+               
+              </>
+            )}
+          </div>
+          { tags.length > 0 && <IonButton fill="clear" routerLink="/add-tags">
+            <IonIcon icon={add}></IonIcon>
+            Add Tags
+          </IonButton>}
+        </IonModal>
       </IonContent>
     </IonPage>
   );

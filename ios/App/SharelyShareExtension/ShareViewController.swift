@@ -74,6 +74,8 @@ class ShareViewController: SLComposeServiceViewController {
         if let userId = userId {
             dataToSave["userId"] = userId
         }
+
+        dataToSave["createdAt"] = FieldValue.serverTimestamp()
         
         let db = Firestore.firestore()
         db.collection("sharedItems").addDocument(data: dataToSave) { error in

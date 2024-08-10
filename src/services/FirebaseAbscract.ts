@@ -8,9 +8,11 @@ import {
   doc,
   getDoc,
   getDocs,
+  query,
   serverTimestamp,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
 export class FirebaseAbstract {
   private collection: string;
@@ -79,6 +81,16 @@ export class FirebaseAbstract {
         return docSnap;
       }
       return null;
+    } catch (error) {
+      throw new Error("Error fetching document");
+    }
+  }
+
+  public async findByField(field: string, value: string) {
+    try {
+      const _query = query(collection(db, this.collection), where(field, "==", value));
+      const querySnapshot = await getDocs(_query);
+      return this.querySnapshotToArray(querySnapshot);
     } catch (error) {
       throw new Error("Error fetching document");
     }
