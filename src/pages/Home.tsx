@@ -1,5 +1,4 @@
 import {
-  IonBadge,
   IonButton,
   IonButtons,
   IonContent,
@@ -80,7 +79,7 @@ const Home: React.FC = () => {
           <IonSearchbar />
         </div>
         {listArray &&
-          listArray.map((item) => (
+          listArray.map((item, index) => (
             <>
               <div className="flex">
                 <div
@@ -114,7 +113,7 @@ const Home: React.FC = () => {
                   ))}
                 </div>
               </div>
-              <IonItemDivider />
+              { index < listArray.length - 1 && <IonItemDivider />}
             </>
           ))}
         <IonModal

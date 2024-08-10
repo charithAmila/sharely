@@ -22,37 +22,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     if(!user) {
       return;
     }
-    const fetchItems = async () => {
-      try {
-        const itemService = new ItemService();
-        const data = await itemService.findByField("userId", user.id);
 
-        const groupByCreatedAt=(array: any[]): any[] => {
-          const groupedMap: { [key: string]: any[] } = {};
-          array.forEach(item => {
-            if(!item.createdAt) {
-              item.createdAt = new Date();
-            }
-
-            if (!groupedMap[new Date(item.createdAt).toLocaleDateString()]) {
-              groupedMap[new Date(item.createdAt).toLocaleDateString()] = [];
-            }
-            groupedMap[`${new Date(item.createdAt).toLocaleDateString()}`].push({ ...item });
-          });
-        
-          return Object.keys(groupedMap).map(createdAt => ({
-            createdAt,
-            data: groupedMap[createdAt],
-          }));
-        }
-
-        if(data.length > 0) {
-          setItems(groupByCreatedAt(data));
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
 
     const fetchTags = async () => {
       try {
@@ -64,8 +34,42 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
       }
     }
     fetchTags();
-    fetchItems();
   }, [user]);
+
+  const groupByCreatedAt=(array: any[]): any[] => {
+    const groupedMap: { [key: string]: any[] } = {};
+    
+    array.forEach(item => {      
+      if(!item.createdAt) {
+        item.createdAt = new Date();
+      }
+
+      if (!groupedMap[new Date(item.createdAt).toLocaleDateString()]) {
+        groupedMap[new Date(item.createdAt).toLocaleDateString()] = [];
+      }
+      groupedMap[`${new Date(item.createdAt).toLocaleDateString()}`].push({ ...item });
+    });
+  
+    return Object.keys(groupedMap).map(createdAt => ({
+      createdAt,
+      data: groupedMap[createdAt],
+    }));
+  }
+
+  useEffect(() => {
+    if(!user) {
+      return;
+    }
+    const unsubscribe = () => {
+      const itemService = new ItemService();
+      itemService.onDocumentChange(user.id, (data: any) => {  
+         setItems(groupByCreatedAt([...data]));
+      })
+     }
+    return unsubscribe();
+  }, [user]);
+
+  
 
   const createTag = async (name: string) => {
 

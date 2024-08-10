@@ -5,6 +5,8 @@ import {
   import { createContext, useContext, useEffect, useState } from "react";
   import { auth } from "../firebase";
   import { UserService } from "../services/UserService";
+import Echo from "../plugins/Echo";
+import { Capacitor } from "@capacitor/core";
   
   type AuthContextProviderProps = {
     children: React.ReactNode;
@@ -46,9 +48,25 @@ import {
                   ...(userDoc.exists() ? userDoc.data() : {}),
                 });
                 setAuthenticated(true);
+
+                if( Capacitor.getPlatform() === 'ios') {
+                  
+                    const savedUserId = await Echo.readFromKeyChain({key: 'uid'})
+
+                    if(savedUserId.value !== user.uid) {
+                        Echo.saveToKeyChain({key: 'uid', value: user.uid})
+                    }
+
+                }
+
               }else {
                 setUser(null);
+
                 setAuthenticated(false);
+
+                if( Capacitor.getPlatform() === 'ios') {
+                    Echo.deleteFromKeyChain({key: 'uid'})
+                }
               }
             } catch (error) {
               setUser(null);

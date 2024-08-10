@@ -8,6 +8,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   serverTimestamp,
   setDoc,
@@ -110,20 +111,24 @@ export class FirebaseAbstract {
     }
   }
 
+  public async onDocumentChange(userId: string ,callback: any) {
+    const q = query(collection(db, this.collection), where("userId", "==", userId));
+    return onSnapshot(q, (querySnapshot) => {
+      const dataArray = this.querySnapshotToArray(querySnapshot);
+      callback(dataArray);
+    });
+  }
+
   private querySnapshotToArray(querySnapshot: any) {
     const dataArray: any[] = [];
     querySnapshot.forEach((doc: any) => {
-      const { createdAt, updatedAt, ...rest } = doc.data();
-      const times: any = {};
-      if (createdAt) {
-        times.createdAt = createdAt.toDate().toString();
-      }
-      if (updatedAt) {
-        times.updatedAt = updatedAt.toDate().toString();
-      }
+      
+      const { createdAt, updatedAt } = doc.data();
+   
       dataArray.push({
-        ...rest,
-        ...times,
+        ...doc.data(),
+        createdAt: !createdAt ? null : createdAt?.toDate().toString(),
+        updatedAt: !updatedAt ? null : updatedAt?.toDate().toString(),
         id: doc.id,
       });
     });
