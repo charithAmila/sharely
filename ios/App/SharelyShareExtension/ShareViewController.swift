@@ -44,7 +44,8 @@ class ShareViewController: SLComposeServiceViewController {
         for (typeIdentifier, handler) in contentTypes {
             if itemProvider.hasItemConformingToTypeIdentifier(typeIdentifier) {
                 itemProvider.loadItem(forTypeIdentifier: typeIdentifier, options: nil) { (item, error) in
-                    if error != nil {
+                    if let error = error {
+                        print("Error loading item of type \(typeIdentifier): \(error)")
                         self.close()
                         return
                     }
@@ -90,39 +91,74 @@ class ShareViewController: SLComposeServiceViewController {
     
     private func handleText(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
         itemProvider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { (item, error) in
-            completion(item as? String)
+            if let error = error {
+                print("Error loading text: \(error)")
+                completion(nil)
+            } else {
+                completion(item as? String)
+            }
         }
     }
     
     private func handleImage(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
         itemProvider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { (item, error) in
-            if let url = item as? URL {
-                completion(url)
-            } else {
+            if let error = error {
+                print("Error loading image: \(error)")
                 completion(nil)
+            } else {
+                print("Loaded item type: \(type(of: item))")
+                if let url = item as? URL {
+                    completion(url)
+                } else if let data = item as? Data {
+                    completion(data) // You can convert Data to UIImage if needed
+                } else if let image = item as? UIImage {
+                    completion(image)
+                } else {
+                    print("Unexpected item type: \(String(describing: item))")
+                    completion(nil)
+                }
             }
         }
     }
     
     private func handleURL(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
         itemProvider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { (item, error) in
-            completion(item as? URL)
+            if let error = error {
+                print("Error loading URL: \(error)")
+                completion(nil)
+            } else {
+                completion(item as? URL)
+            }
         }
     }
     
     private func handleVideo(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
         itemProvider.loadItem(forTypeIdentifier: UTType.movie.identifier, options: nil) { (item, error) in
-            if let url = item as? URL {
-                completion(url)
-            } else {
+            if let error = error {
+                print("Error loading video: \(error)")
                 completion(nil)
+            } else {
+                print("Loaded item type: \(type(of: item))")
+                if let url = item as? URL {
+                    completion(url)
+                } else if let data = item as? Data {
+                    completion(data) // You can convert Data to URL or other media types
+                } else {
+                    print("Unexpected item type: \(String(describing: item))")
+                    completion(nil)
+                }
             }
         }
     }
     
     private func presentContent(typeIdentifier: String, content: Any?) {
+        if self.userId == nil {
+            self.userId = getAuthUidFromKeychain()
+            self.isUserAuthenticated = true
+        }
+        
         var view: ShareExtensionView
-        if isUserAuthenticated {
+        if self.isUserAuthenticated {
             switch typeIdentifier {
             case UTType.plainText.identifier:
                 view = ShareExtensionView(contentType: .text(content as? String ?? ""), onSave: self.saveToFirestore, isUserAuthenticated: true, userId: self.userId ?? "")
@@ -153,7 +189,7 @@ class ShareViewController: SLComposeServiceViewController {
     }
     
     func retrieveAuthStateAndReauthenticate() {
-        // This moment token is user uid. I will implement proper authentication macanism later
+        // This moment token is user uid. I will implement proper authentication mechanism later
         guard let uid = getAuthUidFromKeychain() else {
             print("No auth token found")
             return
@@ -191,3 +227,4 @@ class ShareViewController: SLComposeServiceViewController {
         return uid
     }
 }
+

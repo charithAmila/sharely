@@ -118,16 +118,56 @@ struct ShareExtensionView: View {
 
         var body: some View {
             HStack {
-                TextField("Search tags", text: $text)
+                CustomTextField(text: $text, placeholder: "Search tags")
                     .padding(7)
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
                     .padding(.horizontal, 10)
+                    .frame(height: 40) // Set a specific height
             }
             .padding(.top, 10)
         }
     }
 
+    struct CustomTextField: UIViewRepresentable {
+        @Binding var text: String
+        var placeholder: String
+
+        class Coordinator: NSObject, UITextFieldDelegate {
+            @Binding var text: String
+
+            init(text: Binding<String>) {
+                _text = text
+            }
+
+            func textFieldDidChangeSelection(_ textField: UITextField) {
+                text = textField.text ?? ""
+            }
+        }
+
+        func makeCoordinator() -> Coordinator {
+            return Coordinator(text: $text)
+        }
+
+        func makeUIView(context: Context) -> UITextField {
+            let textField = UITextField()
+            textField.placeholder = placeholder
+            textField.delegate = context.coordinator
+            textField.returnKeyType = .done
+            
+            // Set the size constraints
+            textField.translatesAutoresizingMaskIntoConstraints = false
+            NSLayoutConstraint.activate([
+                textField.heightAnchor.constraint(equalToConstant: 40) // Set a specific height
+            ])
+            
+            return textField
+        }
+
+        func updateUIView(_ uiView: UITextField, context: Context) {
+            uiView.text = text
+        }
+    }
     
     var filteredTags: [UserTag] {
         if searchText.isEmpty {

@@ -2,10 +2,10 @@ import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, 
 import React, { useEffect, useState } from 'react';
 
 interface Metadata {
-  title: string;
-  description: string;
-  image: string;
-  url: string;
+  title?: string;
+  description?: string;
+  image?: string;
+  url?: string;
 }
 
 interface LinkPreviewProps {
@@ -17,8 +17,32 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
   const [metadata, setMetadata] = useState<Metadata | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [contentType, setContentType] = useState<"text" | "url" | null>(null);
+
+  function isValidURL(string: string) {
+    const regex = /^(https?:\/\/)?([\w-]+(\.[\w-]+)+\.?(:\d+)?(\/.*)?)$/;
+    return regex.test(string);
+  }
 
   useEffect(() => {
+
+    let url = item.url;
+
+    setContentType('url');
+
+    if(!item.url && item.content && isValidURL(item.content)) {
+      url = item.content;
+    }
+
+    if(!url) {
+      setMetadata({
+        description: item.content
+      })
+      setLoading(false);
+      setContentType('text');
+      return;
+    }
+    
     const fetchMetadata = async () => {
       try {
         const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(item.url)}`);
@@ -40,7 +64,7 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
     };
 
     fetchMetadata();
-  }, [item.url]);
+  }, [item]);
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
@@ -61,9 +85,9 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
               <IonCardSubtitle>{metadata.title}</IonCardSubtitle>
             </IonCardHeader>
             <IonCardContent>
-              { truncateText(metadata.description, 100) }
+              { metadata.description && truncateText(metadata.description, 100) }
               <div className='flex gap-2 justify-content-start pt-10 flex-wrap'>
-                {(item.tags || []).map((tag: string) => <IonChip color={ selectedTags.find(t => t.name === tag) ? "warning" : "primary"}>{tag}</IonChip>)}
+                {(item.tags || []).map((tag: string) => <IonChip key={tag} color={ selectedTags.find(t => t.name === tag) ? "warning" : "primary"}>{tag}</IonChip>)}
               </div>
               <a href={metadata.url} target="_blank" rel="noopener noreferrer">Visit Site</a> 
             </IonCardContent>

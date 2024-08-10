@@ -7,16 +7,16 @@ type AppContextProviderProps = {
     user: AuthUser | null;
 };
 type ContextProps = {
-    items : any[]
-    tags: {id: string, name: string}[]
+    items : GroupedSharedItem[]
+    tags: Tag[]
     createTag: (name: string) => Promise<void>;
   };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
 
 const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
-  const [items, setItems] = useState<any[]>([]);
-  const [tags, setTags] = useState<{ id: string, name: string }[]>([]);
+  const [items, setItems] = useState<GroupedSharedItem[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
 
   useEffect(() => {
     if(!user) {
@@ -36,14 +36,10 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     fetchTags();
   }, [user]);
 
-  const groupByCreatedAt=(array: any[]): any[] => {
-    const groupedMap: { [key: string]: any[] } = {};
+  const groupByCreatedAt=(array: SharedItem[]): GroupedSharedItem[] => {
+    const groupedMap: { [key: string]: SharedItem[] } = {};
     
-    array.forEach(item => {      
-      if(!item.createdAt) {
-        item.createdAt = new Date();
-      }
-
+    array.forEach((item : SharedItem) => {      
       if (!groupedMap[new Date(item.createdAt).toLocaleDateString()]) {
         groupedMap[new Date(item.createdAt).toLocaleDateString()] = [];
       }

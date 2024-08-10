@@ -15,31 +15,15 @@ import {
 import LinkPreview from "../components/LinkPreview";
 import { useAppContext } from "../context/MainContext";
 import { add, filter } from "ionicons/icons";
-import { useMemo, useRef, useState } from "react";
+import { Fragment, useMemo, useRef, useState } from "react";
+import { months } from "../utils/constant";
 
-const Home: React.FC = () => {
+const Home = () => {
   const { items, tags } = useAppContext();
 
   const modal = useRef<HTMLIonModalElement>(null);
 
-  const [selectedTags, setSelectedTags] = useState<
-    { id: string; name: string }[]
-  >([]);
-
-  const months = [
-    "Jan",
-    "Feb",
-    "Mar",
-    "Apr",
-    "May",
-    "Jun",
-    "Jul",
-    "Aug",
-    "Sep",
-    "Oct",
-    "Nov",
-    "Dec",
-  ];
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   const listArray = useMemo(() => {
     if (!selectedTags || selectedTags.length === 0) {
@@ -52,7 +36,7 @@ const Home: React.FC = () => {
       ...item,
       data: item.data.filter((dataItem: any) =>
         (dataItem.tags || []).some((tag: any) => selectedTagNames.includes(tag))
-      ),
+      ).sort((a: SharedItem, b: SharedItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
     })).filter(item => item.data.length > 0);
   
   }, [items, selectedTags]);
@@ -80,7 +64,7 @@ const Home: React.FC = () => {
         </div>
         {listArray &&
           listArray.map((item, index) => (
-            <>
+            <Fragment key={index}>
               <div className="flex">
                 <div
                   className="w-2 flex justify-content-center"
@@ -108,13 +92,13 @@ const Home: React.FC = () => {
                 <div className="w-10">
                   {item.data.map((_d: any) => (
                     <div key={_d.id} className="w-full">
-                      {_d.url && <LinkPreview selectedTags={selectedTags} item={_d} />}
+                       <LinkPreview selectedTags={selectedTags} item={_d} />
                     </div>
                   ))}
                 </div>
               </div>
               { index < listArray.length - 1 && <IonItemDivider />}
-            </>
+            </Fragment>
           ))}
         <IonModal
           ref={modal}
