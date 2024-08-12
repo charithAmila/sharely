@@ -8,7 +8,9 @@ import {
   IonSkeletonText,
   IonThumbnail,
   IonAvatar,
+  IonIcon,
 } from "@ionic/react";
+import { linkOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 
 interface Metadata {
@@ -24,9 +26,6 @@ interface LinkPreviewProps {
 }
 
 const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-  const [contentType, setContentType] = useState<"text" | "url" | null>(null);
 
   const { metadata } = item;
 
@@ -48,18 +47,6 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
       </div>
     );
   }
-
-  if (contentType === "text") {
-    return (
-      <IonCard>
-        <IonCardContent>
-          {truncateText(item.content || "", 1000)}
-        </IonCardContent>
-      </IonCard>
-    );
-  }
-
-  console.log("metadata", metadata);
 
   return (
     <>
@@ -103,15 +90,13 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
                 ))}
               </div>
               <div className="flex justify-content-end">
-                {contentType === "url" && (
                   <a
                     href={metadata.url}
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Visit Site
+                    <IonIcon icon={linkOutline} />
                   </a>
-                )}
               </div>
             </IonCardContent>
           </IonCard>
