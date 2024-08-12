@@ -40,6 +40,14 @@ const Home = () => {
     })).filter(item => item.data.length > 0);
   
   }, [items, selectedTags]);
+
+  const onClickTag = (tag: Tag) => {
+    setSelectedTags(
+      selectedTags.map((t) => t.id).includes(tag.id)
+        ? selectedTags.filter((t) => t.id !== tag.id)
+        : [...selectedTags, tag]
+    )
+  };
   
   return (
     <IonPage>
@@ -117,13 +125,7 @@ const Home = () => {
                       ? "solid"
                       : "outline"
                   }
-                  onClick={() =>
-                    setSelectedTags(
-                      selectedTags.map((t) => t.id).includes(tag.id)
-                        ? selectedTags.filter((t) => t.id !== tag.id)
-                        : [...selectedTags, tag]
-                    )
-                  }
+                  onClick={() => onClickTag(tag)}
                 >
                   {tag.name}
                 </IonButton>

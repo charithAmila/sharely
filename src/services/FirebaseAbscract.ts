@@ -9,6 +9,7 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
+  orderBy,
   query,
   serverTimestamp,
   setDoc,
@@ -112,7 +113,7 @@ export class FirebaseAbstract {
   }
 
   public async onDocumentChange(userId: string ,callback: any) {
-    const q = query(collection(db, this.collection), where("userId", "==", userId));
+    const q = query(collection(db, this.collection), where("userId", "==", userId), orderBy("createdAt", "desc"));
     return onSnapshot(q, (querySnapshot) => {
       const dataArray = this.querySnapshotToArray(querySnapshot);
       callback(dataArray);

@@ -1,9 +1,10 @@
 import { SignInWithApple, SignInWithAppleOptions, SignInWithAppleResponse } from "@capacitor-community/apple-sign-in";
 import { IonButton, IonIcon } from "@ionic/react";
 import { logoApple } from "ionicons/icons";
-import { appleSignIn } from "../firebase";
+import { useAuthContext } from "../context/AuthContext";
 
 const AppleLogin = () => {
+  const { appleSignIn } = useAuthContext();
     const signIn = () => {
         let options: SignInWithAppleOptions = {
           clientId: 'io.sharely.app',

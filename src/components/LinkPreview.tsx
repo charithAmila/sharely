@@ -1,5 +1,15 @@
-import { IonCard, IonCardHeader, IonCardTitle, IonCardSubtitle, IonCardContent, IonChip } from '@ionic/react';
-import React, { useEffect, useState } from 'react';
+import {
+  IonCard,
+  IonCardHeader,
+  IonCardTitle,
+  IonCardSubtitle,
+  IonCardContent,
+  IonChip,
+  IonSkeletonText,
+  IonThumbnail,
+  IonAvatar,
+} from "@ionic/react";
+import React, { useEffect, useState } from "react";
 
 interface Metadata {
   title?: string;
@@ -10,86 +20,99 @@ interface Metadata {
 
 interface LinkPreviewProps {
   item: any;
-  selectedTags: {id: string, name: string}[];
+  selectedTags: { id: string; name: string }[];
 }
 
 const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
-  const [metadata, setMetadata] = useState<Metadata | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [contentType, setContentType] = useState<"text" | "url" | null>(null);
 
-  function isValidURL(string: string) {
-    const regex = /^(https?:\/\/)?([\w-]+(\.[\w-]+)+\.?(:\d+)?(\/.*)?)$/;
-    return regex.test(string);
-  }
-
-  useEffect(() => {
-
-    let url = item.url;
-
-    setContentType('url');
-
-    if(!item.url && item.content && isValidURL(item.content)) {
-      url = item.content;
-    }
-
-    if(!url) {
-      setMetadata({
-        description: item.content
-      })
-      setLoading(false);
-      setContentType('text');
-      return;
-    }
-    
-    const fetchMetadata = async () => {
-      try {
-        const response = await fetch(`https://api.microlink.io?url=${encodeURIComponent(item.url)}`);
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setMetadata({
-          title: data.data.title,
-          description: data.data.description,
-          image: data.data.image?.url,
-          url: data.data.url
-        });
-      } catch (error) {
-        setError('Failed to fetch metadata');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMetadata();
-  }, [item]);
+  const { metadata } = item;
 
   const truncateText = (text: string, maxLength: number) => {
     if (text.length > maxLength) {
-      return text.slice(0, maxLength) + '...';
+      return text.slice(0, maxLength) + "...";
     }
     return text;
+  };
+
+  if (!metadata) {
+    return (
+      <div className="ion-padding w-full">
+        <IonSkeletonText
+          className="w-full"
+          style={{ height: "200px" }}
+          animated={true}
+        ></IonSkeletonText>
+      </div>
+    );
   }
+
+  if (contentType === "text") {
+    return (
+      <IonCard>
+        <IonCardContent>
+          {truncateText(item.content || "", 1000)}
+        </IonCardContent>
+      </IonCard>
+    );
+  }
+
+  console.log("metadata", metadata);
 
   return (
     <>
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
       {metadata && (
         <>
           <IonCard>
-          {metadata.image && <img src={metadata.image} alt="Preview" />}
+            {metadata.image && (
+              <img
+                src={metadata?.image?.url}
+                style={{ maxHeight: "300px", width: "100%" }}
+                alt="Preview"
+              />
+            )}
             <IonCardHeader>
+              <div className="flex gap-4 align-items-center">
+              {metadata.logo && (
+                <IonAvatar style={{ width: "30px", height: "30px" }}>
+                  <img
+                    alt="Silhouette of a person's head"
+                    src={metadata.logo.url}
+                  />
+                </IonAvatar>
+              )}
               <IonCardSubtitle>{metadata.title}</IonCardSubtitle>
+              </div>
             </IonCardHeader>
             <IonCardContent>
-              { metadata.description && truncateText(metadata.description, 100) }
-              <div className='flex gap-2 justify-content-start pt-10 flex-wrap'>
-                {(item.tags || []).map((tag: string) => <IonChip key={tag} color={ selectedTags.find(t => t.name === tag) ? "warning" : "primary"}>{tag}</IonChip>)}
+              {metadata.description && truncateText(metadata.description, 100)}
+              <div className="flex gap-2 justify-content-start pt-10 flex-wrap">
+                {(item.tags || []).map((tag: string) => (
+                  <IonChip
+                    key={tag}
+                    color={
+                      selectedTags.find((t) => t.name === tag)
+                        ? "warning"
+                        : "primary"
+                    }
+                  >
+                    {tag}
+                  </IonChip>
+                ))}
               </div>
-              <a href={metadata.url} target="_blank" rel="noopener noreferrer">Visit Site</a> 
+              <div className="flex justify-content-end">
+                {contentType === "url" && (
+                  <a
+                    href={metadata.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Visit Site
+                  </a>
+                )}
+              </div>
             </IonCardContent>
           </IonCard>
         </>
