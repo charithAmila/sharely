@@ -13,7 +13,7 @@ class UserTagsViewModel: ObservableObject {
     }
     
     func fetchTags() {
-        db.collection("users").document(userId).collection("tags").getDocuments { (querySnapshot, error) in
+        db.collection("tags").whereField("userId", isEqualTo: userId).getDocuments { (querySnapshot, error) in
             guard let documents = querySnapshot?.documents else {
                 print("No documents")
                 self.tags = [UserTag(id: "untitled", name: "Untitled")]

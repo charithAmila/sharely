@@ -101,16 +101,16 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
             <IonCardContent>
               {metadata.description && truncateText(metadata.description, 100)}
               <div className="flex gap-2 justify-content-start pt-10 flex-wrap">
-                {(item.tags || []).map((tag: string) => (
+                {(item.tags || []).map((tag: Tag) => (
                   <IonChip
-                    key={tag}
+                    key={tag.id}
                     color={
-                      selectedTags.find((t) => t.name === tag)
+                      selectedTags.find((t) => t.id === tag.id)
                         ? "warning"
                         : "primary"
                     }
                   >
-                    {tag}
+                    {tag.name}
                   </IonChip>
                 ))}
               </div>

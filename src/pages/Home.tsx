@@ -56,6 +56,7 @@ const Home = () => {
   
   }, [items, selectedTags]);
 
+
   const onClickTag = (tag: Tag) => {
     setSelectedTags(
       selectedTags.map((t) => t.id).includes(tag.id)

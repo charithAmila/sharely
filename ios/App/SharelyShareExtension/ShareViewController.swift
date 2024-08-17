@@ -157,6 +157,8 @@ class ShareViewController: SLComposeServiceViewController {
             self.isUserAuthenticated = true
         }
         
+        print("content", content as Any)
+        
         var view: ShareExtensionView
         if self.isUserAuthenticated {
             switch typeIdentifier {

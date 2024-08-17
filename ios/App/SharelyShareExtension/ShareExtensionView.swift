@@ -67,7 +67,7 @@ struct ShareExtensionView: View {
                                 data["videoPath"] = url.path
                             }
                     }
-                    data["tags"] = selectedTags.map { $0.name }
+                    data["tags"] = selectedTags.map { ["name": $0.name, "id": $0.id] }
                     self.onSave(data)
                 }) {
                     Text("Share")

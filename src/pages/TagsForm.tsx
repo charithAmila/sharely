@@ -32,11 +32,6 @@ const TagsForm = () => {
         
     }
 
-    console.log('+++ canGoBack', canGoBack());
-    console.log('+++ canGoBack', canGoBack);
-    
-    
-
     return (
         <IonPage>
             <IonHeader>
