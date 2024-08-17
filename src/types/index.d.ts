@@ -6,9 +6,19 @@ type AuthUser = {
     updatedAt?: string;
 };
 
+type ShareUser = {
+    id: string;
+    name: string;
+    type: "author" | "contributor";
+}
+
 type Tag = {
     id: string;
     name: string;
+    userId: string;
+    sharedWith?: ShareUser[];
+    createdAt?: string;
+    updatedAt?: string;
 };
 
 type SharedItem = {
@@ -17,7 +27,7 @@ type SharedItem = {
     updatedAt?: string;
     url?: string;
     content?: string;
-    tags: Tag[];
+    tags: {id: string, name: string}[];
     userId: string;
 }
 

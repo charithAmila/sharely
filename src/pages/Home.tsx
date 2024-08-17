@@ -25,18 +25,33 @@ const Home = () => {
 
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
+  const itemFilterByTags = (item: SharedItem) => {
+    
+    const selectedTagIds = selectedTags.map(tag => tag.id);
+    const itemTagIds = item.tags.map(tag => tag.id);
+
+    if (selectedTagIds.length === 0) {
+      return true;
+    }
+    
+    // Compare item tags with selected tags
+    if (!itemTagIds.some(tagId => selectedTagIds.includes(tagId))) {
+      return false;
+    }
+
+    return true
+  }
+
   const listArray = useMemo(() => {
     if (!selectedTags || selectedTags.length === 0) {
       return items; // Return all items if no tags are selected
     }
   
-    const selectedTagNames = selectedTags.map(tag => tag.name);
+    const selectedTagIds: string[] = selectedTags.map(tag => tag.id);
   
-    return items.map(item => ({
+    return items.map((item: GroupedSharedItem) => ({
       ...item,
-      data: item.data.filter((dataItem: any) =>
-        (dataItem.tags || []).some((tag: any) => selectedTagNames.includes(tag))
-      ).sort((a: SharedItem, b: SharedItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
+      data: item.data.filter(itemFilterByTags).sort((a: SharedItem, b: SharedItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
     })).filter(item => item.data.length > 0);
   
   }, [items, selectedTags]);
@@ -116,10 +131,11 @@ const Home = () => {
         >
           <div className="h-50vh ion-padding">
             {tags.length > 0 ? (
-              tags.map((tag: { id: string; name: string }) => (
+              tags.map((tag: Tag) => (
                 <IonButton
                   key={tag.id}
                   shape="round"
+                  size="default"
                   fill={
                     selectedTags.map((t) => t.id).includes(tag.id)
                       ? "solid"
@@ -138,7 +154,7 @@ const Home = () => {
                     expand="full"
                     shape="round"
                     fill="outline"
-                    routerLink="/add-tags"
+                    routerLink="/tags"
                   >
                     Add Tags
                   </IonButton>
@@ -147,7 +163,7 @@ const Home = () => {
               </>
             )}
           </div>
-          { tags.length > 0 && <IonButton fill="clear" routerLink="/add-tags">
+          { tags.length > 0 && <IonButton fill="clear" routerLink="/tags-form">
             <IonIcon icon={add}></IonIcon>
             Add Tags
           </IonButton>}

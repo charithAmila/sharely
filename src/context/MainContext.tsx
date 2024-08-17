@@ -26,8 +26,8 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
 
     const fetchTags = async () => {
       try {
-        const tag = new TagService(user.id);
-        const data = await tag.all();
+        const tag = new TagService();
+        const data = await tag.findByField("userId", user.id);
         setTags(data);
       } catch (error) {
         console.error(error);
@@ -58,7 +58,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     }
     const unsubscribe = () => {
       const itemService = new ItemService();
-      itemService.onDocumentChange(user.id, (data: any) => {  
+      itemService.onDocumentChange(user.id, (data: SharedItem[]) => {  
          setItems(groupByCreatedAt([...data]));
       })
      }
@@ -73,13 +73,23 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
       return;
     }
 
-    const tag = new TagService(user.id);
-    const data = await tag.create({ name });
+    const tag = new TagService();
 
-    data.id && setTags([...tags, {
-      id: data.id,
-      name
-    }]);
+    const newTag: Omit<Tag, "id"> = {
+      name,
+      userId: user.id,
+      sharedWith: [
+        {
+          id: user.id,
+          name: user.name,
+          type: "author"
+        }
+      ]
+    }
+
+    const data = await tag.create(newTag);
+
+    data.id && setTags([{...newTag, id: data.id},...tags]);
 
   }
 

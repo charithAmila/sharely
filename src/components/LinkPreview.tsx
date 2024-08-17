@@ -9,6 +9,7 @@ import {
   IonThumbnail,
   IonAvatar,
   IonIcon,
+  IonText,
 } from "@ionic/react";
 import { linkOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
@@ -37,13 +38,37 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
   };
 
   if (!metadata) {
+    if(item.content){
+      return (
+        <IonCard>
+          <div className="ion-padding">
+            <IonText>{truncateText(item.content, 100)}</IonText>
+          </div>
+          <div className="flex gap-2 justify-content-start pt-10 flex-wrap">
+              {(item.tags || []).map((tag: string) => (
+                <IonChip
+                  key={tag}
+                  color={
+                    selectedTags.find((t) => t.name === tag)
+                      ? "warning"
+                      : "primary"
+                  }
+                >
+                  {tag}
+                </IonChip>
+              ))}
+            </div>
+        </IonCard>
+      )
+    }
+    
     return (
       <div className="ion-padding w-full">
         <IonSkeletonText
           className="w-full"
           style={{ height: "200px" }}
           animated={true}
-        ></IonSkeletonText>
+        />
       </div>
     );
   }
@@ -70,7 +95,7 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
                   />
                 </IonAvatar>
               )}
-              <IonCardSubtitle>{metadata.title}</IonCardSubtitle>
+              <IonCardSubtitle>{truncateText(metadata.title, 25)}</IonCardSubtitle>
               </div>
             </IonCardHeader>
             <IonCardContent>

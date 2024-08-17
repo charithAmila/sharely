@@ -62,7 +62,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
               setUser({
                 ...authUser,
                 ...(userDoc.exists() ? userDoc.data() : {}),
-                id: user.uid,
+                id: "z5Ky1P4Es9QDQ563oBzHWTKpg2p1" //user.uid,
               });
               setAuthenticated(true);
 
