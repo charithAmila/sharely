@@ -36,7 +36,7 @@ const ItemDetail = () => {
             icon: createOutline,
             label: note.trim().length > 0 ? 'Update Note' : 'Write a Note',
             onClick: () => {
-                setModalType('note'); 
+                setModalType('note');
                 setIsOpen(true)
             }
         },
@@ -100,35 +100,35 @@ const ItemDetail = () => {
 
         let url = '';
 
-        if(!item) {
+        if (!item) {
             return null;
         }
-    
-        if (item.url && isUrl(item.url)) {
-          url = item.url;
-        } else if (item.content && isUrl(item.content)) {
-          url = item.content;
-        }
-    
-        if(!url) {
-          return null;
-        }
-    
-    
-        return (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            ref={linkRef}
-            style={{ display: 'none' }}
-          >
-            
-          </a>
-        )
-      }
 
-    
+        if (item.url && isUrl(item.url)) {
+            url = item.url;
+        } else if (item.content && isUrl(item.content)) {
+            url = item.content;
+        }
+
+        if (!url) {
+            return null;
+        }
+
+
+        return (
+            <a
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                ref={linkRef}
+                style={{ display: 'none' }}
+            >
+
+            </a>
+        )
+    }
+
+
 
     return (
         <IonPage>
@@ -143,7 +143,7 @@ const ItemDetail = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent scrollY={true}>
-                { item?.metadata?.image && <div className="p-10 bg-light">
+                {item?.metadata?.image && <div className="p-10 bg-light">
                     <IonImg className="h-30vh" src={item?.metadata?.image.url} />
                 </div>}
                 <div className="flex ion-padding flex-column gap-4">
@@ -195,44 +195,46 @@ const ItemDetail = () => {
                         </IonText>
                     </div>
                 </div>
-                <IonList>
-                    {menu.map((item) => (
-                        <IonItem key={item.label} onClick={item.onClick || (() => { })} button>
-                            <IonIcon slot="start" icon={item.icon} />
-                            <IonLabel>
-                                {item.label}
-                            </IonLabel>
-                        </IonItem>
-                    ))}
-                </IonList>
-                {item?.note && <div className="ion-padding bg-light">
-                    <IonText color="dark">
-                        <h1>Note</h1>
-                    </IonText>
-                    <IonText>
-                        {item?.note}
-                    </IonText>
-                </div>}
+                <div className="flex flex-column gap-5">
+                    <IonList>
+                        {menu.map((item) => (
+                            <IonItem key={item.label} onClick={item.onClick || (() => { })} button>
+                                <IonIcon slot="start" icon={item.icon} />
+                                <IonLabel>
+                                    {item.label}
+                                </IonLabel>
+                            </IonItem>
+                        ))}
+                    </IonList>
 
+                    {item?.note && <div className="ion-padding bg-light">
+                        <IonText color="dark">
+                            <h1>Note</h1>
+                        </IonText>
+                        <IonText>
+                            {item?.note}
+                        </IonText>
+                    </div>}
+                </div>
             </IonContent>
             <IonModal isOpen={isOpen}>
-                    {
-                        modalType === 'note' ? (
-                            <NoteForm
-                                onClickSave={onClickSave}
-                                setIsOpen={setIsOpen}
-                                note={note}
-                                setNote={setNote}
-                            />
-                        ) : (
-                            <TagSelector
-                                id={id}
-                                selectedTags={item?.tags || []}
-                                title="Manage Tags"
-                                setIsOpen={setIsOpen}
-                            />
-                        )
-                    }
+                {
+                    modalType === 'note' ? (
+                        <NoteForm
+                            onClickSave={onClickSave}
+                            setIsOpen={setIsOpen}
+                            note={note}
+                            setNote={setNote}
+                        />
+                    ) : (
+                        <TagSelector
+                            id={id}
+                            selectedTags={item?.tags || []}
+                            title="Manage Tags"
+                            setIsOpen={setIsOpen}
+                        />
+                    )
+                }
             </IonModal>
         </IonPage>
     )
