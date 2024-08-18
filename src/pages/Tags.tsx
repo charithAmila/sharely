@@ -47,7 +47,7 @@ const Tags = () => {
                         showForm === true && (
                             <>
                                 <IonItem>
-                                    <IonInput label="Tag Name" placeholder="Enter Tag Name" value={tagName} onIonChange={(e) => e.detail.value && setTagName(e.detail.value)} />
+                                    <IonInput label="Tag Name" placeholder="Enter Tag Name" value={tagName} onIonInput={(e) => e.detail.value && setTagName(e.detail.value)} />
                                     <IonButton 
                                         shape="round" 
                                         color={'danger'} 

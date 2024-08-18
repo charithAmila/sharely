@@ -84,7 +84,7 @@ import AppleLogin from "../components/AppleLogin";
                   <IonInput
                     label={`Email ${!!errors.email ? `(${errors.email.message})` : ""}`}
                     onBlur={onBlur}
-                    onIonChange={onChange}
+                    onIonInput={onChange}
                     value={value}
                     type="email"
                     labelPlacement="stacked" 
@@ -105,7 +105,7 @@ import AppleLogin from "../components/AppleLogin";
                         type="password" 
                         label={`Password ${!!errors.password ? `(${errors.password.message})` : ""}`} 
                         labelPlacement="stacked" 
-                        onIonChange={onChange} 
+                        onIonInput={onChange} 
                         onBlur={onBlur}
                         value={value}
                       >

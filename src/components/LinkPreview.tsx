@@ -13,8 +13,7 @@ import {
   IonButton,
 } from "@ionic/react";
 import { linkOutline } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
-import { truncateText } from "../helpers";
+import { isUrl, truncateText } from "../helpers";
 
 interface Metadata {
   title?: string;
@@ -54,6 +53,33 @@ const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps)
     )
   }
 
+  const renderLink = () => {
+
+    let url = '';
+
+    if (item.url && isUrl(item.url)) {
+      url = item.url;
+    } else if (item.content && isUrl(item.content)) {
+      url = item.content;
+    }
+
+    if(!url) {
+      return null;
+    }
+
+
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex align-items-center"
+      >
+        <IonIcon icon={linkOutline} />
+      </a>
+    )
+  }
+
   if (!metadata) {
     if (item.content) {
       return (
@@ -64,6 +90,7 @@ const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps)
           <div className="flex gap-2 justify-content-start pt-10 flex-wrap">
             {renderChips()}
           </div>
+          {renderLink()}
         </IonCard>
       )
     }
@@ -111,13 +138,7 @@ const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps)
               </div>
               <div className="flex justify-content-end align-items-center">
                 <IonButton fill="clear" size="small"  routerLink={`item/${item.id}`}>Read</IonButton>
-                <a
-                  href={metadata.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <IonIcon icon={linkOutline} />
-                </a>
+                {renderLink()}
               </div>
             </IonCardContent>
           </IonCard>

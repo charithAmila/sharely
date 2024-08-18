@@ -2,6 +2,7 @@ import { IonButton, IonText, IonIcon, IonItem, IonInput, useIonToast } from "@io
 import { add, checkmark, remove } from "ionicons/icons";
 import { useState } from "react";
 import { useAppContext } from "../context/MainContext";
+import TagList from "./TagList";
 
 type Props = {
     tags: Tag[];
@@ -13,7 +14,7 @@ const TagsFitler = ({ tags, selectedTags, onClickTag }: Props) => {
     const [showForm, setShowForm] = useState(false);
     const [tagName, setTagName] = useState('');
     const { createTag } = useAppContext();
-    const [ present ] = useIonToast();
+    const [present] = useIonToast();
 
     const onClickDone = () => {
         if (tagName.trim().length > 0) {
@@ -44,10 +45,10 @@ const TagsFitler = ({ tags, selectedTags, onClickTag }: Props) => {
                         <IonItem>
                             <IonInput
                                 slot="start"
-                                label="Tag Name"
+                                // label="Tag Name"
                                 placeholder="Enter Tag Name"
                                 value={tagName}
-                                onIonChange={(e) => e.detail.value && setTagName(e.detail.value)}
+                                onIonInput={(e) => e.detail.value && setTagName(e.detail.value)}
                             />
                             <IonButton
                                 shape="round"
@@ -63,21 +64,7 @@ const TagsFitler = ({ tags, selectedTags, onClickTag }: Props) => {
                 ) :
                     <>
                         {tags.length > 0 ? (
-                            tags.map((tag: Tag) => (
-                                <IonButton
-                                    key={tag.id}
-                                    shape="round"
-                                    size="default"
-                                    fill={
-                                        selectedTags.map((t) => t.id).includes(tag.id)
-                                            ? "solid"
-                                            : "outline"
-                                    }
-                                    onClick={() => onClickTag(tag)}
-                                >
-                                    {tag.name}
-                                </IonButton>
-                            ))
+                            <TagList selectedTags={selectedTags} onClickTag={onClickTag} />
                         ) : (
                             <>
                                 <div className="flex flex-column gap-4">
@@ -105,7 +92,6 @@ const TagsFitler = ({ tags, selectedTags, onClickTag }: Props) => {
             </> : <>
                 <IonButton color={'danger'} fill="clear" onClick={() => setShowForm(false)} >
                     <IonText>Cancel</IonText>
-
                 </IonButton>
             </>
 

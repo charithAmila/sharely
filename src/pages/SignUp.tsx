@@ -75,7 +75,7 @@ export default function SignUp() {
                   label={`Name ${!!errors.name ? `(${errors.name.message})` : ""}`}
                   autoCapitalize="on"
                   onBlur={onBlur}
-                  onIonChange={onChange}
+                  onIonInput={onChange}
                   value={value}
                   type="text"
                   labelPlacement="stacked"
@@ -99,7 +99,7 @@ export default function SignUp() {
                     <IonInput
                         label={`Email ${!!errors.email ? `(${errors.email.message})` : ""}`}
                         onBlur={onBlur}
-                        onIonChange={onChange}
+                        onIonInput={onChange}
                         value={value}
                         type="email"
                         labelPlacement="stacked" 
@@ -120,7 +120,7 @@ export default function SignUp() {
                         type="password" 
                         label={`Password ${!!errors.password ? `(${errors.password.message})` : ""}`}
                         labelPlacement="stacked" 
-                        onIonChange={onChange} 
+                        onIonInput={onChange} 
                         onBlur={onBlur}
                         value={value}
                     >

@@ -1,3 +1,4 @@
+import { Fragment, useMemo, useRef, useState } from "react";
 import {
   IonButton,
   IonButtons,
@@ -14,8 +15,7 @@ import {
 } from "@ionic/react";
 import LinkPreview from "../components/LinkPreview";
 import { useAppContext } from "../context/MainContext";
-import { add, filter } from "ionicons/icons";
-import { Fragment, useEffect, useMemo, useRef, useState } from "react";
+import { filter } from "ionicons/icons";
 import { months } from "../utils/constant";
 import TagsFitler from "../components/TagsFilter";
 
@@ -23,8 +23,8 @@ const Home = () => {
   const { items, tags } = useAppContext();
 
   const modal = useRef<HTMLIonModalElement>(null);
-
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [searchText, setSearchText] = useState("");
 
   const itemFilterByTags = (item: SharedItem) => {
 
@@ -48,8 +48,6 @@ const Home = () => {
       return items; // Return all items if no tags are selected
     }
 
-    const selectedTagIds: string[] = selectedTags.map(tag => tag.id);
-
     return items.map((item: GroupedSharedItem) => ({
       ...item,
       data: item.data.filter(itemFilterByTags).sort((a: SharedItem, b: SharedItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
@@ -59,8 +57,6 @@ const Home = () => {
 
 
   const onClickTag = (tag: Tag) => {
-    console.log(tag);
-
     setSelectedTags(
       selectedTags.map((t) => t.id).includes(tag.id)
         ? selectedTags.filter((t) => t.id !== tag.id)
@@ -87,7 +83,10 @@ const Home = () => {
           </IonToolbar>
         </IonHeader>
         <div className="">
-          <IonSearchbar />
+          <IonSearchbar placeholder="Search" onInput={(e) => {
+            // @ts-ignore
+            setSearchText(e.target.value || "")
+          }} value={searchText} />
         </div>
         {listArray &&
           listArray.map((item, index) => (

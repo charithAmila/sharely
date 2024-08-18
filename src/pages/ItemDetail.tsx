@@ -1,8 +1,11 @@
-import { IonAvatar, IonBackButton, IonButton, IonButtons, IonCardSubtitle, IonChip, IonContent, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonModal, IonPage, IonText, IonTextarea, IonTitle, IonToolbar, useIonAlert, useIonRouter, useIonToast } from "@ionic/react"
+import { IonAvatar, IonBackButton, IonButtons, IonCardSubtitle, IonChip, IonContent, IonHeader, IonIcon, IonImg, IonItem, IonLabel, IonList, IonModal, IonPage, IonText, IonTitle, IonToolbar, useIonAlert, useIonRouter, useIonToast } from "@ionic/react"
 import { useParams } from "react-router"
 import { useAppContext } from "../context/MainContext"
-import { calendarClearOutline, createOutline, linkOutline, trashOutline } from "ionicons/icons"
+import { calendarClearOutline, createOutline, linkOutline, pricetagsOutline, trashOutline } from "ionicons/icons"
 import { useEffect, useRef, useState } from "react"
+import NoteForm from "../components/NoteForm"
+import TagSelector from "../components/TagSelector"
+import { isUrl } from "../helpers"
 
 type Params = {
     id: string
@@ -14,6 +17,7 @@ const ItemDetail = () => {
 
     const item = sharedItems.find(item => item.id === id);
     const [isOpen, setIsOpen] = useState(false);
+    const [modalType, setModalType] = useState<'note' | 'tags'>('note');
     const [note, setNote] = useState(item?.note || '');
     const [present] = useIonToast();
     const [presentAlert] = useIonAlert();
@@ -31,7 +35,18 @@ const ItemDetail = () => {
         {
             icon: createOutline,
             label: note.trim().length > 0 ? 'Update Note' : 'Write a Note',
-            onClick: () => setIsOpen(true)
+            onClick: () => {
+                setModalType('note'); 
+                setIsOpen(true)
+            }
+        },
+        {
+            icon: pricetagsOutline,
+            label: 'Manage Tags',
+            onClick: () => {
+                setModalType('tags');
+                setIsOpen(true);
+            }
         },
         {
             icon: trashOutline,
@@ -81,6 +96,40 @@ const ItemDetail = () => {
         }
     }
 
+    const renderLink = () => {
+
+        let url = '';
+
+        if(!item) {
+            return null;
+        }
+    
+        if (item.url && isUrl(item.url)) {
+          url = item.url;
+        } else if (item.content && isUrl(item.content)) {
+          url = item.content;
+        }
+    
+        if(!url) {
+          return null;
+        }
+    
+    
+        return (
+          <a
+            href={url}
+            target="_blank"
+            rel="noopener noreferrer"
+            ref={linkRef}
+            style={{ display: 'none' }}
+          >
+            
+          </a>
+        )
+      }
+
+    
+
     return (
         <IonPage>
             <IonHeader>
@@ -94,13 +143,13 @@ const ItemDetail = () => {
                 </IonToolbar>
             </IonHeader>
             <IonContent scrollY={true}>
-                <div className="p-10 bg-light">
+                { item?.metadata?.image && <div className="p-10 bg-light">
                     <IonImg className="h-30vh" src={item?.metadata?.image.url} />
-                </div>
-                <div className="flex ion-padding flex align-items-center gap-4">
-                    <a ref={linkRef} href={item?.url} target="_blank" style={{ display: 'none' }} rel="noreferrer" />
-                    <div className="flex-2 flex align-items-center">
-                        {item?.metadata.logo && (
+                </div>}
+                <div className="flex ion-padding flex-column gap-4">
+                    {renderLink()}
+                    <div className="flex-1 flex gap-5 align-items-center">
+                        {item?.metadata?.logo && (
                             <IonAvatar style={{ width: "35px", height: "35px" }}>
                                 <img
                                     alt="Silhouette of a person's head"
@@ -112,7 +161,7 @@ const ItemDetail = () => {
                             <IonCardSubtitle>{item?.metadata.publisher} (publisher) </IonCardSubtitle>
                         )}
                     </div>
-                    <div className="flex-1 flex justify-content-end">
+                    <div className="flex-1 flex">
                         {
                             item?.createdAt && (
                                 <div className="flex align-items-center gap-4">
@@ -121,7 +170,6 @@ const ItemDetail = () => {
                                         {new Date(item.createdAt).toLocaleDateString()}
                                     </IonText>
                                 </div>
-
                             )
                         }
                     </div>
@@ -140,6 +188,11 @@ const ItemDetail = () => {
                                 </IonChip>
                             ))
                         }
+                    </div>
+                    <div>
+                        <IonText>
+                            {item?.metadata?.description}
+                        </IonText>
                     </div>
                 </div>
                 <IonList>
@@ -163,20 +216,23 @@ const ItemDetail = () => {
 
             </IonContent>
             <IonModal isOpen={isOpen}>
-                <IonHeader>
-                    <IonToolbar>
-                        <IonButtons slot="start">
-                            <IonButton onClick={() => setIsOpen(false)}>Close</IonButton>
-                        </IonButtons>
-                        <IonTitle>Write a Note</IonTitle>
-                        <IonButtons slot="end">
-                            <IonButton onClick={() => onClickSave()}>Save</IonButton>
-                        </IonButtons>
-                    </IonToolbar>
-                </IonHeader>
-                <IonContent className="ion-padding">
-                    <IonTextarea value={note} onIonChange={(e) => setNote(e.detail.value!)} autoGrow label="Note" labelPlacement="stacked" placeholder="Write a note"></IonTextarea>
-                </IonContent>
+                    {
+                        modalType === 'note' ? (
+                            <NoteForm
+                                onClickSave={onClickSave}
+                                setIsOpen={setIsOpen}
+                                note={note}
+                                setNote={setNote}
+                            />
+                        ) : (
+                            <TagSelector
+                                id={id}
+                                selectedTags={item?.tags || []}
+                                title="Manage Tags"
+                                setIsOpen={setIsOpen}
+                            />
+                        )
+                    }
             </IonModal>
         </IonPage>
     )

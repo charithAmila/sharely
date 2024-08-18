@@ -4,3 +4,7 @@ export const truncateText = (text: string, maxLength: number) => {
     }
     return text;
 };
+
+export const isUrl = (text: string) => {
+    return text.startsWith("https://") || text.startsWith("http://");
+}
