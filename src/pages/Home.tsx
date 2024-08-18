@@ -15,8 +15,9 @@ import {
 import LinkPreview from "../components/LinkPreview";
 import { useAppContext } from "../context/MainContext";
 import { add, filter } from "ionicons/icons";
-import { Fragment, useMemo, useRef, useState } from "react";
+import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { months } from "../utils/constant";
+import TagsFitler from "../components/TagsFilter";
 
 const Home = () => {
   const { items, tags } = useAppContext();
@@ -26,14 +27,14 @@ const Home = () => {
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
 
   const itemFilterByTags = (item: SharedItem) => {
-    
+
     const selectedTagIds = selectedTags.map(tag => tag.id);
     const itemTagIds = item.tags.map(tag => tag.id);
 
     if (selectedTagIds.length === 0) {
       return true;
     }
-    
+
     // Compare item tags with selected tags
     if (!itemTagIds.some(tagId => selectedTagIds.includes(tagId))) {
       return false;
@@ -46,25 +47,27 @@ const Home = () => {
     if (!selectedTags || selectedTags.length === 0) {
       return items; // Return all items if no tags are selected
     }
-  
+
     const selectedTagIds: string[] = selectedTags.map(tag => tag.id);
-  
+
     return items.map((item: GroupedSharedItem) => ({
       ...item,
       data: item.data.filter(itemFilterByTags).sort((a: SharedItem, b: SharedItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
     })).filter(item => item.data.length > 0);
-  
+
   }, [items, selectedTags]);
 
 
   const onClickTag = (tag: Tag) => {
+    console.log(tag);
+
     setSelectedTags(
       selectedTags.map((t) => t.id).includes(tag.id)
         ? selectedTags.filter((t) => t.id !== tag.id)
         : [...selectedTags, tag]
     )
   };
-  
+
   return (
     <IonPage>
       <IonHeader>
@@ -116,59 +119,25 @@ const Home = () => {
                 <div className="w-10">
                   {item.data.map((_d: any) => (
                     <div key={_d.id} className="w-full">
-                       <LinkPreview selectedTags={selectedTags} item={_d} />
+                      <LinkPreview tags={tags} onClickTag={onClickTag} selectedTags={selectedTags} item={_d} />
                     </div>
                   ))}
                 </div>
               </div>
-              { index < listArray.length - 1 && <IonItemDivider />}
+              {index < listArray.length - 1 && <IonItemDivider />}
             </Fragment>
           ))}
-        <IonModal
-          ref={modal}
-          trigger="open-modal"
-          initialBreakpoint={1}
-          breakpoints={[0, 1]}
-        >
-          <div className="h-50vh ion-padding">
-            {tags.length > 0 ? (
-              tags.map((tag: Tag) => (
-                <IonButton
-                  key={tag.id}
-                  shape="round"
-                  size="default"
-                  fill={
-                    selectedTags.map((t) => t.id).includes(tag.id)
-                      ? "solid"
-                      : "outline"
-                  }
-                  onClick={() => onClickTag(tag)}
-                >
-                  {tag.name}
-                </IonButton>
-              ))
-            ) : (
-              <>
-                <div className="flex flex-column gap-4">
-                <IonText>No Tags</IonText>
-                  <IonButton
-                    expand="full"
-                    shape="round"
-                    fill="outline"
-                    routerLink="/tags"
-                  >
-                    Add Tags
-                  </IonButton>
-                </div>
-               
-              </>
-            )}
-          </div>
-          { tags.length > 0 && <IonButton fill="clear" routerLink="/tags-form">
-            <IonIcon icon={add}></IonIcon>
-            Add Tags
-          </IonButton>}
-        </IonModal>
+        <div className="c-modal-container">
+          <IonModal
+            ref={modal}
+            trigger="open-modal"
+            initialBreakpoint={1}
+            breakpoints={[0, 1]}
+          >
+            <TagsFitler tags={tags} selectedTags={selectedTags} onClickTag={onClickTag} />
+          </IonModal>
+        </div>
+
       </IonContent>
     </IonPage>
   );

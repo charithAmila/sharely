@@ -10,6 +10,9 @@ type ContextProps = {
     items : GroupedSharedItem[]
     tags: Tag[]
     createTag: (name: string) => Promise<void>;
+    sharedItems: SharedItem[];
+    updateItem: (item: Partial<SharedItem>, id: string) => Promise<void>;
+    deleteItem: (item: SharedItem) => Promise<void>;
   };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -17,6 +20,7 @@ const AuthContext = createContext<ContextProps | undefined>(undefined);
 const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const [items, setItems] = useState<GroupedSharedItem[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
+  const [sharedItems, setSharedItems] = useState<SharedItem[]>([]);
 
   useEffect(() => {
     if(!user) {
@@ -59,7 +63,8 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     const unsubscribe = () => {
       const itemService = new ItemService();
       itemService.onDocumentChange(user.id, (data: SharedItem[]) => {  
-         setItems(groupByCreatedAt([...data]));
+        setSharedItems([...data]);
+        setItems(groupByCreatedAt([...data]));
       })
      }
     return unsubscribe();
@@ -93,10 +98,39 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
 
   }
 
+  const updateItem = async (item: Partial<SharedItem>, id: string) => {
+
+    const _item = sharedItems.find((i) => i.id === id);
+
+    const itemService = new ItemService();
+    await itemService.update({...item, id});
+
+    const index = sharedItems.findIndex((i) => i.id === id);
+    if (index !== -1 && _item) {
+      sharedItems[index] = _item;
+      setSharedItems([...sharedItems]);
+    }
+
+  }
+
+  const deleteItem = async (item: SharedItem) => {
+    const itemService = new ItemService();
+    await itemService.delete(item.id);
+
+    const index = sharedItems.findIndex((i) => i.id === item.id);
+    if (index !== -1) {
+      sharedItems.splice(index, 1);
+      setSharedItems([...sharedItems]);
+    }
+  }
+
   const values: ContextProps = {
     items,
     tags,
-    createTag
+    createTag,
+    sharedItems,
+    updateItem,
+    deleteItem
   };
 
   return (

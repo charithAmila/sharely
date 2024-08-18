@@ -27,8 +27,10 @@ type SharedItem = {
     updatedAt?: string;
     url?: string;
     content?: string;
-    tags: {id: string, name: string}[];
+    tags: Tag[];
     userId: string;
+    metadata?: any;
+    note?: string;
 }
 
 type GroupedSharedItem = {

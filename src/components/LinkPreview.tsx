@@ -10,9 +10,11 @@ import {
   IonAvatar,
   IonIcon,
   IonText,
+  IonButton,
 } from "@ionic/react";
 import { linkOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { truncateText } from "../helpers";
 
 interface Metadata {
   title?: string;
@@ -22,46 +24,50 @@ interface Metadata {
 }
 
 interface LinkPreviewProps {
-  item: any;
+  item: SharedItem;
   selectedTags: { id: string; name: string }[];
+  onClickTag: (tag: Tag) => void;
+  tags: Tag[];
 }
 
-const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
+const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps) => {
 
   const { metadata } = item;
 
-  const truncateText = (text: string, maxLength: number) => {
-    if (text.length > maxLength) {
-      return text.slice(0, maxLength) + "...";
-    }
-    return text;
-  };
+  const renderChips = () => {
+    return (
+      <>
+        {(item.tags || []).map((tag: Tag) => (
+          <IonChip
+            key={tag.id}
+            onClick={() => onClickTag(tags.find((t) => t.id === tag.id)!)}
+            color={
+              selectedTags.find((t) => t.id === tag.id)
+                ? "warning"
+                : "primary"
+            }
+          >
+            {tag.name}
+          </IonChip>
+        ))}
+      </>
+    )
+  }
 
   if (!metadata) {
-    if(item.content){
+    if (item.content) {
       return (
         <IonCard>
           <div className="ion-padding">
             <IonText>{truncateText(item.content, 100)}</IonText>
           </div>
           <div className="flex gap-2 justify-content-start pt-10 flex-wrap">
-              {(item.tags || []).map((tag: string) => (
-                <IonChip
-                  key={tag}
-                  color={
-                    selectedTags.find((t) => t.name === tag)
-                      ? "warning"
-                      : "primary"
-                  }
-                >
-                  {tag}
-                </IonChip>
-              ))}
-            </div>
+            {renderChips()}
+          </div>
         </IonCard>
       )
     }
-    
+
     return (
       <div className="ion-padding w-full">
         <IonSkeletonText
@@ -87,41 +93,31 @@ const LinkPreview = ({ item, selectedTags }: LinkPreviewProps) => {
             )}
             <IonCardHeader>
               <div className="flex gap-4 align-items-center">
-              {metadata.logo && (
-                <IonAvatar style={{ width: "30px", height: "30px" }}>
-                  <img
-                    alt="Silhouette of a person's head"
-                    src={metadata.logo.url}
-                  />
-                </IonAvatar>
-              )}
-              <IonCardSubtitle>{truncateText(metadata.title, 25)}</IonCardSubtitle>
+                {metadata.logo && (
+                  <IonAvatar style={{ width: "30px", height: "30px" }}>
+                    <img
+                      alt="Silhouette of a person's head"
+                      src={metadata.logo.url}
+                    />
+                  </IonAvatar>
+                )}
+                <IonCardSubtitle>{truncateText(metadata.title, 25)}</IonCardSubtitle>
               </div>
             </IonCardHeader>
             <IonCardContent>
               {metadata.description && truncateText(metadata.description, 100)}
               <div className="flex gap-2 justify-content-start pt-10 flex-wrap">
-                {(item.tags || []).map((tag: Tag) => (
-                  <IonChip
-                    key={tag.id}
-                    color={
-                      selectedTags.find((t) => t.id === tag.id)
-                        ? "warning"
-                        : "primary"
-                    }
-                  >
-                    {tag.name}
-                  </IonChip>
-                ))}
+                {renderChips()}
               </div>
-              <div className="flex justify-content-end">
-                  <a
-                    href={metadata.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <IonIcon icon={linkOutline} />
-                  </a>
+              <div className="flex justify-content-end align-items-center">
+                <IonButton fill="clear" size="small"  routerLink={`item/${item.id}`}>Read</IonButton>
+                <a
+                  href={metadata.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <IonIcon icon={linkOutline} />
+                </a>
               </div>
             </IonCardContent>
           </IonCard>

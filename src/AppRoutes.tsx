@@ -2,7 +2,7 @@ import { Redirect, Route } from "react-router";
 import { useAuthContext } from "./context/AuthContext";
 import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel, IonContent, IonPage } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { home, addCircle, person } from "ionicons/icons";
+import { home, addCircle, person, pricetagOutline, pricetagsOutline } from "ionicons/icons";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import { AppContextProvider } from "./context/MainContext";
 import TagsForm from "./pages/TagsForm";
 import Tags from "./pages/Tags";
+import ItemDetail from "./pages/ItemDetail";
 
   const AuthRoutes = () => {
     const { authenticated, user } = useAuthContext();
@@ -20,6 +21,7 @@ import Tags from "./pages/Tags";
                     <IonRouterOutlet>
                         <Route exact path="/tabs" render={() => <Redirect to="/tabs/home" />} />
                         <Route exact path="/tabs/home" component={Home} />
+                        <Route exact path="/tabs/item/:id" component={ItemDetail} />
                         <Route exact path="/tabs/profile" component={Profile} />
                         <Route exact path="/tabs/tags" component={Tags} />
                         <Route exact path="/tabs/tags/tags-form" component={TagsForm} />
@@ -30,8 +32,8 @@ import Tags from "./pages/Tags";
                             <IonLabel>Home</IonLabel>
                         </IonTabButton>
                         <IonTabButton tab="tab2" href="/tabs/tags">
-                            <IonIcon aria-hidden="true" icon={addCircle} />
-                            <IonLabel>Add New</IonLabel>
+                            <IonIcon aria-hidden="true" icon={pricetagsOutline} />
+                            <IonLabel>Tags</IonLabel>
                         </IonTabButton>
                         <IonTabButton tab="profile" href="/tabs/profile">
                             <IonIcon aria-hidden="true" icon={person} />

@@ -9,7 +9,7 @@ const Profile = () => {
   const menu = [
     { name: 'Settings',  icon: cog },
     { name: 'Groups',  icon: peopleOutline },
-    { name: 'Tags', url: '/tags', icon: pricetagsOutline },
+    { name: 'Tags', url: '/tabs/tags', icon: pricetagsOutline },
   ]
 
   return (
@@ -24,7 +24,7 @@ const Profile = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent forceOverscroll={false} fullscreen className='ion-padding'>
+      <IonContent forceOverscroll={false} fullscreen>
         <IonHeader collapse="condense">
           <IonToolbar>
             <IonTitle size="large">Profile</IonTitle>

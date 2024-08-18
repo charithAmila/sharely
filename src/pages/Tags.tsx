@@ -9,12 +9,6 @@ const Tags = () => {
     const [showForm, setShowForm] = useState(false);
     const [present] = useIonToast();
 
-    useEffect(() => {
-       console.log('+++ mounterd');
-        
-    },[])
-
-
     const onClickDone = () => {
         if(tagName.trim().length > 0){
             setTagName('');
