@@ -1,6 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { ItemService } from "../services/ItemServices";
 import { TagService } from "../services/TagService";
+import { Omit } from "react-router";
+import { GroupService } from "../services/GroupService";
+import { UserService } from "../services/UserService";
 
 type AppContextProviderProps = {
     children: React.ReactNode;
@@ -13,6 +16,12 @@ type ContextProps = {
     sharedItems: SharedItem[];
     updateItem: (item: Partial<SharedItem>, id: string) => Promise<void>;
     deleteItem: (item: SharedItem) => Promise<void>;
+    groups: Group[];
+    createGroup: (data : Omit<Group, "id" | "createdAt" | "updatedAt" | "userId">) => Promise<void>;
+    updateGroup: (group: Partial<Group>, id: string) => Promise<void>;
+    deleteGroup: (group: Group) => Promise<void>;
+    friends: Member[];
+    getFriends: () => Promise<void>;
   };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -21,6 +30,8 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const [items, setItems] = useState<GroupedSharedItem[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [sharedItems, setSharedItems] = useState<SharedItem[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
+  const [friends, setFriends] = useState<Member[]>([]);
 
   useEffect(() => {
     if(!user) {
@@ -37,6 +48,19 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
         console.error(error);
       }
     }
+
+
+    const fetchGroups = async () => {
+      try {
+        const group = new GroupService();
+        const data = await group.findByField("userId", user.id);
+        setGroups(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchGroups();
     fetchTags();
   }, [user]);
 
@@ -124,13 +148,88 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     }
   }
 
+  const createGroup = async (data : Omit<Group, "id" | "createdAt" | "updatedAt" | "userId">) => {
+
+    if(!user) {
+      return;
+    }
+
+    const group = new GroupService();
+
+    const newGroup: Omit<Group, "id"> = {
+      name: data.name,
+      userId: user.id,
+      members: data.members || [],
+      tags: data.tags || [],
+    }
+
+    const groupData = await group.create(newGroup);
+
+    if(groupData.id) {
+      setGroups([{
+        id: groupData.id,
+        ...newGroup, 
+      } ,...groups, ]);
+    }
+  }
+
+  const updateGroup = async (group: Partial<Group>, id: string) => {
+    const _group = groups.find((i) => i.id === id);
+    const groupService = new GroupService();
+    await groupService.update({...group, id});
+    const index = groups.findIndex((i) => i.id === id);
+    if (index !== -1 && _group) {
+      groups[index] = _group;
+      setGroups([...groups]);
+    }
+  }
+
+  const deleteGroup = async (group: Group) => {
+    const groupService = new GroupService();
+    await groupService.delete(group.id);
+    const index = groups.findIndex((i) => i.id === group.id);
+    if (index !== -1) {
+      groups.splice(index, 1);
+      setGroups([...groups]);
+    }
+  }
+
+  const getFriends = async () => {
+  
+    if(!user || !user.friends) {
+      return;
+    }
+     
+    const friendsIds: string[] = user.friends.map((f) => f.id);
+
+    const userService = new UserService();
+
+    const data: AuthUser[] = await userService.findByFieldsArray("id", friendsIds);
+
+    const _friends: Member[] = data.map((d) => {
+      return {
+        id: d.id,
+        name: d.name,
+        email: d.email,
+      }
+    })
+
+    setFriends(_friends);
+  }
+
   const values: ContextProps = {
     items,
     tags,
     createTag,
     sharedItems,
     updateItem,
-    deleteItem
+    deleteItem,
+    groups,
+    createGroup,
+    updateGroup,
+    deleteGroup,
+    friends,
+    getFriends
   };
 
   return (
