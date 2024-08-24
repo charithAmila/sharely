@@ -29,7 +29,7 @@ const Home = () => {
   const itemFilterByTags = (item: SharedItem) => {
 
     const selectedTagIds = selectedTags.map(tag => tag.id);
-    const itemTagIds = item.tags.map(tag => tag.id);
+    const itemTagIds = item.tags.map(tag => tag);
 
     if (selectedTagIds.length === 0) {
       return true;
