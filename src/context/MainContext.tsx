@@ -4,6 +4,7 @@ import { TagService } from "../services/TagService";
 import { Omit } from "react-router";
 import { GroupService } from "../services/GroupService";
 import { UserService } from "../services/UserService";
+import { groupByCreatedAt } from "../helpers";
 
 type AppContextProviderProps = {
     children: React.ReactNode;
@@ -64,21 +65,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     fetchTags();
   }, [user]);
 
-  const groupByCreatedAt=(array: SharedItem[]): GroupedSharedItem[] => {
-    const groupedMap: { [key: string]: SharedItem[] } = {};
-    
-    array.forEach((item : SharedItem) => {      
-      if (!groupedMap[new Date(item.createdAt).toLocaleDateString()]) {
-        groupedMap[new Date(item.createdAt).toLocaleDateString()] = [];
-      }
-      groupedMap[`${new Date(item.createdAt).toLocaleDateString()}`].push({ ...item });
-    });
-  
-    return Object.keys(groupedMap).map(createdAt => ({
-      createdAt,
-      data: groupedMap[createdAt],
-    }));
-  }
+
 
   useEffect(() => {
     if(!user) {
@@ -107,13 +94,6 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     const newTag: Omit<Tag, "id"> = {
       name,
       userId: user.id,
-      sharedWith: [
-        {
-          id: user.id,
-          name: user.name,
-          type: "author"
-        }
-      ]
     }
 
     const data = await tag.create(newTag);
@@ -204,7 +184,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
 
     const userService = new UserService();
 
-    const data: AuthUser[] = await userService.findByFieldsArray("id", friendsIds);
+    const data: AuthUser[] = await userService.findByFieldsArrayIn("id", friendsIds);
 
     const _friends: Member[] = data.map((d) => {
       return {

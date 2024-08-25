@@ -11,21 +11,44 @@ import {
   IonChip,
   IonItemDivider,
   IonLabel,
+  IonIcon,
 } from "@ionic/react";
 import { useAppContext } from "../context/MainContext";
 import { useParams } from "react-router";
 import LinkPreview from "../components/LinkPreview";
-import { Fragment, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import { months } from "../utils/constant";
+import { ItemService } from "../services/ItemServices";
+import { groupByCreatedAt } from "../helpers";
+import { add } from "ionicons/icons";
 
 export default function Group() {
-  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-
-  const { groups, items, tags } = useAppContext();
-
   const { id } = useParams<{ id: string }>();
+  const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [items, setItems] = useState<GroupedSharedItem[]>([]);
 
+  const { groups, tags } = useAppContext();
   const group = groups.find((i) => i.id === id);
+
+  useEffect(() => {
+    
+    if(!group) {
+      return;
+    }
+
+    const tagIds = (group?.tags || []).map((tag) => tag.id) || [];
+
+    if (tagIds.length > 0) {
+      const itemService = new ItemService();
+      itemService.findByFieldsArrayContainsAny("tags", tagIds).then((data) => {
+        
+        const groupedItem: GroupedSharedItem[] = groupByCreatedAt(data);
+
+        setItems([...groupedItem]);
+      })
+    }
+    
+  },[group])
 
   const itemFilterByTags = (item: SharedItem) => {
     const selectedTagIds = selectedTags.map((tag) => tag.id);
@@ -107,6 +130,9 @@ export default function Group() {
                   )}
                 </IonAvatar>
               ))}
+              <IonAvatar className={`flex justify-content-center align-items-center bg-dark`} style={{ width: "30px", height: "30px" }}>
+                <IonIcon color="light" icon={add}></IonIcon>
+              </IonAvatar>
           </div>
         </div>
         <div className="ion-padding">
@@ -114,7 +140,7 @@ export default function Group() {
             group?.tags?.map((tag, index) => (
               <IonChip
                 key={index}
-                color="primary"
+                color={ selectedTags.find((t) => t.id === tag.id) ? "warning" : "primary"}
                 onClick={() => onClickTag(tag)}
               >
                 {tag.name}

@@ -69,11 +69,6 @@ export default function GroupMembers({ closeModal, selectedMembers, setSelectedM
             <IonIcon icon={addCircleOutline} slot="start"></IonIcon>
             <IonLabel>Add New Contact to Sharely</IonLabel>
           </IonButton>
-          <br />
-          <IonButton fill="outline" expand="block">
-            <IonIcon icon={linkOutline} slot="start"></IonIcon>
-            <IonLabel>Copy Link</IonLabel>
-          </IonButton>
         </div>
         {!!friends.length && (
           <IonList>
