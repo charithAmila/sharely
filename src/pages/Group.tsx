@@ -12,6 +12,9 @@ import {
   IonItemDivider,
   IonLabel,
   IonIcon,
+  IonButton,
+  useIonActionSheet,
+  IonModal,
 } from "@ionic/react";
 import { useAppContext } from "../context/MainContext";
 import { useParams } from "react-router";
@@ -20,12 +23,17 @@ import { Fragment, useEffect, useMemo, useState } from "react";
 import { months } from "../utils/constant";
 import { ItemService } from "../services/ItemServices";
 import { groupByCreatedAt } from "../helpers";
-import { add } from "ionicons/icons";
+import { add, menuOutline, optionsOutline } from "ionicons/icons";
+import GroupMembers from "../components/GroupMembers";
 
 export default function Group() {
   const { id } = useParams<{ id: string }>();
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [items, setItems] = useState<GroupedSharedItem[]>([]);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const [present] = useIonActionSheet();
+
 
   const { groups, tags } = useAppContext();
   const group = groups.find((i) => i.id === id);
@@ -92,13 +100,56 @@ export default function Group() {
     );
   };
 
+  const onClickMoreOptions = () => {
+    present({
+      header: 'Actions',
+      buttons: [
+        {
+          text: 'Delete',
+          role: 'destructive',
+          handler: () => {
+            alert('Sorry, not implemented yet');
+          },
+          data: {
+            action: 'delete',
+          },
+        },
+        {
+          text: 'Manage Members',
+          handler: () => {
+            setIsOpen(true);
+          }
+        },
+        {
+          text: 'Manage Tags',
+          handler: () => {
+            // setIsOpen(true);
+          }
+        },
+        {
+          text: 'Cancel',
+          role: 'cancel',
+          data: {
+            action: 'cancel',
+          },
+        },
+      ],
+    })
+  }
+    
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonTitle></IonTitle>
           <IonButtons slot="start">
             <IonBackButton />
+          </IonButtons>
+          <IonTitle>{ group?.name ?? "Group" }</IonTitle>
+          <IonButtons slot="end">
+            <IonButton onClick={onClickMoreOptions}>
+              <IonIcon slot="icon-only" icon={menuOutline} />
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -183,6 +234,13 @@ export default function Group() {
               </Fragment>
             ))}
         </div>
+        <IonModal isOpen={isOpen}>
+            <GroupMembers 
+              closeModal={() => setIsOpen(false)} 
+              selectedMembers={group?.members || []} 
+              setSelectedMembers={(members) => {}} 
+            />
+        </IonModal>
       </IonContent>
     </IonPage>
   );
