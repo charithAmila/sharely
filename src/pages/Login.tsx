@@ -1,74 +1,76 @@
 import {
-    IonButton,
-    IonContent,
-    IonIcon,
-    IonInput,
-    IonInputPasswordToggle,
-    IonItem,
-    IonLabel,
-    IonPage,
-    IonSpinner,
-    IonText,
-    useIonToast,
-  } from "@ionic/react";
-  import { useState } from "react";
-  import { useForm, Controller, SubmitHandler } from "react-hook-form";
-  import { Link } from "react-router-dom";
-  import { logoApple } from "ionicons/icons";
+  IonButton,
+  IonCol,
+  IonContent,
+  IonIcon,
+  IonInput,
+  IonItem,
+  IonPage,
+  IonRow,
+  IonSpinner,
+  IonText,
+  useIonToast,
+} from "@ionic/react";
+import { useState } from "react";
+import { useForm, Controller, SubmitHandler } from "react-hook-form";
+import { Link } from "react-router-dom";
+import { eye, eyeOff } from "ionicons/icons";
 import { useAuthContext } from "../context/AuthContext";
 import { EMAIL_REGEX } from "../utils/constant";
-import Logo from "../assets/Logo";
+import Logo from "../assets/svg/ExpandedLogo";
 import AppleLogin from "../components/AppleLogin";
-  
-  interface IFormInput {
+import GoogleLogin from "../components/GoogleLogin";
+import AuthHeader from "../components/auth/AuthHeader";
+import SocialAuth from "../components/auth/SocialAuth";
+
+interface IFormInput {
+  email: string;
+  password: string;
+}
+
+export default function Login() {
+  const { login: signInWithEmailPassword } = useAuthContext();
+
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<IFormInput>();
+
+  const [loading, setLoading] = useState(false);
+  const [present, dismiss] = useIonToast();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const onSubmit: SubmitHandler<IFormInput> = (data: {
     email: string;
     password: string;
-  }
-  
-  export default function Login() {
-  
-    const { login: signInWithEmailPassword } = useAuthContext();
-  
-    const {
-      control,
-      handleSubmit,
-      formState: { errors },
-    } = useForm<IFormInput>();
-  
-    const [loading, setLoading] = useState(false);
-    const [present, dismiss] = useIonToast();
-  
-    const onSubmit: SubmitHandler<IFormInput> = (data: {
-      email: string;
-      password: string;
-    }) => {
-      setLoading(true);
-      signInWithEmailPassword({email: data.email, password: data.password})
-        .then(() => {
-          setLoading(false);
-        })
-        .catch((error) => {
-          setLoading(false);
-          const errorCode = error?.code;
-          const errorMessage = error?.message;
-          present({
-            color: "danger",
-            buttons: [{ text: "hide", handler: () => dismiss() }],
-            message:
-              errorCode === "auth/wrong-password"
-                ? `There's no account with this email. Please check for typos or sign up.`
-                : errorMessage,
-          });
+  }) => {
+    setLoading(true);
+    signInWithEmailPassword({ email: data.email, password: data.password })
+      .then(() => {
+        setLoading(false);
+      })
+      .catch((error) => {
+        setLoading(false);
+        const errorCode = error?.code;
+        const errorMessage = error?.message;
+        present({
+          color: "danger",
+          buttons: [{ text: "hide", handler: () => dismiss() }],
+          message:
+            errorCode === "auth/wrong-password"
+              ? `There's no account with this email. Please check for typos or sign up.`
+              : errorMessage,
         });
-    };
-  
-    return (
-      <IonPage>
-        <IonContent className="ion-padding" scrollY={false}>
-          <div className="flex justify-content-center align-items-end h-30vh">
-            <Logo />
-          </div>
-          <form className="mt-16" onSubmit={handleSubmit(onSubmit)}>
+      });
+  };
+
+  return (
+    <IonPage>
+      <IonContent className="ion-padding" scrollY={false} fullscreen>
+        <div className="flex flex-column h-100vh">
+          <AuthHeader title="Sign in to your Account" />
+          <form className="pt-5" onSubmit={handleSubmit(onSubmit)}>
             <Controller
               name="email"
               control={control}
@@ -80,14 +82,14 @@ import AppleLogin from "../components/AppleLogin";
                 },
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <IonItem>
+                <IonItem lines="full">
                   <IonInput
-                    label={`Email ${!!errors.email ? `(${errors.email.message})` : ""}`}
                     onBlur={onBlur}
                     onIonInput={onChange}
                     value={value}
-                    type="email"
-                    labelPlacement="stacked" 
+                    label="Email"
+                    labelPlacement="floating"
+                    placeholder="Enter email"
                   />
                 </IonItem>
               )}
@@ -99,38 +101,46 @@ import AppleLogin from "../components/AppleLogin";
                 required: "This is required",
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <>
-                  <IonItem>
-                      <IonInput 
-                        type="password" 
-                        label={`Password ${!!errors.password ? `(${errors.password.message})` : ""}`} 
-                        labelPlacement="stacked" 
-                        onIonInput={onChange} 
-                        onBlur={onBlur}
-                        value={value}
-                      >
-                          <IonInputPasswordToggle slot="end"></IonInputPasswordToggle>
-                      </IonInput>
-                  </IonItem>
-                </>
+                <IonItem className="pt-4" lines="full">
+                  <IonInput
+                    type={showPassword ? "text" : "password"}
+                    label="Password"
+                    labelPlacement="floating"
+                    placeholder="Enter password"
+                    onIonInput={onChange}
+                    onBlur={onBlur}
+                    value={value}
+                  />
+                  <IonIcon
+                    onClick={() => setShowPassword(!showPassword)}
+                    color="primary"
+                    slot="end"
+                    icon={showPassword ? eye : eyeOff}
+                  />
+                </IonItem>
               )}
             />
-            <IonButton
-              shape="round"
-              type="submit"
-              className="m-20"
-              expand="block"
-            >
-              {loading && <IonSpinner slot="start" name="lines-small" />} Login
-            </IonButton>
+            <IonText className="ion-text-end font-bold" color="primary">
+              <p>Forgot password?</p>
+            </IonText>
+            <div className="pt-4">
+              <IonButton type="submit" color={"primary"} expand="block">
+                {loading && <IonSpinner slot="start" name="lines-small" />}{" "}
+                <IonText color="light">Sign In</IonText>
+              </IonButton>
+            </div>
           </form>
-          <AppleLogin />
-          <IonText>
-            <p className="ion-text-center">
-              First time here? <Link to="/sign-up">Sign up</Link>
-            </p>
-          </IonText>
-        </IonContent>
-      </IonPage>
-    );
-  }
+          <SocialAuth />
+          <div className="flex flex-column justify-content-center align-items-center flex-grow-1">
+            <IonText className="pb-4 mt-auto">
+              <p className="ion-text-center">
+                Don't have an account?{" "}
+                <Link to="/sign-up">Create New Account</Link>
+              </p>
+            </IonText>
+          </div>
+        </div>
+      </IonContent>
+    </IonPage>
+  );
+}

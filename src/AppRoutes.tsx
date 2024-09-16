@@ -1,8 +1,24 @@
 import { Redirect, Route } from "react-router";
 import { useAuthContext } from "./context/AuthContext";
-import { IonTabs, IonRouterOutlet, IonTabBar, IonTabButton, IonIcon, IonLabel, IonContent, IonPage } from "@ionic/react";
+import {
+  IonTabs,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonIcon,
+  IonLabel,
+  IonContent,
+  IonPage,
+} from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { home, addCircle, person, pricetagOutline, pricetagsOutline, peopleOutline } from "ionicons/icons";
+import {
+  home,
+  addCircle,
+  person,
+  pricetagOutline,
+  pricetagsOutline,
+  peopleOutline,
+} from "ionicons/icons";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
@@ -14,85 +30,113 @@ import ItemDetail from "./pages/ItemDetail";
 import Groups from "./pages/Groups";
 import Group from "./pages/Group";
 import GroupForm from "./pages/GroupForm";
+import OnBoard from "./pages/Onboard";
 
-  const AuthRoutes = () => {
-    const { authenticated, user } = useAuthContext();
-    return (
-        <AppContextProvider user={user}>
-            <IonReactRouter>
-                <IonTabs>
-                    <IonRouterOutlet>
-                        <Route exact path="/tabs" render={() => <Redirect to="/tabs/home" />} />
-                        <Route exact path="/tabs/home" component={Home} />
-                        <Route exact path="/tabs/item/:id" component={ItemDetail} />
-                        <Route exact path="/tabs/profile" component={Profile} />
-                        <Route exact path="/tabs/tags" component={Tags} />
-                        <Route exact path="/tabs/tags/tags-form" component={TagsForm} />
-                        <Route exact path="/tabs/groups" component={Groups} />
-                        <Route exact path="/tabs/groups/:id" component={Group} />
-                        <Route exact path="/tabs/group-form" component={GroupForm} />
-                    </IonRouterOutlet>
-                    <IonTabBar slot="bottom">
-                        <IonTabButton tab="tab1" href="/tabs/home">
-                            <IonIcon aria-hidden="true" icon={home} />
-                            <IonLabel>Home</IonLabel>
-                        </IonTabButton>
-                        <IonTabButton tab="tab2" href="/tabs/tags">
-                            <IonIcon aria-hidden="true" icon={pricetagsOutline} />
-                            <IonLabel>Tags</IonLabel>
-                        </IonTabButton>
-                        <IonTabButton tab="groups" href="/tabs/groups">
-                            <IonIcon aria-hidden="true" icon={peopleOutline} />
-                            <IonLabel>Groups</IonLabel>
-                        </IonTabButton>
-                        <IonTabButton tab="profile" href="/tabs/profile">
-                            <IonIcon aria-hidden="true" icon={person} />
-                            <IonLabel>Profile</IonLabel>
-                        </IonTabButton>
-                    </IonTabBar>
-                </IonTabs>
-            </IonReactRouter>
-        </AppContextProvider>
-    );
-  }
-
-  const StackNavigation = () => {
-    const { authenticated, user } = useAuthContext();
-    return (
-        <AppContextProvider user={user}>
-            <IonReactRouter>
-                <IonRouterOutlet>
-                    <Route exact path="/stack/group-form" component={GroupForm} />
-                </IonRouterOutlet>
-            </IonReactRouter>
-        </AppContextProvider>
-    );
-  }
-
-  const AppRoutes = () => {
-    const { authenticated } = useAuthContext();
-    if (authenticated === null)
-        return (
-          <>
-            <IonPage>
-              <IonContent fullscreen>
-                {/* Loading */}
-              </IonContent>
-            </IonPage>
-          </>
-    );
-
-    return (
-        <IonReactRouter>
-            <IonRouterOutlet>
-                <Route exact path="/" render={() => <Redirect to="/tabs/" />} />
-                <Route exact path="/login" render={() => authenticated === true ? <Redirect to="/tabs/home" /> : <Login />} />
-                <Route exact path="/sign-up" render={() => authenticated === true ? <Redirect to="/tabs/home" /> : <SignUp />} component={SignUp} />
-                <Route exact path="/tabs/*" render={() => authenticated === true ?  <AuthRoutes /> : <Redirect to="/login" />}></Route>
-                {/* <Route exact path="/stack/*" render={() => authenticated === true ?  <StackNavigation /> : <Redirect to="/login" />}></Route> */}
-            </IonRouterOutlet>
-        </IonReactRouter>
-    );
+const AuthRoutes = () => {
+  const { authenticated, user } = useAuthContext();
+  return (
+    <AppContextProvider user={user}>
+      <IonReactRouter>
+        <IonTabs>
+          <IonRouterOutlet>
+            <Route
+              exact
+              path="/tabs"
+              render={() => <Redirect to="/tabs/home" />}
+            />
+            <Route exact path="/tabs/home" component={Home} />
+            <Route exact path="/tabs/item/:id" component={ItemDetail} />
+            <Route exact path="/tabs/profile" component={Profile} />
+            <Route exact path="/tabs/tags" component={Tags} />
+            <Route exact path="/tabs/tags/tags-form" component={TagsForm} />
+            <Route exact path="/tabs/groups" component={Groups} />
+            <Route exact path="/tabs/groups/:id" component={Group} />
+            <Route exact path="/tabs/group-form" component={GroupForm} />
+          </IonRouterOutlet>
+          <IonTabBar slot="bottom">
+            <IonTabButton tab="tab1" href="/tabs/home">
+              <IonIcon aria-hidden="true" icon={home} />
+              <IonLabel>Home</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="tab2" href="/tabs/tags">
+              <IonIcon aria-hidden="true" icon={pricetagsOutline} />
+              <IonLabel>Tags</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="groups" href="/tabs/groups">
+              <IonIcon aria-hidden="true" icon={peopleOutline} />
+              <IonLabel>Groups</IonLabel>
+            </IonTabButton>
+            <IonTabButton tab="profile" href="/tabs/profile">
+              <IonIcon aria-hidden="true" icon={person} />
+              <IonLabel>Profile</IonLabel>
+            </IonTabButton>
+          </IonTabBar>
+        </IonTabs>
+      </IonReactRouter>
+    </AppContextProvider>
+  );
 };
 
-export default AppRoutes
+const StackNavigation = () => {
+  const { authenticated, user } = useAuthContext();
+  return (
+    <AppContextProvider user={user}>
+      <IonReactRouter>
+        <IonRouterOutlet>
+          <Route exact path="/stack/group-form" component={GroupForm} />
+        </IonRouterOutlet>
+      </IonReactRouter>
+    </AppContextProvider>
+  );
+};
+
+const AppRoutes = () => {
+  const { authenticated } = useAuthContext();
+
+  return <OnBoard />;
+
+  if (authenticated === null)
+    return (
+      <>
+        <IonPage>
+          <IonContent fullscreen>
+            <h1>Loading...</h1>
+            {/* Loading */}
+          </IonContent>
+        </IonPage>
+      </>
+    );
+
+  return (
+    <IonReactRouter>
+      <IonRouterOutlet>
+        <Route exact path="/" render={() => <Redirect to="/tabs/" />} />
+        <Route
+          exact
+          path="/login"
+          render={() =>
+            authenticated === true ? <Redirect to="/tabs/home" /> : <Login />
+          }
+        />
+        <Route
+          exact
+          path="/sign-up"
+          render={() =>
+            authenticated === true ? <Redirect to="/tabs/home" /> : <SignUp />
+          }
+          component={SignUp}
+        />
+        <Route
+          exact
+          path="/tabs/*"
+          render={() =>
+            authenticated === true ? <AuthRoutes /> : <Redirect to="/login" />
+          }
+        ></Route>
+        {/* <Route exact path="/stack/*" render={() => authenticated === true ?  <StackNavigation /> : <Redirect to="/login" />}></Route> */}
+      </IonRouterOutlet>
+    </IonReactRouter>
+  );
+};
+
+export default AppRoutes;

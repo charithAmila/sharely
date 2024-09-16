@@ -3,11 +3,12 @@ import {
   SignInWithAppleOptions,
   SignInWithAppleResponse,
 } from "@capacitor-community/apple-sign-in";
-import { IonButton, IonIcon } from "@ionic/react";
-import { logoApple } from "ionicons/icons";
+import { IonButton, IonCol, IonIcon, IonRow, IonText } from "@ionic/react";
+import { logoApple, logoGoogle } from "ionicons/icons";
 import { useAuthContext } from "../context/AuthContext";
+import GoogleLogo from "../assets/svg/GoogleLogo";
 
-const AppleLogin = () => {
+const GoogleLogin = () => {
   const { appleSignIn } = useAuthContext();
   const signIn = () => {
     let options: SignInWithAppleOptions = {
@@ -34,10 +35,14 @@ const AppleLogin = () => {
       color="medium"
       expand="block"
     >
-      <IonIcon slot="start" icon={logoApple}></IonIcon>
-      Apple
+      <IonRow className="ion-align-items-center">
+        <IonCol>
+          <GoogleLogo />
+        </IonCol>
+        <IonCol>Google</IonCol>
+      </IonRow>
     </IonButton>
   );
 };
 
-export default AppleLogin;
+export default GoogleLogin;
