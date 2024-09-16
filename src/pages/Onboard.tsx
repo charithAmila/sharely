@@ -9,7 +9,11 @@ import OnBoardFourth from "../assets/svg/OnBoardFourth";
 
 import "swiper/scss";
 import "@ionic/react/css/ionic-swiper.css";
-export default function OnBoard() {
+
+type Props = {
+  onBoardDone: () => void;
+};
+export default function OnBoard({ onBoardDone }: Props) {
   const swiperRef = useRef<any>(null); // Ref to store swiper instance
 
   const slides = [
@@ -63,7 +67,9 @@ export default function OnBoard() {
     {
       img: <OnBoardFourth />,
       buttonLabel: "Start Using Sharely",
-      onClickButton: () => {},
+      onClickButton: () => {
+        onBoardDone();
+      },
       title: (
         <>
           You're <br></br>Ready to Go!

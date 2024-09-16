@@ -1,16 +1,33 @@
-import { IonButton, IonButtons, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonPage, IonTitle, IonToolbar } from '@ionic/react';
-import { useAuthContext } from '../context/AuthContext';
-import { cog, home, peopleOutline, powerOutline, pricetagsOutline } from 'ionicons/icons';
-
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonHeader,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+} from "@ionic/react";
+import { useAuthContext } from "../context/AuthContext";
+import {
+  cog,
+  home,
+  peopleOutline,
+  powerOutline,
+  pricetagsOutline,
+} from "ionicons/icons";
 
 const Profile = () => {
   const { logout } = useAuthContext();
 
   const menu = [
-    { name: 'Settings',  icon: cog },
-    { name: 'Groups',  icon: peopleOutline },
-    { name: 'Tags', url: '/tabs/tags', icon: pricetagsOutline },
-  ]
+    { name: "Settings", icon: cog },
+    { name: "Groups", icon: peopleOutline },
+    { name: "Tags", url: "/tabs/tags", icon: pricetagsOutline },
+  ];
 
   return (
     <IonPage>
@@ -18,7 +35,12 @@ const Profile = () => {
         <IonToolbar>
           <IonTitle></IonTitle>
           <IonButtons slot="end">
-            <IonButton onClick={logout}>
+            <IonButton
+              onClick={() => {
+                localStorage.removeItem("isOnBoarded");
+                logout();
+              }}
+            >
               <IonIcon slot="icon-only" icon={powerOutline} />
             </IonButton>
           </IonButtons>
@@ -31,14 +53,12 @@ const Profile = () => {
           </IonToolbar>
         </IonHeader>
         <IonList>
-          {
-            menu.map(item => (
-              <IonItem key={item.name} button routerLink={item.url}>
-                <IonIcon slot="start" icon={item.icon} />
-                <IonLabel>{item.name}</IonLabel>
-              </IonItem>
-            ))
-          }
+          {menu.map((item) => (
+            <IonItem key={item.name} button routerLink={item.url}>
+              <IonIcon slot="start" icon={item.icon} />
+              <IonLabel>{item.name}</IonLabel>
+            </IonItem>
+          ))}
         </IonList>
       </IonContent>
     </IonPage>

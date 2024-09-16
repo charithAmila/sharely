@@ -31,9 +31,25 @@ import Groups from "./pages/Groups";
 import Group from "./pages/Group";
 import GroupForm from "./pages/GroupForm";
 import OnBoard from "./pages/Onboard";
+import { useState } from "react";
+import ExpandedLogo from "./assets/svg/ExpandedLogo";
 
 const AuthRoutes = () => {
-  const { authenticated, user } = useAuthContext();
+  const { user } = useAuthContext();
+
+  const st: string | null = localStorage.getItem("isOnBoarded");
+
+  const [isOnBoarded, setIsOnBoarded] = useState<string>(!!st ? st : "NO");
+
+  const onBoard = () => {
+    localStorage.setItem("isOnBoarded", "YES");
+    setIsOnBoarded("YES");
+  };
+
+  if (isOnBoarded === "NO") {
+    return <OnBoard onBoardDone={onBoard} />;
+  }
+
   return (
     <AppContextProvider user={user}>
       <IonReactRouter>
@@ -77,31 +93,17 @@ const AuthRoutes = () => {
   );
 };
 
-const StackNavigation = () => {
-  const { authenticated, user } = useAuthContext();
-  return (
-    <AppContextProvider user={user}>
-      <IonReactRouter>
-        <IonRouterOutlet>
-          <Route exact path="/stack/group-form" component={GroupForm} />
-        </IonRouterOutlet>
-      </IonReactRouter>
-    </AppContextProvider>
-  );
-};
-
 const AppRoutes = () => {
   const { authenticated } = useAuthContext();
-
-  return <OnBoard />;
 
   if (authenticated === null)
     return (
       <>
         <IonPage>
-          <IonContent fullscreen>
-            <h1>Loading...</h1>
-            {/* Loading */}
+          <IonContent className="ion-padding bg-primary" fullscreen>
+            <div className="flex align-items-center justify-content-center h-100vh">
+              <ExpandedLogo fill="#fff" />
+            </div>
           </IonContent>
         </IonPage>
       </>
