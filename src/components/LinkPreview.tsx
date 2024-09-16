@@ -36,7 +36,7 @@ const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps)
   const renderChips = () => {
     return (
       <>
-        {(item.tags || []).map((tag: Tag) => (
+        {(tags.filter((tag) => item.tags.includes(tag.id)) || []).map((tag: Tag) => (
           <IonChip
             key={tag.id}
             onClick={() => onClickTag(tags.find((t) => t.id === tag.id)!)}

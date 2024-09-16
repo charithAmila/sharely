@@ -98,6 +98,26 @@ export class FirebaseAbstract {
     }
   }
 
+  public async findByFieldsArrayIn(field: string, value: string[]) {
+    try {
+      const _query = query(collection(db, this.collection), where(field, "in", value));
+      const querySnapshot = await getDocs(_query);
+      return this.querySnapshotToArray(querySnapshot);
+    } catch (error) {
+      throw new Error("Error fetching document");
+    }
+  }
+
+  public async findByFieldsArrayContainsAny(field: string, value: string[]) {
+    try {
+      const _query = query(collection(db, this.collection), where(field, "array-contains-any", value));
+      const querySnapshot = await getDocs(_query);
+      return this.querySnapshotToArray(querySnapshot);
+    } catch (error) {
+      throw new Error("Error fetching document");
+    }
+  }
+
   /**
    * Set a document
    * @param documentId String

@@ -2,21 +2,32 @@ type AuthUser = {
     id: string;
     name: string;
     email: string;
+    photo?: string;
+    phone?: string;
+    friends?: AuthUserFriend[];
     createdAt?: string;
     updatedAt?: string;
 };
 
-type ShareUser = {
+type AuthUserFriend = {
+    id: string;
+    createdAt?: string;
+    updatedAt?: string;
+};
+
+type Member = {
     id: string;
     name: string;
-    type: "author" | "contributor";
+    email?: string;
+    photo?: string;
+    phone?: string;
+    type?: "author" | "contributor";
 }
 
 type Tag = {
     id: string;
     name: string;
     userId: string;
-    sharedWith?: ShareUser[];
     createdAt?: string;
     updatedAt?: string;
 };
@@ -27,7 +38,7 @@ type SharedItem = {
     updatedAt?: string;
     url?: string;
     content?: string;
-    tags: Tag[];
+    tags: string[];
     userId: string;
     metadata?: any;
     note?: string;
@@ -36,4 +47,15 @@ type SharedItem = {
 type GroupedSharedItem = {
   createdAt: string;
   data: SharedItem[];
+}
+
+
+type Group = {
+    id: string;
+    name: string;
+    userId: string;
+    members?: Member[];
+    tags?: Tag[];
+    createdAt?: string;
+    updatedAt?: string;
 }

@@ -28,7 +28,7 @@ export default function TagSelector({ title, setIsOpen, ...rest }: Props) {
       };
 
     const onClickSave = async () => {
-        await updateItem({ tags: selectedTags }, rest.id)
+        await updateItem({ tags: selectedTags.map((t) => t.id) }, rest.id)
         setIsOpen(false)
     }
 

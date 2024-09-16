@@ -13,7 +13,7 @@ type Params = {
 const ItemDetail = () => {
     const { id }: Params = useParams()
     const { goBack } = useIonRouter();
-    const { sharedItems, updateItem, deleteItem } = useAppContext();
+    const { sharedItems, updateItem, deleteItem, tags } = useAppContext();
 
     const item = sharedItems.find(item => item.id === id);
     const [isOpen, setIsOpen] = useState(false);
@@ -183,8 +183,8 @@ const ItemDetail = () => {
                     <div>
                         {
                             item?.tags?.map((tag) => (
-                                <IonChip key={tag.id}>
-                                    {tag.name}
+                                <IonChip key={tag}>
+                                    {tags.find((t) => t.id === tag)?.name}
                                 </IonChip>
                             ))
                         }
@@ -229,7 +229,7 @@ const ItemDetail = () => {
                     ) : (
                         <TagSelector
                             id={id}
-                            selectedTags={item?.tags || []}
+                            selectedTags={tags.filter((tag) => item?.tags?.includes(tag.id)) || []}
                             title="Manage Tags"
                             setIsOpen={setIsOpen}
                         />
