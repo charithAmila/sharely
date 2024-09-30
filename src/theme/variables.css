@@ -122,3 +122,21 @@ ion-button {
   --ion-background-color-step-900: #3b464b;
   --ion-background-color-step-950: #303c41;
 }
+
+.white-header {
+  --background: var(--ion-color-white);
+  --border-width: 0;
+  --box-shadow: none;
+  --border-color: transparent;
+}
+
+ion-toolbar > .chips-container {
+  display: flex;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  max-width: max-content;
+}
+
+ion-toolbar > .chips-container > ion-chip {
+  flex: 0 0 auto;
+}

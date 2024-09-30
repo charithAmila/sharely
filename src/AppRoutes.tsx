@@ -6,18 +6,14 @@ import {
   IonTabBar,
   IonTabButton,
   IonIcon,
-  IonLabel,
   IonContent,
   IonPage,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import {
-  home,
-  addCircle,
-  person,
-  pricetagOutline,
-  pricetagsOutline,
-  peopleOutline,
+  searchOutline,
+  homeOutline,
+  personCircleOutline,
 } from "ionicons/icons";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -71,20 +67,13 @@ const AuthRoutes = () => {
           </IonRouterOutlet>
           <IonTabBar slot="bottom">
             <IonTabButton tab="tab1" href="/tabs/home">
-              <IonIcon aria-hidden="true" icon={home} />
-              <IonLabel>Home</IonLabel>
+              <IonIcon aria-hidden="true" icon={homeOutline} />
             </IonTabButton>
             <IonTabButton tab="tab2" href="/tabs/tags">
-              <IonIcon aria-hidden="true" icon={pricetagsOutline} />
-              <IonLabel>Tags</IonLabel>
-            </IonTabButton>
-            <IonTabButton tab="groups" href="/tabs/groups">
-              <IonIcon aria-hidden="true" icon={peopleOutline} />
-              <IonLabel>Groups</IonLabel>
+              <IonIcon aria-hidden="true" icon={searchOutline} />
             </IonTabButton>
             <IonTabButton tab="profile" href="/tabs/profile">
-              <IonIcon aria-hidden="true" icon={person} />
-              <IonLabel>Profile</IonLabel>
+              <IonIcon aria-hidden="true" icon={personCircleOutline} />
             </IonTabButton>
           </IonTabBar>
         </IonTabs>
@@ -135,7 +124,6 @@ const AppRoutes = () => {
             authenticated === true ? <AuthRoutes /> : <Redirect to="/login" />
           }
         ></Route>
-        {/* <Route exact path="/stack/*" render={() => authenticated === true ?  <StackNavigation /> : <Redirect to="/login" />}></Route> */}
       </IonRouterOutlet>
     </IonReactRouter>
   );

@@ -1,6 +1,5 @@
 import { IonPage, IonContent, IonText, IonButton } from "@ionic/react";
 import ExpandedLogo from "../../assets/svg/ExpandedLogo";
-import OnBoardFirst from "../../assets/svg/OnBoardFirst";
 
 type Props = {
   img: React.ReactNode;
