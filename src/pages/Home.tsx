@@ -1,6 +1,5 @@
 import { Fragment, useMemo, useRef, useState } from "react";
 import {
-  IonBadge,
   IonButton,
   IonButtons,
   IonChip,
@@ -12,13 +11,12 @@ import {
   IonModal,
   IonPage,
   IonText,
-  IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import LinkPreview from "../components/LinkPreview";
 import { useAppContext } from "../context/MainContext";
-import { add, close, filter } from "ionicons/icons";
-import { getOrdinalSuffix, months } from "../utils/constant";
+import { add } from "ionicons/icons";
+import { getOrdinalSuffix } from "../utils/constant";
 import TagsFitler from "../components/TagsFilter";
 import ExpandedLogo from "../assets/svg/ExpandedLogo";
 
@@ -37,7 +35,6 @@ const Home = () => {
 
   const modal = useRef<HTMLIonModalElement>(null);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const [searchText, setSearchText] = useState("");
 
   const itemFilterByTags = (item: SharedItem) => {
     const selectedTagIds = selectedTags.map((tag) => tag.id);
@@ -218,7 +215,6 @@ const Home = () => {
                     </IonText>
                   </div>
                 </div>
-
                 <div className="ion-padding">
                   {item.data.map((_d: any) => (
                     <div key={_d.id} className="w-full">

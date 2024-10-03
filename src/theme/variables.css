@@ -140,3 +140,7 @@ ion-toolbar > .chips-container {
 ion-toolbar > .chips-container > ion-chip {
   flex: 0 0 auto;
 }
+
+.main-card {
+  box-shadow: none !important;
+}
