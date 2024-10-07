@@ -144,3 +144,8 @@ ion-toolbar > .chips-container > ion-chip {
 .main-card {
   box-shadow: none !important;
 }
+
+.custom-ion-item {
+  --background: #eef0f5;
+  --border-color: #c3c9da;
+}

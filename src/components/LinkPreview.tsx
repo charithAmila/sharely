@@ -21,6 +21,7 @@ import {
 } from "ionicons/icons";
 import { isUrl, truncateText } from "../helpers";
 import { useRef } from "react";
+import ThinDivider from "./ThinDivider";
 
 interface Metadata {
   title?: string;
@@ -193,11 +194,7 @@ const LinkPreview = ({
             </div>
             <div className="flex flex-column gap-5">
               {renderChips()}
-
-              <div
-                className="w-full"
-                style={{ height: "1px", backgroundColor: "#C3C9DA" }}
-              />
+              <ThinDivider />
               <div className="flex align-items-center">
                 <div className="flex-1 flex justify-content-start">
                   <IonButton

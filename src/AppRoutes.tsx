@@ -69,7 +69,7 @@ const AuthRoutes = () => {
             <IonTabButton tab="tab1" href="/tabs/home">
               <IonIcon aria-hidden="true" icon={homeOutline} />
             </IonTabButton>
-            <IonTabButton tab="tab2" href="/tabs/tags">
+            <IonTabButton tab="tab2">
               <IonIcon aria-hidden="true" icon={searchOutline} />
             </IonTabButton>
             <IonTabButton tab="profile" href="/tabs/profile">
