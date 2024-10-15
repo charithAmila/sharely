@@ -29,22 +29,24 @@ import GroupForm from "./pages/GroupForm";
 import OnBoard from "./pages/Onboard";
 import { useState } from "react";
 import ExpandedLogo from "./assets/svg/ExpandedLogo";
+import Search from "./pages/Search";
+import Subscription from "./pages/Subscription";
 
 const AuthRoutes = () => {
   const { user } = useAuthContext();
 
   const st: string | null = localStorage.getItem("isOnBoarded");
 
-  const [isOnBoarded, setIsOnBoarded] = useState<string>(!!st ? st : "NO");
+  const [isOnBoarded, setIsOnBoarded] = useState<string>("NO");
 
   const onBoard = () => {
     localStorage.setItem("isOnBoarded", "YES");
     setIsOnBoarded("YES");
   };
 
-  if (isOnBoarded === "NO") {
-    return <OnBoard onBoardDone={onBoard} />;
-  }
+  // if (isOnBoarded === "NO") {
+  //   return <OnBoard onBoardDone={onBoard} />;
+  // }
 
   return (
     <AppContextProvider user={user}>
@@ -57,6 +59,7 @@ const AuthRoutes = () => {
               render={() => <Redirect to="/tabs/home" />}
             />
             <Route exact path="/tabs/home" component={Home} />
+            <Route exact path="/tabs/search" component={Search} />
             <Route exact path="/tabs/item/:id" component={ItemDetail} />
             <Route exact path="/tabs/profile" component={Profile} />
             <Route exact path="/tabs/tags" component={Tags} />
@@ -64,12 +67,13 @@ const AuthRoutes = () => {
             <Route exact path="/tabs/groups" component={Groups} />
             <Route exact path="/tabs/groups/:id" component={Group} />
             <Route exact path="/tabs/group-form" component={GroupForm} />
+            <Route exact path="/tabs/subscribe" component={Subscription} />
           </IonRouterOutlet>
           <IonTabBar slot="bottom">
             <IonTabButton tab="tab1" href="/tabs/home">
               <IonIcon aria-hidden="true" icon={homeOutline} />
             </IonTabButton>
-            <IonTabButton tab="tab2">
+            <IonTabButton tab="tab2" href="/tabs/search">
               <IonIcon aria-hidden="true" icon={searchOutline} />
             </IonTabButton>
             <IonTabButton tab="profile" href="/tabs/profile">

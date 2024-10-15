@@ -15,15 +15,7 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { useAuthContext } from "../context/AuthContext";
-import {
-  cog,
-  home,
-  pencil,
-  peopleOutline,
-  personCircleOutline,
-  powerOutline,
-  pricetagsOutline,
-} from "ionicons/icons";
+import { pencil, personCircleOutline, pricetagsOutline } from "ionicons/icons";
 
 const Profile = () => {
   const { logout } = useAuthContext();
@@ -31,7 +23,11 @@ const Profile = () => {
 
   const menu = [
     { name: "Tags", url: "/tabs/tags", icon: pricetagsOutline },
-    { name: "Subscription Plans", icon: personCircleOutline },
+    {
+      name: "Subscription Plans",
+      icon: personCircleOutline,
+      url: "/tabs/subscribe",
+    },
   ];
 
   return (
@@ -100,7 +96,10 @@ const Profile = () => {
             fill="outline"
             shape="round"
             expand="block"
-            onClick={() => logout()}
+            onClick={() => {
+              localStorage.removeItem("isOnBoarded");
+              logout();
+            }}
           >
             Logout
           </IonButton>

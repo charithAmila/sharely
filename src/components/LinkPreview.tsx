@@ -215,7 +215,7 @@ const LinkPreview = ({
                     onClick={() => linkRef.current?.click()}
                   >
                     <IonIcon slot="start" icon={openOutline} />
-                    Open Link
+                    Open
                   </IonButton>
                   {renderLink()}
                 </div>

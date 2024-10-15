@@ -10,6 +10,7 @@ import {
   IonLabel,
   IonModal,
   IonPage,
+  IonSearchbar,
   IonText,
   IonToolbar,
 } from "@ionic/react";
@@ -24,17 +25,28 @@ import { addIcons } from "ionicons";
 import FilterSvg from "../assets/icons/filter-icon.svg";
 import CardSvg from "../assets/icons/card-icon.svg";
 import dayjs from "dayjs";
+import { useParams } from "react-router";
 
 addIcons({
   "filter-icon": FilterSvg,
   "card-icon": CardSvg,
 });
 
-const Home = () => {
-  const { items, tags } = useAppContext();
+type Props = {
+  isSearch?: boolean;
+};
+
+const Home = ({ isSearch }: Props) => {
+  const { items, tags, sharedItems } = useAppContext();
 
   const modal = useRef<HTMLIonModalElement>(null);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const itemsCount = (tagId: string) => {
+    return sharedItems.filter((item: SharedItem) => item.tags.includes(tagId))
+      .length;
+  };
 
   const itemFilterByTags = (item: SharedItem) => {
     const selectedTagIds = selectedTags.map((tag) => tag.id);
@@ -86,46 +98,64 @@ const Home = () => {
           <IonButtons slot="end">
             <IonButton
               onClick={() => {
+                setShowAddForm(false);
                 modal.current?.present();
               }}
             >
               <IonIcon icon={"filter-icon"} />
             </IonButton>
-            <IonButton
+            {/* <IonButton
               onClick={() => {
                 modal.current?.present();
               }}
             >
               <IonIcon icon={"card-icon"} />
-            </IonButton>
+            </IonButton> */}
           </IonButtons>
         </IonToolbar>
-        <IonToolbar className="white-header pl-3">
+        {!!isSearch && (
+          <IonToolbar className="white-header">
+            <IonSearchbar placeholder="Search"></IonSearchbar>
+          </IonToolbar>
+        )}
+        <IonToolbar className="white-header pl-2">
           <div className="chips-container">
-            <IonChip outline color="primary">
+            <IonChip
+              onClick={() => {
+                setShowAddForm(true);
+                modal.current?.present();
+              }}
+              outline
+              color="primary"
+            >
               <IonIcon icon={add} color="primary"></IonIcon>
               <IonLabel>Add New Tag</IonLabel>
             </IonChip>
-            <IonChip className="gap-4" color="primary">
-              <IonLabel className="font-16 font-bold">All</IonLabel>
-              <span
-                className="font-16 font-bold p-1"
-                style={{
-                  width: "1.4rem",
-                  height: "1.4rem",
-                  backgroundColor: "var(--ion-color-light)",
-                  borderRadius: "50%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginLeft: "10px",
-                  color: "var(--ion-color-primary)",
-                }}
+            {sharedItems.length > 0 && (
+              <IonChip
+                className="gap-4"
+                color={selectedTags.length === 0 ? "primary" : ""}
               >
-                9+
-              </span>
-            </IonChip>
-            <IonChip className="gap-4">
+                <IonLabel className="font-16 font-bold">All</IonLabel>
+                <span
+                  className="font-16 font-bold p-1"
+                  style={{
+                    width: "1.4rem",
+                    height: "1.4rem",
+                    backgroundColor: "var(--ion-color-light)",
+                    borderRadius: "50%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginLeft: "10px",
+                    color: "var(--ion-color-primary)",
+                  }}
+                >
+                  {sharedItems.length > 9 ? "9+" : sharedItems.length}
+                </span>
+              </IonChip>
+            )}
+            {/* <IonChip className="gap-4">
               <IonLabel>Untagged</IonLabel>
               <span
                 className="font-16 font-bold p-1"
@@ -143,45 +173,38 @@ const Home = () => {
               >
                 1
               </span>
-            </IonChip>
-            <IonChip className="gap-4">
-              <IonLabel>Facebook</IonLabel>
-              <span
-                className="font-16 font-bold p-1"
-                style={{
-                  width: "1.4rem",
-                  height: "1.4rem",
-                  backgroundColor: "var(--ion-color-light)",
-                  borderRadius: "50%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginLeft: "10px",
-                  color: "var(--ion-color-primary)",
-                }}
-              >
-                1
-              </span>
-            </IonChip>
-            <IonChip className="gap-4">
-              <IonLabel>Facebook</IonLabel>
-              <span
-                className="font-16 font-bold p-1"
-                style={{
-                  width: "1.4rem",
-                  height: "1.4rem",
-                  backgroundColor: "var(--ion-color-light)",
-                  borderRadius: "50%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginLeft: "10px",
-                  color: "var(--ion-color-primary)",
-                }}
-              >
-                1
-              </span>
-            </IonChip>
+            </IonChip> */}
+            {tags.map((tag: Tag) => {
+              const count = itemsCount(tag.id);
+              return (
+                <IonChip
+                  key={tag.id}
+                  className="gap-4"
+                  onClick={() => onClickTag(tag)}
+                  color={selectedTags.includes(tag) ? "primary" : ""}
+                >
+                  <IonLabel>{tag.name}</IonLabel>
+                  {count > 0 && (
+                    <span
+                      className="font-16 font-bold p-1"
+                      style={{
+                        width: "1.4rem",
+                        height: "1.4rem",
+                        backgroundColor: "var(--ion-color-light)",
+                        borderRadius: "50%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginLeft: "10px",
+                        color: "var(--ion-color-primary)",
+                      }}
+                    >
+                      {count > 9 ? "9+" : count}
+                    </span>
+                  )}
+                </IonChip>
+              );
+            })}
           </div>
         </IonToolbar>
       </IonHeader>
@@ -239,6 +262,7 @@ const Home = () => {
             breakpoints={[0, 1]}
           >
             <TagsFitler
+              showAddForm={showAddForm}
               tags={tags}
               selectedTags={selectedTags}
               onClickTag={onClickTag}
