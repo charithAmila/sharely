@@ -59,10 +59,17 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           try {
             const userDoc = await userService.findByDocument(user.uid);
             if (userDoc) {
+
+              let friends: AuthUserFriend[] = [];
+              if (userDoc.exists() && userDoc.data().friends) {
+                friends = userDoc.data().friends;
+              }
+
               setUser({
                 ...authUser,
                 ...(userDoc.exists() ? userDoc.data() : {}),
                 id: user.uid,
+                friends,
               });
               setAuthenticated(true);
 

@@ -11,9 +11,17 @@ import {
   IonIcon,
   IonText,
   IonButton,
+  IonItemDivider,
 } from "@ionic/react";
-import { linkOutline } from "ionicons/icons";
+import {
+  createOutline,
+  linkOutline,
+  openOutline,
+  trashOutline,
+} from "ionicons/icons";
 import { isUrl, truncateText } from "../helpers";
+import { useRef } from "react";
+import ThinDivider from "./ThinDivider";
 
 interface Metadata {
   title?: string;
@@ -29,33 +37,41 @@ interface LinkPreviewProps {
   tags: Tag[];
 }
 
-const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps) => {
-
+const LinkPreview = ({
+  item,
+  selectedTags,
+  onClickTag,
+  tags,
+}: LinkPreviewProps) => {
   const { metadata } = item;
 
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
   const renderChips = () => {
+    const first3Tags = item.tags.slice(0, 3);
     return (
-      <>
-        {(item.tags || []).map((tag: Tag) => (
-          <IonChip
-            key={tag.id}
-            onClick={() => onClickTag(tags.find((t) => t.id === tag.id)!)}
-            color={
-              selectedTags.find((t) => t.id === tag.id)
-                ? "warning"
-                : "primary"
-            }
-          >
-            {tag.name}
-          </IonChip>
-        ))}
-      </>
-    )
-  }
+      <div className="flex gap-2 pt-2">
+        {(tags.filter((tag) => first3Tags.includes(tag.id)) || []).map(
+          (tag: Tag) => (
+            <IonChip outline key={tag.id}>
+              {tag.name}
+            </IonChip>
+          )
+        )}
+
+        {item.tags.length > 3 && (
+          <IonChip outline>+{item.tags.length - 3} more</IonChip>
+        )}
+      </div>
+    );
+  };
 
   const renderLink = () => {
+    let url = "";
 
-    let url = '';
+    if (!item) {
+      return null;
+    }
 
     if (item.url && isUrl(item.url)) {
       url = item.url;
@@ -63,22 +79,20 @@ const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps)
       url = item.content;
     }
 
-    if(!url) {
+    if (!url) {
       return null;
     }
-
 
     return (
       <a
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex align-items-center"
-      >
-        <IonIcon icon={linkOutline} />
-      </a>
-    )
-  }
+        ref={linkRef}
+        style={{ display: "none" }}
+      ></a>
+    );
+  };
 
   if (!metadata) {
     if (item.content) {
@@ -87,12 +101,12 @@ const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps)
           <div className="ion-padding">
             <IonText>{truncateText(item.content, 100)}</IonText>
           </div>
-          <div className="flex gap-2 justify-content-start pt-10 flex-wrap">
-            {renderChips()}
-          </div>
+
+          {renderChips()}
+
           {renderLink()}
         </IonCard>
-      )
+      );
     }
 
     return (
@@ -110,37 +124,114 @@ const LinkPreview = ({ item, selectedTags, onClickTag, tags }: LinkPreviewProps)
     <>
       {metadata && (
         <>
-          <IonCard>
-            {metadata.image && (
-              <img
-                src={metadata?.image?.url}
-                style={{ maxHeight: "300px", width: "100%" }}
-                alt="Preview"
-              />
-            )}
-            <IonCardHeader>
-              <div className="flex gap-4 align-items-center">
-                {metadata.logo && (
-                  <IonAvatar style={{ width: "30px", height: "30px" }}>
-                    <img
-                      alt="Silhouette of a person's head"
-                      src={metadata.logo.url}
-                    />
-                  </IonAvatar>
-                )}
-                <IonCardSubtitle>{truncateText(metadata.title, 25)}</IonCardSubtitle>
+          <IonCard className="main-card">
+            <div
+              style={{
+                backgroundColor: "#EEF0F5",
+                borderRadius: "8px",
+                border: "1px solid #C3C9DA",
+              }}
+            >
+              {metadata.image && (
+                <div className="relative">
+                  {metadata.logo && (
+                    <div
+                      className="absolute flex justify-content-center align-items-center shadow-1"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        top: "40%",
+                        right: "40%",
+                        borderRadius: "50%",
+                        backgroundColor: "white",
+                      }}
+                    >
+                      <IonAvatar style={{ width: "50px", height: "50px" }}>
+                        <img
+                          alt="Silhouette of a person's head"
+                          src={metadata.logo.url}
+                        />
+                      </IonAvatar>
+                    </div>
+                  )}
+                  <img
+                    src={metadata?.image?.url}
+                    style={{
+                      maxHeight: "225px",
+                      width: "100%",
+                      objectFit: "cover",
+                      borderTopLeftRadius: "8px",
+                      borderTopRightRadius: "8px",
+                    }}
+                    alt="Preview"
+                  />
+                </div>
+              )}
+              <div>
+                <IonCardHeader>
+                  <div className="flex gap-4 align-items-center">
+                    <IonCardSubtitle>
+                      {truncateText(metadata.title, 25)}
+                    </IonCardSubtitle>
+                  </div>
+                </IonCardHeader>
+                <IonCardContent className="flex flex-column gap-4">
+                  {metadata.publisher && (
+                    <IonText>{truncateText(metadata.publisher, 38)}</IonText>
+                  )}
+
+                  {metadata.url && (
+                    <IonText color={"primary"}>
+                      {truncateText(metadata.url, 38)}
+                    </IonText>
+                  )}
+
+                  {metadata.description && (
+                    <IonText>{truncateText(metadata.description, 100)}</IonText>
+                  )}
+                </IonCardContent>
               </div>
-            </IonCardHeader>
-            <IonCardContent>
-              {metadata.description && truncateText(metadata.description, 100)}
-              <div className="flex gap-2 justify-content-start pt-10 flex-wrap">
-                {renderChips()}
+            </div>
+            <div className="flex flex-column gap-5">
+              {renderChips()}
+              <ThinDivider />
+              <div className="flex align-items-center">
+                <div className="flex-1 flex justify-content-start">
+                  <IonButton
+                    color="medium"
+                    fill="clear"
+                    size="small"
+                    routerLink={`item/${item.id}`}
+                  >
+                    <IonIcon slot="start" icon={createOutline} />
+                    Edit
+                  </IonButton>
+                </div>
+                <div className="flex-1 flex justify-content-center">
+                  <IonButton
+                    color="medium"
+                    fill="clear"
+                    size="small"
+                    onClick={() => linkRef.current?.click()}
+                  >
+                    <IonIcon slot="start" icon={openOutline} />
+                    Open
+                  </IonButton>
+                  {renderLink()}
+                </div>
+                <div className="flex-1 flex justify-content-end">
+                  <IonButton
+                    color="medium"
+                    fill="clear"
+                    size="small"
+                    routerLink={`item/${item.id}`}
+                  >
+                    <IonIcon slot="start" icon={trashOutline} />
+                    Delete
+                  </IonButton>
+                </div>
               </div>
-              <div className="flex justify-content-end align-items-center">
-                <IonButton fill="clear" size="small"  routerLink={`item/${item.id}`}>Read</IonButton>
-                {renderLink()}
-              </div>
-            </IonCardContent>
+            </div>
           </IonCard>
         </>
       )}

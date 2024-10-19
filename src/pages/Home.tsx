@@ -2,123 +2,251 @@ import { Fragment, useMemo, useRef, useState } from "react";
 import {
   IonButton,
   IonButtons,
+  IonChip,
   IonContent,
   IonHeader,
   IonIcon,
   IonItemDivider,
+  IonLabel,
   IonModal,
   IonPage,
   IonSearchbar,
   IonText,
-  IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import LinkPreview from "../components/LinkPreview";
 import { useAppContext } from "../context/MainContext";
-import { filter } from "ionicons/icons";
-import { months } from "../utils/constant";
+import { add } from "ionicons/icons";
+import { getOrdinalSuffix } from "../utils/constant";
 import TagsFitler from "../components/TagsFilter";
+import ExpandedLogo from "../assets/svg/ExpandedLogo";
 
-const Home = () => {
-  const { items, tags } = useAppContext();
+import { addIcons } from "ionicons";
+import FilterSvg from "../assets/icons/filter-icon.svg";
+import CardSvg from "../assets/icons/card-icon.svg";
+import dayjs from "dayjs";
+import { useParams } from "react-router";
+
+addIcons({
+  "filter-icon": FilterSvg,
+  "card-icon": CardSvg,
+});
+
+type Props = {
+  isSearch?: boolean;
+};
+
+const Home = ({ isSearch }: Props) => {
+  const { items, tags, sharedItems } = useAppContext();
 
   const modal = useRef<HTMLIonModalElement>(null);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
-  const [searchText, setSearchText] = useState("");
+  const [showAddForm, setShowAddForm] = useState(false);
+
+  const itemsCount = (tagId: string) => {
+    return sharedItems.filter((item: SharedItem) => item.tags.includes(tagId))
+      .length;
+  };
 
   const itemFilterByTags = (item: SharedItem) => {
-
-    const selectedTagIds = selectedTags.map(tag => tag.id);
-    const itemTagIds = item.tags.map(tag => tag.id);
+    const selectedTagIds = selectedTags.map((tag) => tag.id);
+    const itemTagIds = item.tags.map((tag) => tag);
 
     if (selectedTagIds.length === 0) {
       return true;
     }
 
     // Compare item tags with selected tags
-    if (!itemTagIds.some(tagId => selectedTagIds.includes(tagId))) {
+    if (!itemTagIds.some((tagId) => selectedTagIds.includes(tagId))) {
       return false;
     }
 
-    return true
-  }
+    return true;
+  };
 
   const listArray = useMemo(() => {
     if (!selectedTags || selectedTags.length === 0) {
       return items; // Return all items if no tags are selected
     }
 
-    return items.map((item: GroupedSharedItem) => ({
-      ...item,
-      data: item.data.filter(itemFilterByTags).sort((a: SharedItem, b: SharedItem) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()),
-    })).filter(item => item.data.length > 0);
-
+    return items
+      .map((item: GroupedSharedItem) => ({
+        ...item,
+        data: item.data
+          .filter(itemFilterByTags)
+          .sort(
+            (a: SharedItem, b: SharedItem) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          ),
+      }))
+      .filter((item) => item.data.length > 0);
   }, [items, selectedTags]);
-
 
   const onClickTag = (tag: Tag) => {
     setSelectedTags(
       selectedTags.map((t) => t.id).includes(tag.id)
         ? selectedTags.filter((t) => t.id !== tag.id)
         : [...selectedTags, tag]
-    )
+    );
   };
 
   return (
     <IonPage>
       <IonHeader>
-        <IonToolbar>
-          <IonTitle>Collection</IonTitle>
+        <IonToolbar className="p-3 white-header">
+          <ExpandedLogo />
           <IonButtons slot="end">
-            <IonButton id="open-modal">
-              <IonIcon slot="icon-only" icon={filter}></IonIcon>
+            <IonButton
+              onClick={() => {
+                setShowAddForm(false);
+                modal.current?.present();
+              }}
+            >
+              <IonIcon icon={"filter-icon"} />
             </IonButton>
+            {/* <IonButton
+              onClick={() => {
+                modal.current?.present();
+              }}
+            >
+              <IonIcon icon={"card-icon"} />
+            </IonButton> */}
           </IonButtons>
         </IonToolbar>
-      </IonHeader>
-      <IonContent forceOverscroll={false} scrollY={true} fullscreen>
-        <IonHeader collapse="condense">
-          <IonToolbar>
-            <IonTitle size="large">Collection</IonTitle>
+        {!!isSearch && (
+          <IonToolbar className="white-header">
+            <IonSearchbar placeholder="Search"></IonSearchbar>
           </IonToolbar>
-        </IonHeader>
-        <div className="">
-          <IonSearchbar placeholder="Search" onInput={(e) => {
-            // @ts-ignore
-            setSearchText(e.target.value || "")
-          }} value={searchText} />
-        </div>
-        {listArray &&
-          listArray.map((item, index) => (
-            <Fragment key={index}>
-              <div className="flex">
-                <div
-                  className="w-2 flex justify-content-center"
-                  style={{ marginTop: "20px" }}
+        )}
+        <IonToolbar className="white-header pl-2">
+          <div className="chips-container">
+            <IonChip
+              onClick={() => {
+                setShowAddForm(true);
+                modal.current?.present();
+              }}
+              outline
+              color="primary"
+            >
+              <IonIcon icon={add} color="primary"></IonIcon>
+              <IonLabel>Add New Tag</IonLabel>
+            </IonChip>
+            {sharedItems.length > 0 && (
+              <IonChip
+                className="gap-4"
+                color={selectedTags.length === 0 ? "primary" : ""}
+              >
+                <IonLabel className="font-16 font-bold">All</IonLabel>
+                <span
+                  className="font-16 font-bold p-1"
+                  style={{
+                    width: "1.4rem",
+                    height: "1.4rem",
+                    backgroundColor: "var(--ion-color-light)",
+                    borderRadius: "50%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    marginLeft: "10px",
+                    color: "var(--ion-color-primary)",
+                  }}
                 >
-                  <div
-                    className="flex flex-column"
-                    style={{
-                      width: "50px",
-                      height: "50px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      borderRadius: "50%",
-                    }}
-                  >
-                    <IonText color="primary font-24 font-bold">
-                      {new Date(item.createdAt).getDate()}
+                  {sharedItems.length > 9 ? "9+" : sharedItems.length}
+                </span>
+              </IonChip>
+            )}
+            {/* <IonChip className="gap-4">
+              <IonLabel>Untagged</IonLabel>
+              <span
+                className="font-16 font-bold p-1"
+                style={{
+                  width: "1.4rem",
+                  height: "1.4rem",
+                  backgroundColor: "var(--ion-color-light)",
+                  borderRadius: "50%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginLeft: "10px",
+                  color: "var(--ion-color-primary)",
+                }}
+              >
+                1
+              </span>
+            </IonChip> */}
+            {tags.map((tag: Tag) => {
+              const count = itemsCount(tag.id);
+              return (
+                <IonChip
+                  key={tag.id}
+                  className="gap-4"
+                  onClick={() => onClickTag(tag)}
+                  color={selectedTags.includes(tag) ? "primary" : ""}
+                >
+                  <IonLabel>{tag.name}</IonLabel>
+                  {count > 0 && (
+                    <span
+                      className="font-16 font-bold p-1"
+                      style={{
+                        width: "1.4rem",
+                        height: "1.4rem",
+                        backgroundColor: "var(--ion-color-light)",
+                        borderRadius: "50%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        marginLeft: "10px",
+                        color: "var(--ion-color-primary)",
+                      }}
+                    >
+                      {count > 9 ? "9+" : count}
+                    </span>
+                  )}
+                </IonChip>
+              );
+            })}
+          </div>
+        </IonToolbar>
+      </IonHeader>
+      <IonContent className="" style={{ position: "relative" }} fullscreen>
+        {listArray &&
+          listArray.map((item: GroupedSharedItem, index: number) => (
+            <Fragment key={index}>
+              <div className="flex flex-column">
+                <div
+                  className="flex justify-content-center pb-3 ion-padding"
+                  style={{
+                    marginTop: "20px",
+                    borderBottom: "1px solid #ccc",
+                    position: "-webkit-sticky",
+                  }}
+                >
+                  <div className="flex flex-column w-full">
+                    <IonText color="dark font-lg" style={{}}>
+                      {dayjs().isSame(item.createdAt, "day")
+                        ? "Today"
+                        : dayjs()
+                            .subtract(1, "day")
+                            .isSame(item.createdAt, "day")
+                        ? "Yesterday"
+                        : dayjs(item.createdAt).format("MMMM, YYYY")}
                     </IonText>
-                    <IonText color="primary font-12 font-bold">
-                      {months[new Date(item.createdAt).getMonth()]}
+                    <IonText color="dark font-2xl font-bold" className="w-full">
+                      {dayjs(item.createdAt).format("DD")}
+                      {getOrdinalSuffix(dayjs(item.createdAt).date())},{" "}
+                      {dayjs(item.createdAt).format("dddd")}
                     </IonText>
                   </div>
                 </div>
-                <div className="w-10">
+                <div className="ion-padding">
                   {item.data.map((_d: any) => (
                     <div key={_d.id} className="w-full">
-                      <LinkPreview tags={tags} onClickTag={onClickTag} selectedTags={selectedTags} item={_d} />
+                      <LinkPreview
+                        tags={tags}
+                        onClickTag={onClickTag}
+                        selectedTags={selectedTags}
+                        item={_d}
+                      />
                     </div>
                   ))}
                 </div>
@@ -133,10 +261,14 @@ const Home = () => {
             initialBreakpoint={1}
             breakpoints={[0, 1]}
           >
-            <TagsFitler tags={tags} selectedTags={selectedTags} onClickTag={onClickTag} />
+            <TagsFitler
+              showAddForm={showAddForm}
+              tags={tags}
+              selectedTags={selectedTags}
+              onClickTag={onClickTag}
+            />
           </IonModal>
         </div>
-
       </IonContent>
     </IonPage>
   );
