@@ -1,19 +1,13 @@
+import { useEffect, useRef, useState } from "react";
 import {
   IonAvatar,
   IonBackButton,
   IonButton,
   IonButtons,
   IonCard,
-  IonCardSubtitle,
   IonChip,
   IonContent,
   IonHeader,
-  IonIcon,
-  IonImg,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenuButton,
   IonModal,
   IonPage,
   IonText,
@@ -25,14 +19,7 @@ import {
 } from "@ionic/react";
 import { useParams } from "react-router";
 import { useAppContext } from "../context/MainContext";
-import {
-  calendarClearOutline,
-  createOutline,
-  linkOutline,
-  pricetagsOutline,
-  trashOutline,
-} from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
+import { Clipboard } from "@capacitor/clipboard";
 import NoteForm from "../components/NoteForm";
 import TagSelector from "../components/TagSelector";
 import { isUrl } from "../helpers";
@@ -60,6 +47,12 @@ const ItemDetail = () => {
   useEffect(() => {
     setNote(item?.note || "");
   }, [item?.note]);
+
+  const writeToClipboard = async () => {
+    await Clipboard.write({
+      string: item?.url || item?.content,
+    });
+  };
 
   const title = () => {
     if (!item) return;
@@ -236,7 +229,13 @@ const ItemDetail = () => {
               <IonText className="">{item?.metadata.publisher}</IonText>
             )}
             <div style={{ marginLeft: "auto" }} className="font-bold">
-              <IonText color={"primary"}>Copy Link</IonText>
+              <IonButton
+                className="font-bold"
+                fill="clear"
+                onClick={writeToClipboard}
+              >
+                Copy Link
+              </IonButton>
             </div>
           </div>
         </div>

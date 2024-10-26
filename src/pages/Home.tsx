@@ -90,6 +90,10 @@ const Home = ({ isSearch }: Props) => {
     );
   };
 
+  const searchByText = (e: any) => {
+    e.preventDefault();
+  };
+
   return (
     <IonPage>
       <IonHeader>
@@ -115,7 +119,12 @@ const Home = ({ isSearch }: Props) => {
         </IonToolbar>
         {!!isSearch && (
           <IonToolbar className="white-header">
-            <IonSearchbar placeholder="Search"></IonSearchbar>
+            <form action="" onSubmit={searchByText}>
+              <IonSearchbar
+                inputmode="search"
+                placeholder="Search"
+              ></IonSearchbar>
+            </form>
           </IonToolbar>
         )}
         <IonToolbar className="white-header pl-2">
@@ -133,6 +142,9 @@ const Home = ({ isSearch }: Props) => {
             </IonChip>
             {sharedItems.length > 0 && (
               <IonChip
+                onClick={() => {
+                  setSelectedTags([]);
+                }}
                 className="gap-4"
                 color={selectedTags.length === 0 ? "primary" : ""}
               >
@@ -174,37 +186,39 @@ const Home = ({ isSearch }: Props) => {
                 1
               </span>
             </IonChip> */}
-            {tags.map((tag: Tag) => {
-              const count = itemsCount(tag.id);
-              return (
-                <IonChip
-                  key={tag.id}
-                  className="gap-4"
-                  onClick={() => onClickTag(tag)}
-                  color={selectedTags.includes(tag) ? "primary" : ""}
-                >
-                  <IonLabel>{tag.name}</IonLabel>
-                  {count > 0 && (
-                    <span
-                      className="font-16 font-bold p-1"
-                      style={{
-                        width: "1.4rem",
-                        height: "1.4rem",
-                        backgroundColor: "var(--ion-color-light)",
-                        borderRadius: "50%",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        marginLeft: "10px",
-                        color: "var(--ion-color-primary)",
-                      }}
-                    >
-                      {count > 9 ? "9+" : count}
-                    </span>
-                  )}
-                </IonChip>
-              );
-            })}
+            {tags
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((tag: Tag) => {
+                const count = itemsCount(tag.id);
+                return (
+                  <IonChip
+                    key={tag.id}
+                    className="gap-4"
+                    onClick={() => onClickTag(tag)}
+                    color={selectedTags.includes(tag) ? "primary" : ""}
+                  >
+                    <IonLabel>{tag.name}</IonLabel>
+                    {count > 0 && (
+                      <span
+                        className="font-16 font-bold p-1"
+                        style={{
+                          width: "1.4rem",
+                          height: "1.4rem",
+                          backgroundColor: "var(--ion-color-light)",
+                          borderRadius: "50%",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          marginLeft: "10px",
+                          color: "var(--ion-color-primary)",
+                        }}
+                      >
+                        {count > 9 ? "9+" : count}
+                      </span>
+                    )}
+                  </IonChip>
+                );
+              })}
           </div>
         </IonToolbar>
       </IonHeader>

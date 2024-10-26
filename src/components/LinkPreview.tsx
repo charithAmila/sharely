@@ -1,17 +1,16 @@
 import {
   IonCard,
   IonCardHeader,
-  IonCardTitle,
   IonCardSubtitle,
   IonCardContent,
   IonChip,
   IonSkeletonText,
-  IonThumbnail,
   IonAvatar,
   IonIcon,
   IonText,
   IonButton,
-  IonItemDivider,
+  useIonAlert,
+  useIonToast,
 } from "@ionic/react";
 import {
   createOutline,
@@ -22,6 +21,7 @@ import {
 import { isUrl, truncateText } from "../helpers";
 import { useRef } from "react";
 import ThinDivider from "./ThinDivider";
+import { useAppContext } from "../context/MainContext";
 
 interface Metadata {
   title?: string;
@@ -37,15 +37,13 @@ interface LinkPreviewProps {
   tags: Tag[];
 }
 
-const LinkPreview = ({
-  item,
-  selectedTags,
-  onClickTag,
-  tags,
-}: LinkPreviewProps) => {
+const LinkPreview = ({ item, tags }: LinkPreviewProps) => {
   const { metadata } = item;
 
   const linkRef = useRef<HTMLAnchorElement>(null);
+  const [presentAlert] = useIonAlert();
+  const [present] = useIonToast();
+  const { deleteItem } = useAppContext();
 
   const renderChips = () => {
     const first3Tags = item.tags.slice(0, 3);
@@ -124,7 +122,7 @@ const LinkPreview = ({
     <>
       {metadata && (
         <>
-          <IonCard className="main-card">
+          <IonCard routerLink={`item/${item.id}`} className="main-card">
             <div
               style={{
                 backgroundColor: "#EEF0F5",
@@ -196,35 +194,57 @@ const LinkPreview = ({
               {renderChips()}
               <ThinDivider />
               <div className="flex align-items-center">
-                <div className="flex-1 flex justify-content-start">
-                  <IonButton
-                    color="medium"
-                    fill="clear"
-                    size="small"
-                    routerLink={`item/${item.id}`}
-                  >
+                {/* <div className="flex-1 flex justify-content-start">
+                  <IonButton color="medium" fill="clear" size="small">
                     <IonIcon slot="start" icon={createOutline} />
                     Edit
                   </IonButton>
-                </div>
-                <div className="flex-1 flex justify-content-center">
-                  <IonButton
-                    color="medium"
-                    fill="clear"
-                    size="small"
-                    onClick={() => linkRef.current?.click()}
-                  >
-                    <IonIcon slot="start" icon={openOutline} />
-                    Open
-                  </IonButton>
-                  {renderLink()}
-                </div>
+                </div> */}
+                {/* <div className="flex-1 flex justify-content-center">
+                  
+                </div> */}
                 <div className="flex-1 flex justify-content-end">
                   <IonButton
                     color="medium"
                     fill="clear"
                     size="small"
-                    routerLink={`item/${item.id}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // linkRef.current?.click();
+                    }}
+                  >
+                    <IonIcon slot="start" icon={openOutline} />
+                    Open
+                  </IonButton>
+
+                  <IonButton
+                    color="medium"
+                    fill="clear"
+                    size="small"
+                    onClick={() => {
+                      presentAlert({
+                        header: "Delete Item",
+                        message: "Are you sure you want to delete this item?",
+                        buttons: [
+                          "Cancel",
+                          {
+                            text: "Delete",
+                            handler: () => {
+                              if (item) {
+                                deleteItem(item);
+                                present({
+                                  message: "Item deleted successfully",
+                                  duration: 1500,
+                                  position: "top",
+                                  color: "success",
+                                });
+                              }
+                            },
+                          },
+                        ],
+                      });
+                    }}
+                    // routerLink={`item/${item.id}`}
                   >
                     <IonIcon slot="start" icon={trashOutline} />
                     Delete
@@ -233,6 +253,7 @@ const LinkPreview = ({
               </div>
             </div>
           </IonCard>
+          {renderLink()}
         </>
       )}
     </>

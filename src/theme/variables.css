@@ -149,3 +149,56 @@ ion-toolbar > .chips-container > ion-chip {
   --background: #eef0f5;
   --border-color: #c3c9da;
 }
+
+.main-search-icon {
+  --background: var(--ion-color-primary);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  color: #f6f8fc;
+  position: absolute;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.tab-btn-home {
+  border-top-left-radius: 30px;
+  border-bottom-left-radius: 30px;
+  height: 40px;
+  background-color: #e2e7f3;
+}
+
+.tab-btn-profile {
+  border-top-right-radius: 30px;
+  border-bottom-right-radius: 30px;
+  height: 40px;
+  background-color: #e2e7f3;
+}
+
+.tab-btn-search {
+  height: 40px;
+  background-color: #e2e7f3;
+}
+
+.tab-btn-profile ion-icon {
+  font-size: 30px;
+}
+
+.tab-btn-home ion-icon {
+  font-size: 30px;
+}
+
+.main-search-icon ion-icon {
+  font-size: 40px;
+}
+
+ion-tab-bar {
+  --border: none;
+  --background: var(--ion-color-white);
+  padding-bottom: 4%;
+  width: 60%;
+  margin-left: 20%;
+  height: 60px;
+  display: flex;
+  gap: 40px;
+}

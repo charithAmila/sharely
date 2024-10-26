@@ -28,9 +28,9 @@ import Group from "./pages/Group";
 import GroupForm from "./pages/GroupForm";
 import OnBoard from "./pages/Onboard";
 import { useState } from "react";
-import ExpandedLogo from "./assets/svg/ExpandedLogo";
 import Search from "./pages/Search";
 import Subscription from "./pages/Subscription";
+import ExpandedLogoWhite from "./assets/svg/ExpandedLogoWhite";
 
 const AuthRoutes = () => {
   const { user } = useAuthContext();
@@ -70,13 +70,25 @@ const AuthRoutes = () => {
             <Route exact path="/tabs/subscribe" component={Subscription} />
           </IonRouterOutlet>
           <IonTabBar slot="bottom">
-            <IonTabButton tab="tab1" href="/tabs/home">
+            <IonTabButton
+              className="tab-btn tab-btn-home"
+              tab="tab1"
+              href="/tabs/home"
+            >
               <IonIcon aria-hidden="true" icon={homeOutline} />
             </IonTabButton>
-            <IonTabButton tab="tab2" href="/tabs/search">
+            <IonTabButton
+              className="main-search-icon"
+              tab="tab2"
+              href="/tabs/search"
+            >
               <IonIcon aria-hidden="true" icon={searchOutline} />
             </IonTabButton>
-            <IonTabButton tab="profile" href="/tabs/profile">
+            <IonTabButton
+              className="tab-btn tab-btn-profile"
+              tab="profile"
+              href="/tabs/profile"
+            >
               <IonIcon aria-hidden="true" icon={personCircleOutline} />
             </IonTabButton>
           </IonTabBar>
@@ -95,7 +107,7 @@ const AppRoutes = () => {
         <IonPage>
           <IonContent className="ion-padding bg-primary" fullscreen>
             <div className="flex align-items-center justify-content-center h-100vh">
-              <ExpandedLogo fill="#fff" />
+              <ExpandedLogoWhite />
             </div>
           </IonContent>
         </IonPage>
