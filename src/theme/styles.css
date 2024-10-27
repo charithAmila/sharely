@@ -222,6 +222,9 @@
 .ml-50 {
   margin-left: 50px;
 }
+.ml-auto {
+  margin-left: auto;
+}
 
 .mt-auto {
   margin-top: auto;

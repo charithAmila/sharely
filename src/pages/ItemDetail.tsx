@@ -330,7 +330,10 @@ const ItemDetail = () => {
           />
         ) : (
           <TagSelector
-            id={id}
+            onClickDone={async (tags) => {
+              await updateItem({ tags: tags.map((tag) => tag.id) }, id);
+              setIsOpen(false);
+            }}
             selectedTags={
               tags.filter((tag) => item?.tags?.includes(tag.id)) || []
             }

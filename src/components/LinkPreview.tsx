@@ -11,6 +11,7 @@ import {
   IonButton,
   useIonAlert,
   useIonToast,
+  useIonRouter,
 } from "@ionic/react";
 import {
   createOutline,
@@ -35,10 +36,13 @@ interface LinkPreviewProps {
   selectedTags: { id: string; name: string }[];
   onClickTag: (tag: Tag) => void;
   tags: Tag[];
+  onClickEdit: () => void;
 }
 
-const LinkPreview = ({ item, tags }: LinkPreviewProps) => {
+const LinkPreview = ({ item, tags, onClickEdit }: LinkPreviewProps) => {
   const { metadata } = item;
+
+  const { push } = useIonRouter();
 
   const linkRef = useRef<HTMLAnchorElement>(null);
   const [presentAlert] = useIonAlert();
@@ -122,7 +126,12 @@ const LinkPreview = ({ item, tags }: LinkPreviewProps) => {
     <>
       {metadata && (
         <>
-          <IonCard routerLink={`item/${item.id}`} className="main-card">
+          <IonCard
+            onClick={() => {
+              push(`/tabs/item/${item.id}`);
+            }}
+            className="main-card"
+          >
             <div
               style={{
                 backgroundColor: "#EEF0F5",
@@ -194,55 +203,64 @@ const LinkPreview = ({ item, tags }: LinkPreviewProps) => {
               {renderChips()}
               <ThinDivider />
               <div className="flex align-items-center">
-                {/* <div className="flex-1 flex justify-content-start">
-                  <IonButton color="medium" fill="clear" size="small">
+                <div className="flex-1 flex justify-content-start">
+                  <IonButton
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onClickEdit();
+                    }}
+                    color="medium"
+                    fill="clear"
+                    size="small"
+                  >
                     <IonIcon slot="start" icon={createOutline} />
                     Edit
                   </IonButton>
-                </div> */}
-                {/* <div className="flex-1 flex justify-content-center">
-                  
-                </div> */}
-                <div className="flex-1 flex justify-content-end">
+                </div>
+                <div className="flex-1 flex justify-content-center">
                   <IonButton
                     color="medium"
                     fill="clear"
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation();
-                      // linkRef.current?.click();
+                      linkRef.current?.click();
                     }}
                   >
                     <IonIcon slot="start" icon={openOutline} />
                     Open
                   </IonButton>
-
+                </div>
+                <div className="flex-1 flex justify-content-end">
                   <IonButton
                     color="medium"
                     fill="clear"
                     size="small"
-                    onClick={() => {
-                      presentAlert({
-                        header: "Delete Item",
-                        message: "Are you sure you want to delete this item?",
-                        buttons: [
-                          "Cancel",
-                          {
-                            text: "Delete",
-                            handler: () => {
-                              if (item) {
-                                deleteItem(item);
-                                present({
-                                  message: "Item deleted successfully",
-                                  duration: 1500,
-                                  position: "top",
-                                  color: "success",
-                                });
-                              }
+                    onClick={(e) => {
+                      try {
+                        e.stopPropagation();
+                        presentAlert({
+                          header: "Delete Item",
+                          message: "Are you sure you want to delete this item?",
+                          buttons: [
+                            "Cancel",
+                            {
+                              text: "Delete",
+                              handler: () => {
+                                if (item) {
+                                  deleteItem(item);
+                                  present({
+                                    message: "Item deleted successfully",
+                                    duration: 1500,
+                                    position: "top",
+                                    color: "success",
+                                  });
+                                }
+                              },
                             },
-                          },
-                        ],
-                      });
+                          ],
+                        });
+                      } catch (error) {}
                     }}
                     // routerLink={`item/${item.id}`}
                   >

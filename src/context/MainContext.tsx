@@ -45,7 +45,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
       try {
         const tag = new TagService();
         const data = await tag.findByField("userId", user.id);
-        setTags(data);
+        setTags(data.sort((a, b) => (a.name > b.name ? 1 : -1)));
       } catch (error) {
         console.error(error);
       }

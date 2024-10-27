@@ -25,7 +25,7 @@ import { addIcons } from "ionicons";
 import FilterSvg from "../assets/icons/filter-icon.svg";
 import CardSvg from "../assets/icons/card-icon.svg";
 import dayjs from "dayjs";
-import { useParams } from "react-router";
+import LinkEdit from "../components/LinkEdit";
 
 addIcons({
   "filter-icon": FilterSvg,
@@ -42,6 +42,10 @@ const Home = ({ isSearch }: Props) => {
   const modal = useRef<HTMLIonModalElement>(null);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [modelType, setModelType] = useState<"tag-filter" | "edit">(
+    "tag-filter"
+  );
+  const [selectedItem, setSelectedItem] = useState<SharedItem>();
 
   const itemsCount = (tagId: string) => {
     return sharedItems.filter((item: SharedItem) => item.tags.includes(tagId))
@@ -103,6 +107,7 @@ const Home = ({ isSearch }: Props) => {
             <IonButton
               onClick={() => {
                 setShowAddForm(false);
+                setModelType("tag-filter");
                 modal.current?.present();
               }}
             >
@@ -132,6 +137,7 @@ const Home = ({ isSearch }: Props) => {
             <IonChip
               onClick={() => {
                 setShowAddForm(true);
+                setModelType("tag-filter");
                 modal.current?.present();
               }}
               outline
@@ -260,6 +266,11 @@ const Home = ({ isSearch }: Props) => {
                         onClickTag={onClickTag}
                         selectedTags={selectedTags}
                         item={_d}
+                        onClickEdit={() => {
+                          setSelectedItem(_d);
+                          setModelType("edit");
+                          modal.current?.present();
+                        }}
                       />
                     </div>
                   ))}
@@ -272,15 +283,27 @@ const Home = ({ isSearch }: Props) => {
           <IonModal
             ref={modal}
             trigger="open-modal"
-            initialBreakpoint={1}
-            breakpoints={[0, 1]}
+            initialBreakpoint={0.5}
+            breakpoints={[0, 0.5, 0.75, 1]}
           >
-            <TagsFitler
-              showAddForm={showAddForm}
-              tags={tags}
-              selectedTags={selectedTags}
-              onClickTag={onClickTag}
-            />
+            {modelType === "edit" ? (
+              <>
+                {selectedItem && (
+                  <LinkEdit
+                    closeModal={() => modal.current?.dismiss()}
+                    tags={tags}
+                    item={selectedItem}
+                  />
+                )}
+              </>
+            ) : (
+              <TagsFitler
+                showAddForm={showAddForm}
+                tags={tags}
+                selectedTags={selectedTags}
+                onClickTag={onClickTag}
+              />
+            )}
           </IonModal>
         </div>
       </IonContent>

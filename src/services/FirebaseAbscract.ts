@@ -2,6 +2,7 @@ import { db } from "../firebase";
 import {
   DocumentData,
   DocumentSnapshot,
+  Timestamp,
   addDoc,
   collection,
   deleteDoc,
@@ -36,6 +37,8 @@ export class FirebaseAbstract {
 
   public async update(data: any) {
     try {
+      if (data.createdAt) delete data.createdAt;
+
       const document = doc(db, this.collection, data.id);
       return await updateDoc(document, {
         ...data,
@@ -65,17 +68,19 @@ export class FirebaseAbstract {
    * @returns Array
    */
   public async all() {
-    try {      
+    try {
       const documents = collection(db, this.collection);
       return this.querySnapshotToArray(await getDocs(documents));
     } catch (error) {
-      console.log('error', error);
-      
+      console.log("error", error);
+
       throw new Error("Error fetching documents");
     }
   }
 
-  public async findByDocument(documentId: string): Promise<DocumentSnapshot<DocumentData> | null> {
+  public async findByDocument(
+    documentId: string
+  ): Promise<DocumentSnapshot<DocumentData> | null> {
     try {
       const document = doc(db, this.collection, documentId);
       const docSnap: DocumentSnapshot<DocumentData> = await getDoc(document);
@@ -90,7 +95,10 @@ export class FirebaseAbstract {
 
   public async findByField(field: string, value: string) {
     try {
-      const _query = query(collection(db, this.collection), where(field, "==", value));
+      const _query = query(
+        collection(db, this.collection),
+        where(field, "==", value)
+      );
       const querySnapshot = await getDocs(_query);
       return this.querySnapshotToArray(querySnapshot);
     } catch (error) {
@@ -100,7 +108,10 @@ export class FirebaseAbstract {
 
   public async findByFieldsArrayIn(field: string, value: string[]) {
     try {
-      const _query = query(collection(db, this.collection), where(field, "in", value));
+      const _query = query(
+        collection(db, this.collection),
+        where(field, "in", value)
+      );
       const querySnapshot = await getDocs(_query);
       return this.querySnapshotToArray(querySnapshot);
     } catch (error) {
@@ -110,7 +121,10 @@ export class FirebaseAbstract {
 
   public async findByFieldsArrayContainsAny(field: string, value: string[]) {
     try {
-      const _query = query(collection(db, this.collection), where(field, "array-contains-any", value));
+      const _query = query(
+        collection(db, this.collection),
+        where(field, "array-contains-any", value)
+      );
       const querySnapshot = await getDocs(_query);
       return this.querySnapshotToArray(querySnapshot);
     } catch (error) {
@@ -132,8 +146,12 @@ export class FirebaseAbstract {
     }
   }
 
-  public async onDocumentChange(userId: string ,callback: any) {
-    const q = query(collection(db, this.collection), where("userId", "==", userId), orderBy("createdAt", "desc"));
+  public async onDocumentChange(userId: string, callback: any) {
+    const q = query(
+      collection(db, this.collection),
+      where("userId", "==", userId),
+      orderBy("createdAt", "desc")
+    );
     return onSnapshot(q, (querySnapshot) => {
       const dataArray = this.querySnapshotToArray(querySnapshot);
       callback(dataArray);
@@ -141,15 +159,36 @@ export class FirebaseAbstract {
   }
 
   private querySnapshotToArray(querySnapshot: any) {
+    function isFirestoreTimestamp(date: any): date is Timestamp {
+      return (
+        date &&
+        typeof date === "object" &&
+        typeof date.seconds === "number" &&
+        typeof date.nanoseconds === "number"
+      );
+    }
+
     const dataArray: any[] = [];
     querySnapshot.forEach((doc: any) => {
-      
       const { createdAt, updatedAt } = doc.data();
-   
+
+      let createdAtTimestamp: string | null = null;
+      let updatedAtTimestamp: string | null = null;
+      if (isFirestoreTimestamp(createdAt)) {
+        createdAtTimestamp = createdAt.toDate().toString();
+      } else if (createdAt) {
+        createdAtTimestamp = new Date(createdAt).toString();
+      }
+      if (isFirestoreTimestamp(updatedAt)) {
+        updatedAtTimestamp = updatedAt.toDate().toString();
+      } else if (updatedAt) {
+        updatedAtTimestamp = new Date(updatedAt).toString();
+      }
+
       dataArray.push({
         ...doc.data(),
-        createdAt: !createdAt ? null : createdAt?.toDate().toString(),
-        updatedAt: !updatedAt ? null : updatedAt?.toDate().toString(),
+        createdAt: createdAtTimestamp,
+        updatedAt: updatedAtTimestamp,
         id: doc.id,
       });
     });
