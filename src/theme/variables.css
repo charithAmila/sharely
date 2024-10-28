@@ -13,7 +13,7 @@ ion-button {
 :root {
   --ion-color-primary: #0172fc;
   --ion-color-primary-rgb: 1, 114, 252;
-  --ion-color-primary-contrast: #000000;
+  --ion-color-primary-contrast: #ffffff;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
   --ion-color-primary-shade: #0164de;
   --ion-color-primary-tint: #1a80fc;

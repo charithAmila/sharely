@@ -44,7 +44,7 @@ export default function TagList({
         <IonButton
           key={tag.id}
           shape="round"
-          size="default"
+          size="small"
           fill={
             selectedTags.map((t) => t.id).includes(tag.id) ? "solid" : "outline"
           }

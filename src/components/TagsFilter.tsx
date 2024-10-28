@@ -1,12 +1,10 @@
 import {
   IonButton,
   IonText,
-  IonIcon,
   IonItem,
   IonInput,
   useIonToast,
 } from "@ionic/react";
-import { add, checkmark, remove } from "ionicons/icons";
 import { useState } from "react";
 import { useAppContext } from "../context/MainContext";
 import TagList from "./TagList";
@@ -16,9 +14,16 @@ type Props = {
   selectedTags: Tag[];
   onClickTag: (tag: Tag) => void;
   showAddForm?: boolean;
+  closeModal: () => void;
 };
 
-const TagsFitler = ({ tags, selectedTags, onClickTag, showAddForm }: Props) => {
+const TagsFilter = ({
+  tags,
+  selectedTags,
+  onClickTag,
+  showAddForm,
+  closeModal,
+}: Props) => {
   const [showForm, setShowForm] = useState(showAddForm || false);
   const [tagName, setTagName] = useState("");
   const { createTag } = useAppContext();
@@ -28,7 +33,13 @@ const TagsFitler = ({ tags, selectedTags, onClickTag, showAddForm }: Props) => {
     if (tagName.trim().length > 0) {
       createTag(tagName);
       setTagName("");
-      setShowForm(false);
+
+      if (showAddForm) {
+        closeModal();
+      } else {
+        setShowForm(false);
+      }
+
       present({
         message: "Tag created successfully",
         duration: 1500,
@@ -50,10 +61,13 @@ const TagsFitler = ({ tags, selectedTags, onClickTag, showAddForm }: Props) => {
       <div className="h-50vh ion-padding">
         {showForm ? (
           <>
+            <IonText>
+              <h1 className="ion-text-left font-large font-bold">
+                Add New Tag
+              </h1>
+            </IonText>
             <IonItem>
               <IonInput
-                slot="start"
-                // label="Tag Name"
                 placeholder="Enter Tag Name"
                 value={tagName}
                 onIonInput={(e) => e.detail.value && setTagName(e.detail.value)}
@@ -61,18 +75,24 @@ const TagsFitler = ({ tags, selectedTags, onClickTag, showAddForm }: Props) => {
               <IonButton
                 shape="round"
                 disabled={tagName.trim().length === 0}
-                color={"success"}
                 slot="end"
                 onClick={() => onClickDone()}
               >
-                <IonIcon slot="icon-only" icon={checkmark} />
+                Save
               </IonButton>
             </IonItem>
           </>
         ) : (
           <>
             {tags.length > 0 ? (
-              <TagList selectedTags={selectedTags} onClickTag={onClickTag} />
+              <>
+                <IonText>
+                  <h1 className="ion-text-left font-large font-bold">
+                    Filter by Tags
+                  </h1>
+                </IonText>
+                <TagList selectedTags={selectedTags} onClickTag={onClickTag} />
+              </>
             ) : (
               <>
                 <div className="flex flex-column gap-4">
@@ -90,29 +110,44 @@ const TagsFitler = ({ tags, selectedTags, onClickTag, showAddForm }: Props) => {
             )}
           </>
         )}
-      </div>
-      {!showForm ? (
-        <>
-          {tags.length > 0 && (
-            <IonButton fill="clear" onClick={() => setShowForm(true)}>
-              <IonIcon icon={add}></IonIcon>
-              Add Tags
-            </IonButton>
+        <div
+          className="w-full"
+          style={{
+            position: "absolute",
+            bottom: "-5px",
+            left: -1,
+            width: "105%",
+          }}
+        >
+          {!showForm ? (
+            <>
+              {tags.length > 0 && (
+                <IonButton expand="full" onClick={() => setShowForm(true)}>
+                  ADD NEW TAG
+                </IonButton>
+              )}
+            </>
+          ) : (
+            <>
+              <IonButton
+                color={"danger"}
+                expand="full"
+                onClick={() => {
+                  if (showAddForm) {
+                    closeModal();
+                    return;
+                  }
+                  setShowForm(false);
+                }}
+              >
+                <IonText>CANCEL</IonText>
+              </IonButton>
+            </>
           )}
-        </>
-      ) : (
-        <>
-          <IonButton
-            color={"danger"}
-            fill="clear"
-            onClick={() => setShowForm(false)}
-          >
-            <IonText>Cancel</IonText>
-          </IonButton>
-        </>
-      )}
+        </div>
+      </div>
     </>
   );
 };
 
-export default TagsFitler;
+export default TagsFilter;

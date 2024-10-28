@@ -18,7 +18,7 @@ import LinkPreview from "../components/LinkPreview";
 import { useAppContext } from "../context/MainContext";
 import { add } from "ionicons/icons";
 import { getOrdinalSuffix } from "../utils/constant";
-import TagsFitler from "../components/TagsFilter";
+import TagsFilter from "../components/TagsFilter";
 import ExpandedLogo from "../assets/svg/ExpandedLogo";
 
 import { addIcons } from "ionicons";
@@ -297,8 +297,9 @@ const Home = ({ isSearch }: Props) => {
                 )}
               </>
             ) : (
-              <TagsFitler
+              <TagsFilter
                 showAddForm={showAddForm}
+                closeModal={() => modal.current?.dismiss()}
                 tags={tags}
                 selectedTags={selectedTags}
                 onClickTag={onClickTag}

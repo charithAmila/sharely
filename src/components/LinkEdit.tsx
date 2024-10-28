@@ -18,6 +18,7 @@ import { useAppContext } from "../context/MainContext";
 import { useEffect, useState } from "react";
 import NoteForm from "./NoteForm";
 import TagSelector from "./TagSelector";
+import { truncateText } from "../helpers";
 
 type Props = {
   item: SharedItem;
@@ -36,9 +37,10 @@ const LinkEdit = ({ item, tags, closeModal }: Props) => {
     setSelectedItem(item);
   }, [item]);
 
-  const onClickRemoveTag = (tagId: string) => {
-    const newTags = item.tags.filter((tag) => tag !== tagId);
+  const onClickRemoveTag = async (tagId: string) => {
+    const newTags = selectedItem.tags.filter((tag) => tag !== tagId);
     setSelectedItem({ ...selectedItem, tags: newTags });
+    await updateItem({ tags: newTags }, item.id);
   };
 
   const onClickSave = async () => {
@@ -118,8 +120,8 @@ const LinkEdit = ({ item, tags, closeModal }: Props) => {
       <IonText color="dark">
         <h5>Note</h5>
       </IonText>
-      <IonItem lines="full">
-        <IonTextarea
+
+      {/* <IonTextarea
           readonly
           onClick={() => {
             setModalType("note");
@@ -131,9 +133,30 @@ const LinkEdit = ({ item, tags, closeModal }: Props) => {
             setSelectedItem({ ...selectedItem, note: e.detail.value! });
           }}
           placeholder="Add a note"
-        />
-      </IonItem>
-      <br />
+        /> */}
+      <div
+        className="w-full p-2"
+        style={{
+          borderWidth: "1px",
+          borderStyle: "solid",
+          borderRadius: "8px",
+          borderColor: "#C3C9DA",
+        }}
+      >
+        <IonText
+          color="dark"
+          onClick={() => {
+            setModalType("note");
+            setIsOpen(true);
+          }}
+          className="font-xs"
+        >
+          <p style={!selectedItem.note ? { color: "#C3C9DA" } : {}}>
+            {truncateText(selectedItem.note || "Enter a note here", 400)}
+          </p>
+        </IonText>
+      </div>
+      {/* <br />
       <br />
       <div className="w-full">
         <IonButton
@@ -148,11 +171,14 @@ const LinkEdit = ({ item, tags, closeModal }: Props) => {
         >
           Done
         </IonButton>
-      </div>
+      </div> */}
       <IonModal isOpen={isOpen}>
         {modalType === "note" ? (
           <NoteForm
-            onClickSave={() => setIsOpen(false)}
+            onClickSave={async () => {
+              await updateItem({ note: selectedItem.note ?? "" }, item.id);
+              setIsOpen(false);
+            }}
             setIsOpen={() => setIsOpen(false)}
             note={selectedItem.note || ""}
             setNote={(e: string) =>
@@ -161,11 +187,12 @@ const LinkEdit = ({ item, tags, closeModal }: Props) => {
           />
         ) : (
           <TagSelector
-            onClickDone={(tags: Tag[]) => {
+            onClickDone={async (tags: Tag[]) => {
               setSelectedItem({
                 ...selectedItem,
                 tags: tags.map((tag) => tag.id),
               });
+              await updateItem({ tags: tags.map((tag) => tag.id) }, item.id);
               setIsOpen(false);
             }}
             title="Select Tags"
