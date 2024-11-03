@@ -13,7 +13,10 @@ type AppContextProviderProps = {
 type ContextProps = {
   items: GroupedSharedItem[];
   tags: Tag[];
+  linksCount: LinkCount[];
   createTag: (name: string) => Promise<void>;
+  updateTag: (tag: Partial<Tag>, id: string) => Promise<void>;
+  deleteTag: (tag: Tag) => Promise<void>;
   sharedItems: SharedItem[];
   updateItem: (item: Partial<SharedItem>, id: string) => Promise<void>;
   deleteItem: (item: SharedItem) => Promise<void>;
@@ -35,6 +38,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const [sharedItems, setSharedItems] = useState<SharedItem[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
   const [friends, setFriends] = useState<Member[]>([]);
+  const [linksCount, setLinksCount] = useState<LinkCount[]>([]);
 
   useEffect(() => {
     if (!user) {
@@ -65,6 +69,28 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     fetchTags();
   }, [user]);
 
+  // calculate links count for each tag
+  useEffect(() => {
+    const linkCountMap: { [tagId: string]: number } = {};
+
+    sharedItems.forEach((item) => {
+      item.tags.forEach((tagId) => {
+        if (linkCountMap[tagId]) {
+          linkCountMap[tagId]++;
+        } else {
+          linkCountMap[tagId] = 1;
+        }
+      });
+    });
+
+    // Convert the map into an array of LinkCount objects
+    setLinksCount(
+      Object.keys(linkCountMap).map((tagId) => ({
+        [tagId]: linkCountMap[tagId],
+      }))
+    );
+  }, [tags, sharedItems]);
+
   useEffect(() => {
     if (!user) {
       return;
@@ -94,6 +120,36 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     const data = await tag.create(newTag);
 
     data.id && setTags([{ ...newTag, id: data.id }, ...tags]);
+  };
+
+  const updateTag = async (tag: Partial<Tag>, id: string) => {
+    if (!user) {
+      return;
+    }
+
+    const tagService = new TagService();
+    await tagService.update({ ...tag, id });
+
+    const index = tags.findIndex((i) => i.id === id);
+    if (index !== -1) {
+      tags[index] = { ...tags[index], ...tag };
+      setTags([...tags]);
+    }
+  };
+
+  const deleteTag = async (tag: Tag) => {
+    if (!user) {
+      return;
+    }
+
+    const tagService = new TagService();
+    await tagService.delete(tag.id);
+
+    const index = tags.findIndex((i) => i.id === tag.id);
+    if (index !== -1) {
+      tags.splice(index, 1);
+      setTags([...tags]);
+    }
   };
 
   const updateItem = async (item: Partial<SharedItem>, id: string) => {
@@ -198,7 +254,10 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const values: ContextProps = {
     items,
     tags,
+    linksCount,
     createTag,
+    updateTag,
+    deleteTag,
     sharedItems,
     updateItem,
     deleteItem,

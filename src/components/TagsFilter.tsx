@@ -8,6 +8,7 @@ import {
 import { useState } from "react";
 import { useAppContext } from "../context/MainContext";
 import TagList from "./TagList";
+import TagForm from "./TagForm";
 
 type Props = {
   tags: Tag[];
@@ -25,65 +26,22 @@ const TagsFilter = ({
   closeModal,
 }: Props) => {
   const [showForm, setShowForm] = useState(showAddForm || false);
-  const [tagName, setTagName] = useState("");
-  const { createTag } = useAppContext();
-  const [present] = useIonToast();
-
-  const onClickDone = () => {
-    if (tagName.trim().length > 0) {
-      createTag(tagName);
-      setTagName("");
-
-      if (showAddForm) {
-        closeModal();
-      } else {
-        setShowForm(false);
-      }
-
-      present({
-        message: "Tag created successfully",
-        duration: 1500,
-        position: "top",
-        color: "success",
-      });
-    } else {
-      present({
-        message: "Please enter tag name",
-        duration: 1500,
-        position: "top",
-        color: "danger",
-      });
-    }
-  };
 
   return (
     <>
-      <div className="h-50vh ion-padding">
+      <div className="h-50vh">
         {showForm ? (
-          <>
-            <IonText>
-              <h1 className="ion-text-left font-large font-bold">
-                Add New Tag
-              </h1>
-            </IonText>
-            <IonItem>
-              <IonInput
-                placeholder="Enter Tag Name"
-                value={tagName}
-                onIonInput={(e) => e.detail.value && setTagName(e.detail.value)}
-              />
-              <IonButton
-                shape="round"
-                disabled={tagName.trim().length === 0}
-                slot="end"
-                onClick={() => onClickDone()}
-              >
-                Save
-              </IonButton>
-            </IonItem>
-          </>
+          <TagForm
+            onSuccess={() => {
+              if (showAddForm) {
+                closeModal();
+              } else {
+                setShowForm(false);
+              }
+            }}
+          />
         ) : (
-          <>
+          <div className="ion-padding">
             {tags.length > 0 ? (
               <>
                 <IonText>
@@ -108,7 +66,7 @@ const TagsFilter = ({
                 </div>
               </>
             )}
-          </>
+          </div>
         )}
         <div
           className="w-full"

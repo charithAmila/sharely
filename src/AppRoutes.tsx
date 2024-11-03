@@ -20,7 +20,6 @@ import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import { AppContextProvider } from "./context/MainContext";
-import TagsForm from "./pages/TagsForm";
 import Tags from "./pages/Tags";
 import ItemDetail from "./pages/ItemDetail";
 import Groups from "./pages/Groups";
@@ -63,7 +62,6 @@ const AuthRoutes = () => {
             <Route exact path="/tabs/item/:id" component={ItemDetail} />
             <Route exact path="/tabs/profile" component={Profile} />
             <Route exact path="/tabs/tags" component={Tags} />
-            <Route exact path="/tabs/tags/tags-form" component={TagsForm} />
             <Route exact path="/tabs/groups" component={Groups} />
             <Route exact path="/tabs/groups/:id" component={Group} />
             <Route exact path="/tabs/group-form" component={GroupForm} />

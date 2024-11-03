@@ -6,10 +6,6 @@ http://ionicframework.com/docs/theming/ */
   font-family: Gabarito;
 }
 
-ion-button {
-  --border-radius: 6px;
-}
-
 :root {
   --ion-color-primary: #0172fc;
   --ion-color-primary-rgb: 1, 114, 252;
@@ -201,4 +197,8 @@ ion-tab-bar {
   height: 60px;
   display: flex;
   gap: 40px;
+}
+
+ion-button {
+  --border-radius: 6px;
 }
