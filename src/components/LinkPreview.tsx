@@ -13,12 +13,7 @@ import {
   useIonToast,
   useIonRouter,
 } from "@ionic/react";
-import {
-  createOutline,
-  linkOutline,
-  openOutline,
-  trashOutline,
-} from "ionicons/icons";
+import { createOutline, openOutline, trashOutline } from "ionicons/icons";
 import { isUrl, truncateText } from "../helpers";
 import { useRef } from "react";
 import ThinDivider from "./ThinDivider";
@@ -31,15 +26,14 @@ interface Metadata {
   url?: string;
 }
 
-interface LinkPreviewProps {
+type Props = {
   item: SharedItem;
   selectedTags: { id: string; name: string }[];
-  onClickTag: (tag: Tag) => void;
   tags: Tag[];
   onClickEdit: () => void;
-}
+};
 
-const LinkPreview = ({ item, tags, onClickEdit }: LinkPreviewProps) => {
+const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
   const { metadata } = item;
 
   const { push } = useIonRouter();

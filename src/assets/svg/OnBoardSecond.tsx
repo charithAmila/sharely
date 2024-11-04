@@ -3,8 +3,8 @@ import { SVGProps } from "react";
 const OnBoardSecond = (props: SVGProps<SVGSVGElement>) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    width={430}
-    height={457}
+    width="100%"
+    height="100%"
     fill="none"
     {...props}
   >

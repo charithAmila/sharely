@@ -43,7 +43,18 @@ export default function OnBoard({ onBoardDone }: Props) {
         </>
       ),
       description: (
-        <ol>
+        <ol
+          style={
+            {
+              // marginTop: 0,
+              // marginBottom: 0,
+              // marginLeft: 0,
+              // paddingLeft: 25,
+              // paddingRight: 15,
+              // fontSize: 15,
+            }
+          }
+        >
           <li>Open any app (like a browser or social media).</li>
           <li>Find a link you want to save.</li>
           <li>Tap 'Share' and choose Sharely.</li>
@@ -89,7 +100,7 @@ export default function OnBoard({ onBoardDone }: Props) {
           }}
         >
           {slides.map((slide, index) => (
-            <SwiperSlide key={index}>
+            <SwiperSlide key={index.toString()}>
               <div className="flex h-100vh w-full">
                 <OnboardSwiper {...slide} />
               </div>

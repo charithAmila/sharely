@@ -18,12 +18,11 @@ import {
 } from "@ionic/react";
 import { useAppContext } from "../context/MainContext";
 import { useParams } from "react-router";
-import LinkPreview from "../components/LinkPreview";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import { months } from "../utils/constant";
 import { ItemService } from "../services/ItemServices";
 import { groupByCreatedAt } from "../helpers";
-import { add, menuOutline, optionsOutline } from "ionicons/icons";
+import { add, menuOutline } from "ionicons/icons";
 import GroupMembers from "../components/GroupMembers";
 
 export default function Group() {
@@ -34,13 +33,11 @@ export default function Group() {
 
   const [present] = useIonActionSheet();
 
-
   const { groups, tags } = useAppContext();
   const group = groups.find((i) => i.id === id);
 
   useEffect(() => {
-    
-    if(!group) {
+    if (!group) {
       return;
     }
 
@@ -49,14 +46,12 @@ export default function Group() {
     if (tagIds.length > 0) {
       const itemService = new ItemService();
       itemService.findByFieldsArrayContainsAny("tags", tagIds).then((data) => {
-        
         const groupedItem: GroupedSharedItem[] = groupByCreatedAt(data);
 
         setItems([...groupedItem]);
-      })
+      });
     }
-    
-  },[group])
+  }, [group]);
 
   const itemFilterByTags = (item: SharedItem) => {
     const selectedTagIds = selectedTags.map((tag) => tag.id);
@@ -102,41 +97,40 @@ export default function Group() {
 
   const onClickMoreOptions = () => {
     present({
-      header: 'Actions',
+      header: "Actions",
       buttons: [
         {
-          text: 'Delete',
-          role: 'destructive',
+          text: "Delete",
+          role: "destructive",
           handler: () => {
-            alert('Sorry, not implemented yet');
+            alert("Sorry, not implemented yet");
           },
           data: {
-            action: 'delete',
+            action: "delete",
           },
         },
         {
-          text: 'Manage Members',
+          text: "Manage Members",
           handler: () => {
             setIsOpen(true);
-          }
+          },
         },
         {
-          text: 'Manage Tags',
+          text: "Manage Tags",
           handler: () => {
             // setIsOpen(true);
-          }
+          },
         },
         {
-          text: 'Cancel',
-          role: 'cancel',
+          text: "Cancel",
+          role: "cancel",
           data: {
-            action: 'cancel',
+            action: "cancel",
           },
         },
       ],
-    })
-  }
-    
+    });
+  };
 
   return (
     <IonPage>
@@ -145,7 +139,7 @@ export default function Group() {
           <IonButtons slot="start">
             <IonBackButton />
           </IonButtons>
-          <IonTitle>{ group?.name ?? "Group" }</IonTitle>
+          <IonTitle>{group?.name ?? "Group"}</IonTitle>
           <IonButtons slot="end">
             <IonButton onClick={onClickMoreOptions}>
               <IonIcon slot="icon-only" icon={menuOutline} />
@@ -163,7 +157,9 @@ export default function Group() {
               (group?.members || []).map((member, index) => (
                 <IonAvatar
                   key={index}
-                  className={`flex justify-content-center align-items-center ${member.type === "author" ? "bg-primary" : "bg-dark"}`}
+                  className={`flex justify-content-center align-items-center ${
+                    member.type === "author" ? "bg-primary" : "bg-dark"
+                  }`}
                   style={{ width: "30px", height: "30px" }}
                 >
                   {member.photo ? (
@@ -181,23 +177,28 @@ export default function Group() {
                   )}
                 </IonAvatar>
               ))}
-              <IonAvatar className={`flex justify-content-center align-items-center bg-dark`} style={{ width: "30px", height: "30px" }}>
-                <IonIcon color="light" icon={add}></IonIcon>
-              </IonAvatar>
+            <IonAvatar
+              className={`flex justify-content-center align-items-center bg-dark`}
+              style={{ width: "30px", height: "30px" }}
+            >
+              <IonIcon color="light" icon={add}></IonIcon>
+            </IonAvatar>
           </div>
         </div>
         <div className="ion-padding">
-          {
-            group?.tags?.map((tag, index) => (
-              <IonChip
-                key={index}
-                color={ selectedTags.find((t) => t.id === tag.id) ? "warning" : "primary"}
-                onClick={() => onClickTag(tag)}
-              >
-                {tag.name}
-              </IonChip>
-            ))
-          }
+          {group?.tags?.map((tag, index) => (
+            <IonChip
+              key={index}
+              color={
+                selectedTags.find((t) => t.id === tag.id)
+                  ? "warning"
+                  : "primary"
+              }
+              onClick={() => onClickTag(tag)}
+            >
+              {tag.name}
+            </IonChip>
+          ))}
         </div>
         <div>
           {listArray &&
@@ -217,29 +218,28 @@ export default function Group() {
                       </IonText>
                     </div>
                   </div>
-                  <div className="w-10">
+                  {/* <div className="w-10">
                     {item.data.map((_d: any) => (
                       <div key={_d.id} className="w-full">
                         <LinkPreview
                           tags={tags}
-                          onClickTag={onClickTag}
                           selectedTags={selectedTags}
                           item={_d}
                         />
                       </div>
                     ))}
-                  </div>
+                  </div> */}
                 </div>
                 {index < listArray.length - 1 && <IonItemDivider />}
               </Fragment>
             ))}
         </div>
         <IonModal isOpen={isOpen}>
-            <GroupMembers 
-              closeModal={() => setIsOpen(false)} 
-              selectedMembers={group?.members || []} 
-              setSelectedMembers={(members) => {}} 
-            />
+          <GroupMembers
+            closeModal={() => setIsOpen(false)}
+            selectedMembers={group?.members || []}
+            setSelectedMembers={(members) => {}}
+          />
         </IonModal>
       </IonContent>
     </IonPage>

@@ -263,7 +263,6 @@ const Home = ({ isSearch }: Props) => {
                     <div key={_d.id} className="w-full">
                       <LinkPreview
                         tags={tags}
-                        onClickTag={onClickTag}
                         selectedTags={selectedTags}
                         item={_d}
                         onClickEdit={() => {

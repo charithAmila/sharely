@@ -43,9 +43,9 @@ const AuthRoutes = () => {
     setIsOnBoarded("YES");
   };
 
-  // if (isOnBoarded === "NO") {
-  //   return <OnBoard onBoardDone={onBoard} />;
-  // }
+  if (isOnBoarded === "NO") {
+    return <OnBoard onBoardDone={onBoard} />;
+  }
 
   return (
     <AppContextProvider user={user}>
