@@ -70,7 +70,7 @@ const Profile = () => {
           <IonItem className="custom-ion-item">
             <IonInput
               disabled
-              label="Password"
+              label="Reset Password"
               labelPlacement="floating"
               placeholder="Enter text"
               type="password"

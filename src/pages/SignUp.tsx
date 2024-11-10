@@ -47,11 +47,10 @@ export default function SignUp() {
       });
       setLoading(false);
     } catch (error) {
-      console.log("+++ error", error);
-
       setLoading(false);
       present({
         message: "Error signing up",
+        position: "top",
         duration: 2000,
         color: "danger",
       });

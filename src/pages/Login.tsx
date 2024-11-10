@@ -56,10 +56,11 @@ export default function Login() {
         const errorMessage = error?.message;
         present({
           color: "danger",
-          buttons: [{ text: "hide", handler: () => dismiss() }],
+          duration: 2000,
+          position: "top",
           message:
-            errorCode === "auth/wrong-password"
-              ? `There's no account with this email. Please check for typos or sign up.`
+            errorCode === "auth/invalid-credential"
+              ? `Invalid email or password`
               : errorMessage,
         });
       });

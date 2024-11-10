@@ -21,7 +21,7 @@ export default function OnboardSwiper({
       <div className="flex align-items-start pt-5">
         <ExpandedLogo />
       </div>
-      <div className="" style={{ height: "55vh" }}>
+      <div className="" style={{ height: "55vh", backgroundColor: "white" }}>
         {img}
       </div>
       <IonText>

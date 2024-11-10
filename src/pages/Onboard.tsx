@@ -2,10 +2,10 @@ import { useRef } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { IonPage, IonContent } from "@ionic/react";
 import OnboardSwiper from "../components/onboard/OnboardSwiper";
-import OnBoardFirst from "../assets/svg/OnBoardFirst";
-import OnBoardSecond from "../assets/svg/OnBoardSecond";
-import OnBoardThird from "../assets/svg/OnBoardThrid";
-import OnBoardFourth from "../assets/svg/OnBoardFourth";
+import OnBoardFirst from "../assets/svg/img/ob1.svg";
+import OnBoardSecond from "../assets/svg/img/ob2.svg";
+import OnBoardThird from "../assets/svg/img/ob3.svg";
+import OnBoardFourth from "../assets/svg/img/ob4.svg";
 
 import "swiper/scss";
 import "@ionic/react/css/ionic-swiper.css";
@@ -18,7 +18,7 @@ export default function OnBoard({ onBoardDone }: Props) {
 
   const slides = [
     {
-      img: <OnBoardFirst />,
+      img: <img src={OnBoardFirst} />,
       buttonLabel: "Get Started",
       onClickButton: () => {
         swiperRef.current?.slideNext();
@@ -32,7 +32,7 @@ export default function OnBoard({ onBoardDone }: Props) {
         "Keep all your shared links in one place, organized and easy to find.",
     },
     {
-      img: <OnBoardSecond />,
+      img: <img src={OnBoardSecond} />,
       buttonLabel: "Got it",
       onClickButton: () => {
         swiperRef.current?.slideNext();
@@ -62,7 +62,7 @@ export default function OnBoard({ onBoardDone }: Props) {
       ),
     },
     {
-      img: <OnBoardThird />,
+      img: <img src={OnBoardThird} />,
       buttonLabel: "Next",
       onClickButton: () => {
         swiperRef.current?.slideNext();
@@ -76,7 +76,7 @@ export default function OnBoard({ onBoardDone }: Props) {
         "Add notes, use tags, and quickly find your saved links whenever you need them.",
     },
     {
-      img: <OnBoardFourth />,
+      img: <img src={OnBoardFourth} />,
       buttonLabel: "Start Using Sharely",
       onClickButton: () => {
         onBoardDone();
@@ -93,7 +93,7 @@ export default function OnBoard({ onBoardDone }: Props) {
 
   return (
     <IonPage>
-      <IonContent className="ion-padding" fullscreen>
+      <IonContent className="ion-padding bg-white" fullscreen>
         <Swiper
           onSwiper={(swiperInstance) => {
             swiperRef.current = swiperInstance; // Set the swiper instance
