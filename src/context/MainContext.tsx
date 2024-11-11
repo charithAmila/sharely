@@ -108,7 +108,9 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const isValidTag = (name: string, id: string = "") => {
     return tags
       .filter((tag) => tag.id !== id)
-      .some((tag) => tag.name.toLowerCase() === name.toLowerCase());
+      .some(
+        (tag) => tag.name.trim().toLowerCase() === name.trim().toLowerCase()
+      );
   };
 
   const createTag = async (name: string) => {
