@@ -1,4 +1,4 @@
-import { Redirect, Route } from "react-router";
+import { Redirect, Route, useHistory, useLocation } from "react-router";
 import { useAuthContext } from "./context/AuthContext";
 import {
   IonTabs,
@@ -10,11 +10,7 @@ import {
   IonPage,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import {
-  searchOutline,
-  homeOutline,
-  personCircleOutline,
-} from "ionicons/icons";
+import { searchOutline } from "ionicons/icons";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
@@ -30,9 +26,21 @@ import { useState } from "react";
 import Search from "./pages/Search";
 import Subscription from "./pages/Subscription";
 import ExpandedLogoWhite from "./assets/svg/ExpandedLogoWhite";
+import { addIcons } from "ionicons";
+import TabHomeActive from "./assets/icons/tab-home-active.svg";
+import TabProfile from "./assets/icons/tab-profile.svg";
+import TabHome from "./assets/icons/tab-home.svg";
+import TabProfileActive from "./assets/icons/tab-profile-active.svg";
+
+addIcons({
+  "tab-home": TabHome,
+  "tab-home-active": TabHomeActive,
+  "tab-profile": TabProfile,
+  "tab-profile-active": TabProfileActive,
+});
 
 const AuthRoutes = () => {
-  const { user } = useAuthContext();
+  const { user, activeTab } = useAuthContext();
 
   const st: string | null = localStorage.getItem("isOnBoarded");
 
@@ -73,7 +81,10 @@ const AuthRoutes = () => {
               tab="tab1"
               href="/tabs/home"
             >
-              <IonIcon aria-hidden="true" icon={homeOutline} />
+              <IonIcon
+                aria-hidden="true"
+                icon={activeTab === "home" ? "tab-home-active" : "tab-home"}
+              />
             </IonTabButton>
             <IonTabButton
               className="main-search-icon"
@@ -87,7 +98,12 @@ const AuthRoutes = () => {
               tab="profile"
               href="/tabs/profile"
             >
-              <IonIcon aria-hidden="true" icon={personCircleOutline} />
+              <IonIcon
+                aria-hidden="true"
+                icon={
+                  activeTab === "profile" ? "tab-profile-active" : "tab-profile"
+                }
+              />
             </IonTabButton>
           </IonTabBar>
         </IonTabs>

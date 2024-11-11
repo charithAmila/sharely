@@ -1,6 +1,5 @@
 import {
   IonButton,
-  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -20,11 +19,14 @@ import { pencil, personCircleOutline, pricetagsOutline } from "ionicons/icons";
 import { useRef, useState } from "react";
 import UserEdit from "../components/user/UserEdit";
 import UserPasswordEdit from "../components/user/UserPasswordEdit";
+import { useTabIcon } from "../hooks/useTabIcon";
 
 const Profile = () => {
   const { logout } = useAuthContext();
   const { user, updateUser } = useAuthContext();
   const modal = useRef<HTMLIonModalElement>(null);
+
+  useTabIcon();
 
   const [modalType, setModalType] = useState<"editUser" | "resetPassword">(
     "editUser"

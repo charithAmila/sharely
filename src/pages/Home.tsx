@@ -26,6 +26,7 @@ import FilterSvg from "../assets/icons/filter-icon.svg";
 import CardSvg from "../assets/icons/card-icon.svg";
 import dayjs from "dayjs";
 import LinkEdit from "../components/LinkEdit";
+import { useTabIcon } from "../hooks/useTabIcon";
 
 addIcons({
   "filter-icon": FilterSvg,
@@ -38,6 +39,8 @@ type Props = {
 
 const Home = ({ isSearch }: Props) => {
   const { items, tags, sharedItems } = useAppContext();
+
+  useTabIcon();
 
   const modal = useRef<HTMLIonModalElement>(null);
   const [selectedTags, setSelectedTags] = useState<Tag[]>([]);
