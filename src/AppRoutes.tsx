@@ -36,7 +36,7 @@ const AuthRoutes = () => {
 
   const st: string | null = localStorage.getItem("isOnBoarded");
 
-  const [isOnBoarded, setIsOnBoarded] = useState<string>("NO");
+  const [isOnBoarded, setIsOnBoarded] = useState<string>(st ?? "NO");
 
   const onBoard = () => {
     localStorage.setItem("isOnBoarded", "YES");

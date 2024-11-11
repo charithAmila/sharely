@@ -105,35 +105,57 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     return unsubscribe();
   }, [user]);
 
+  const isValidTag = (name: string, id: string = "") => {
+    return tags
+      .filter((tag) => tag.id !== id)
+      .some((tag) => tag.name.toLowerCase() === name.toLowerCase());
+  };
+
   const createTag = async (name: string) => {
-    if (!user) {
-      return;
+    try {
+      if (!user) {
+        return;
+      }
+
+      if (isValidTag(name)) {
+        throw new Error("Tag already exists");
+      }
+
+      const tag = new TagService();
+
+      const newTag: Omit<Tag, "id"> = {
+        name,
+        userId: user.id,
+      };
+
+      const data = await tag.create(newTag);
+
+      data.id && setTags([{ ...newTag, id: data.id }, ...tags]);
+    } catch (error: any) {
+      throw new Error(error);
     }
-
-    const tag = new TagService();
-
-    const newTag: Omit<Tag, "id"> = {
-      name,
-      userId: user.id,
-    };
-
-    const data = await tag.create(newTag);
-
-    data.id && setTags([{ ...newTag, id: data.id }, ...tags]);
   };
 
   const updateTag = async (tag: Partial<Tag>, id: string) => {
-    if (!user) {
-      return;
-    }
+    try {
+      if (!user) {
+        return;
+      }
 
-    const tagService = new TagService();
-    await tagService.update({ ...tag, id });
+      if (tag.name && isValidTag(tag.name, id)) {
+        throw new Error("Tag already exists");
+      }
 
-    const index = tags.findIndex((i) => i.id === id);
-    if (index !== -1) {
-      tags[index] = { ...tags[index], ...tag };
-      setTags([...tags]);
+      const tagService = new TagService();
+      await tagService.update({ ...tag, id });
+
+      const index = tags.findIndex((i) => i.id === id);
+      if (index !== -1) {
+        tags[index] = { ...tags[index], ...tag };
+        setTags([...tags]);
+      }
+    } catch (error: any) {
+      throw new Error(error);
     }
   };
 

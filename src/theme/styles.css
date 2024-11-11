@@ -355,6 +355,10 @@ div ::-webkit-scrollbar {
 }
 
 /* Font Size */
+
+.font-xxs {
+  font-size: 12px;
+}
 .font-xs {
   font-size: 16px;
 }
@@ -482,4 +486,9 @@ ion-content {
   &::-webkit-scrollbar {
     display: none;
   }
+}
+
+.error-item {
+  color: var(--ion-color-danger);
+  --border-color: var(--ion-color-danger);
 }

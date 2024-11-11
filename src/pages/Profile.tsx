@@ -9,6 +9,7 @@ import {
   IonLabel,
   IonList,
   IonListHeader,
+  IonModal,
   IonPage,
   IonText,
   IonTitle,
@@ -16,10 +17,18 @@ import {
 } from "@ionic/react";
 import { useAuthContext } from "../context/AuthContext";
 import { pencil, personCircleOutline, pricetagsOutline } from "ionicons/icons";
+import { useRef, useState } from "react";
+import UserEdit from "../components/user/UserEdit";
+import UserPasswordEdit from "../components/user/UserPasswordEdit";
 
 const Profile = () => {
   const { logout } = useAuthContext();
-  const { user } = useAuthContext();
+  const { user, updateUser } = useAuthContext();
+  const modal = useRef<HTMLIonModalElement>(null);
+
+  const [modalType, setModalType] = useState<"editUser" | "resetPassword">(
+    "editUser"
+  );
 
   const menu = [
     { name: "Tags", url: "/tabs/tags", icon: pricetagsOutline },
@@ -48,7 +57,10 @@ const Profile = () => {
           className="w-full ion-padding"
         >
           <IonText className="font-bold">Your Information</IonText>
-          <IonItem className="custom-ion-item">
+          <IonItem
+            onClick={() => modal.current?.present()}
+            className="custom-ion-item"
+          >
             <IonInput
               readonly
               label="Name"
@@ -67,9 +79,15 @@ const Profile = () => {
               value={user?.email}
             />
           </IonItem>
-          <IonItem className="custom-ion-item">
+          <IonItem
+            onClick={() => {
+              setModalType("resetPassword");
+              modal.current?.present();
+            }}
+            className="custom-ion-item"
+          >
             <IonInput
-              disabled
+              readonly
               label="Reset Password"
               labelPlacement="floating"
               placeholder="Enter text"
@@ -104,6 +122,28 @@ const Profile = () => {
             Logout
           </IonButton>
         </div>
+        <IonModal
+          ref={modal}
+          trigger="open-modal"
+          initialBreakpoint={0.5}
+          breakpoints={[0, 0.5, 0.75, 1]}
+        >
+          {modalType === "editUser" ? (
+            <UserEdit
+              updateUser={updateUser}
+              initialValue={user}
+              closeModal={() => {
+                modal.current?.dismiss();
+              }}
+            />
+          ) : (
+            <UserPasswordEdit
+              closeModal={() => {
+                modal.current?.dismiss();
+              }}
+            />
+          )}
+        </IonModal>
       </IonContent>
     </IonPage>
   );

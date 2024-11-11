@@ -25,34 +25,43 @@ const TagForm = ({ onSuccess, initialValue }: Props) => {
     }
   }, [initialValue]);
 
-  const onClickDone = () => {
-    if (!tagName) return;
+  const onClickDone = async () => {
+    try {
+      if (!tagName) return;
 
-    if (tagName.trim().length > 0) {
-      if (initialValue) {
-        updateTag({ name: tagName }, initialValue.id);
+      if (tagName.trim().length > 0) {
+        if (initialValue) {
+          await updateTag({ name: tagName }, initialValue.id);
+          onSuccess();
+          present({
+            message: "Tag updated successfully",
+            duration: 1500,
+            position: "top",
+            color: "success",
+          });
+          return;
+        }
+
+        await createTag(tagName);
+        setTagName("");
         onSuccess();
         present({
-          message: "Tag updated successfully",
+          message: "Tag created successfully",
           duration: 1500,
           position: "top",
           color: "success",
         });
-        return;
+      } else {
+        present({
+          message: "Please enter tag name",
+          duration: 1500,
+          position: "top",
+          color: "danger",
+        });
       }
-
-      createTag(tagName);
-      setTagName("");
-      onSuccess();
+    } catch (error: any) {
       present({
-        message: "Tag created successfully",
-        duration: 1500,
-        position: "top",
-        color: "success",
-      });
-    } else {
-      present({
-        message: "Please enter tag name",
+        message: error.message,
         duration: 1500,
         position: "top",
         color: "danger",

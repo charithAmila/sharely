@@ -75,19 +75,33 @@ export default function SignUp() {
               rules={{
                 required: "This is required",
               }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <IonItem lines="full">
-                  <IonInput
-                    label="Name"
-                    autoCapitalize="on"
-                    placeholder="Enter your name"
-                    onBlur={onBlur}
-                    onIonInput={onChange}
-                    value={value}
-                    type="text"
-                    labelPlacement="floating"
-                  />
-                </IonItem>
+              render={({
+                field: { onChange, onBlur, value },
+                formState: { errors },
+              }) => (
+                <>
+                  <IonItem className={errors.name && "error-item"}>
+                    <IonInput
+                      label="Name"
+                      autoCapitalize="on"
+                      placeholder="Enter your name"
+                      onBlur={onBlur}
+                      onIonInput={onChange}
+                      value={value}
+                      type="text"
+                      labelPlacement="floating"
+                    />
+                  </IonItem>
+                  {errors.name && (
+                    <IonText
+                      className="ion-text-start ion-padding-start font-regular font-xxs"
+                      color="danger"
+                      slot="error"
+                    >
+                      {errors.name.message}
+                    </IonText>
+                  )}
+                </>
               )}
             />
 
@@ -101,18 +115,32 @@ export default function SignUp() {
                   message: "Invalid email address",
                 },
               }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <IonItem lines="full">
-                  <IonInput
-                    label="Email"
-                    placeholder="Enter email"
-                    onBlur={onBlur}
-                    onIonInput={onChange}
-                    value={value}
-                    type="email"
-                    labelPlacement="floating"
-                  />
-                </IonItem>
+              render={({
+                field: { onChange, onBlur, value },
+                formState: { errors },
+              }) => (
+                <>
+                  <IonItem className={errors.email && "error-item"}>
+                    <IonInput
+                      label="Email"
+                      placeholder="Enter email"
+                      onBlur={onBlur}
+                      onIonInput={onChange}
+                      value={value}
+                      type="email"
+                      labelPlacement="floating"
+                    />
+                  </IonItem>
+                  {errors.email && (
+                    <IonText
+                      className="ion-text-start ion-padding-start font-regular font-xxs"
+                      color="danger"
+                      slot="error"
+                    >
+                      {errors.email.message}
+                    </IonText>
+                  )}
+                </>
               )}
             />
             <Controller
@@ -120,25 +148,45 @@ export default function SignUp() {
               control={control}
               rules={{
                 required: "This is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters",
+                },
               }}
-              render={({ field: { onChange, onBlur, value } }) => (
-                <IonItem className="pt-4" lines="full">
-                  <IonInput
-                    type={showPassword ? "text" : "password"}
-                    label="Password"
-                    labelPlacement="floating"
-                    placeholder="Enter password"
-                    onIonInput={onChange}
-                    onBlur={onBlur}
-                    value={value}
-                  />
-                  <IonIcon
-                    onClick={() => setShowPassword(!showPassword)}
-                    color="primary"
-                    slot="end"
-                    icon={showPassword ? eye : eyeOff}
-                  />
-                </IonItem>
+              render={({
+                field: { onChange, onBlur, value },
+                formState: { errors },
+              }) => (
+                <>
+                  <IonItem
+                    className={`pt-4 ${errors.password && "error-item"}`}
+                  >
+                    <IonInput
+                      type={showPassword ? "text" : "password"}
+                      label="Password"
+                      labelPlacement="floating"
+                      placeholder="Enter password"
+                      onIonInput={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                    />
+                    <IonIcon
+                      onClick={() => setShowPassword(!showPassword)}
+                      color="primary"
+                      slot="end"
+                      icon={showPassword ? eye : eyeOff}
+                    />
+                  </IonItem>
+                  {errors.password && (
+                    <IonText
+                      className="ion-text-start ion-padding-start font-regular font-xxs"
+                      color="danger"
+                      slot="error"
+                    >
+                      {errors.password.message}
+                    </IonText>
+                  )}
+                </>
               )}
             />
             <div className="pt-4">

@@ -4,12 +4,12 @@ import {
   OAuthProvider,
   signInWithCredential,
   signInWithEmailAndPassword,
-  createUserWithEmailAndPassword
+  createUserWithEmailAndPassword,
 } from "../firebase";
 import { UserService } from "../services/UserService";
 import Echo from "../plugins/Echo";
 import { Capacitor } from "@capacitor/core";
-import { UserCredential } from "firebase/auth";
+import { getAuth, updatePassword, UserCredential } from "firebase/auth";
 
 type AuthContextProviderProps = {
   children: React.ReactNode;
@@ -36,6 +36,8 @@ type ContextProps = {
   }) => Promise<AuthUser>;
   logout: () => Promise<void>;
   appleSignIn: (token: string) => Promise<AuthUser>;
+  updateUser: (user: Partial<AuthUser>) => Promise<void>;
+  resetPassword: (newPassword: string) => Promise<void>;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -59,7 +61,6 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           try {
             const userDoc = await userService.findByDocument(user.uid);
             if (userDoc) {
-
               let friends: AuthUserFriend[] = [];
               if (userDoc.exists() && userDoc.data().friends) {
                 friends = userDoc.data().friends;
@@ -167,7 +168,6 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
       return Promise.resolve(authUser);
     } catch (error) {
-      console.log("+++ error 2", error);
       throw new Error("Error signing up");
     }
   };
@@ -182,13 +182,44 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   };
 
-  const value = {
+  const updateUser = async (data: Partial<AuthUser>) => {
+    try {
+      if (!user) {
+        return;
+      }
+      const userService = new UserService();
+      await userService.update({ ...data, id: user?.id });
+      setUser({ ...user, ...data });
+    } catch (error) {}
+  };
+
+  const resetPassword = async (newPassword: string) => {
+    try {
+      const auth = getAuth();
+
+      const user = auth.currentUser;
+
+      if (!user) {
+        console.log("No user logged in");
+        throw new Error("No user logged in");
+      }
+
+      await updatePassword(user, newPassword);
+      console.log("Password reset successfully");
+    } catch (error) {
+      throw new Error("Error resetting password");
+    }
+  };
+
+  const value: ContextProps = {
     authenticated,
     user,
     login,
     signup,
     logout,
     appleSignIn,
+    updateUser,
+    resetPassword,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
