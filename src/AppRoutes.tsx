@@ -31,6 +31,7 @@ import TabHomeActive from "./assets/icons/tab-home-active.svg";
 import TabProfile from "./assets/icons/tab-profile.svg";
 import TabHome from "./assets/icons/tab-home.svg";
 import TabProfileActive from "./assets/icons/tab-profile-active.svg";
+import ProConnect from "./pages/ProConnect";
 
 addIcons({
   "tab-home": TabHome,
@@ -38,6 +39,8 @@ addIcons({
   "tab-profile": TabProfile,
   "tab-profile-active": TabProfileActive,
 });
+
+const PRO_USER = false;
 
 const AuthRoutes = () => {
   const { user, activeTab } = useAuthContext();
@@ -53,6 +56,10 @@ const AuthRoutes = () => {
 
   if (isOnBoarded === "NO") {
     return <OnBoard onBoardDone={onBoard} />;
+  }
+
+  if (!PRO_USER) {
+    return <ProConnect />;
   }
 
   return (
