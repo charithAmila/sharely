@@ -13,17 +13,40 @@ import ProPlanLogo from "../assets/svg/ProPlanLogo";
 
 import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
 import { useEffect } from "react";
+import { useAuthContext } from "../context/AuthContext";
+
+const apiKey = "appl_roiSUnYYgptdygPKkRfydtBphQu";
 
 const ProConnect = () => {
+  const { user } = useAuthContext();
   useEffect(() => {
+    if (!user) return;
+
+    console.log("+++++ apiKey", apiKey);
+
     (async function () {
-      await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG }); // Enable to get debug logs
-      await Purchases.configure({
-        apiKey: "sk_KsDdoCxGZVIvBfLGQmfVxCOFOhXAc",
-        // appUserID: "my_app_user_id" // Optional
-      });
+      try {
+        await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG }); // Enable to get debug logs
+        await Purchases.configure({
+          apiKey: apiKey,
+          appUserID: user.id,
+        });
+      } catch (error) {
+        console.log("+++++ error", error);
+        console.error("++++++++++++++++++++Error configuring Purchases", error);
+      }
     })();
-  }, []);
+  }, [user]);
+
+  const onClickActivate = async () => {
+    try {
+      if (!user) return;
+      const logInResult = await Purchases.logIn({ appUserID: user?.id });
+      console.log("+++++ result", logInResult);
+    } catch (error) {
+      console.log("+++++ error", error);
+    }
+  };
 
   return (
     <IonPage>
@@ -89,7 +112,7 @@ const ProConnect = () => {
                   expand="block"
                   color="primary"
                   onClick={() => {
-                    // Purchases.purchasePackage("pro");
+                    onClickActivate();
                   }}
                 >
                   Activate
