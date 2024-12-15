@@ -42,6 +42,7 @@ type SharedItem = {
   userId: string;
   metadata?: any;
   note?: string;
+  imageURL?: string;
 };
 
 type GroupedSharedItem = {

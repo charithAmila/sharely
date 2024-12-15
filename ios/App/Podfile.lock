@@ -1176,6 +1176,9 @@ PODS:
   - Firebase/Firestore (11.0.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 11.0.0)
+  - Firebase/Storage (11.0.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 11.0.0)
   - FirebaseAnalytics (11.0.0):
     - FirebaseAnalytics/AdIdSupport (= 11.0.0)
     - FirebaseCore (~> 11.0)
@@ -1239,6 +1242,13 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
   - FirebaseSharedSwift (11.0.0)
+  - FirebaseStorage (11.0.0):
+    - FirebaseAppCheckInterop (~> 11.0)
+    - FirebaseAuthInterop (~> 11.0)
+    - FirebaseCore (~> 11.0)
+    - FirebaseCoreExtension (~> 11.0)
+    - GoogleUtilities/Environment (~> 8.0)
+    - GTMSessionFetcher/Core (~> 3.4)
   - GoogleAppMeasurement (11.0.0):
     - GoogleAppMeasurement/AdIdSupport (= 11.0.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.0)
@@ -1398,6 +1408,7 @@ DEPENDENCIES:
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - Firebase/Core
   - Firebase/Firestore
+  - Firebase/Storage
   - FirebaseAuth
 
 SPEC REPOS:
@@ -1416,6 +1427,7 @@ SPEC REPOS:
     - FirebaseFirestoreInternal
     - FirebaseInstallations
     - FirebaseSharedSwift
+    - FirebaseStorage
     - GoogleAppMeasurement
     - GoogleUtilities
     - "gRPC-C++"
@@ -1470,6 +1482,7 @@ SPEC CHECKSUMS:
   FirebaseFirestoreInternal: 9fcc0ccb987ab73163f2249444e4bfd9eac63748
   FirebaseInstallations: 833536e8ff1dfadd4b5f80e8dfef69e8edbd071d
   FirebaseSharedSwift: 9d0e7130af2f0cf162ecd136971f9661f2a3f769
+  FirebaseStorage: f9e2bf027d549db18b6195a37b31c85f56e40200
   GoogleAppMeasurement: 6e49ffac7d3f2c3ded9cc663f912a13b67bbd0de
   GoogleUtilities: 52f677b52b0d2bed24e7b9c94455b1f7353a09f8
   "gRPC-C++": ee7ad8da2f509e22126e2c24797eea5ed46f953f
@@ -1480,6 +1493,6 @@ SPEC CHECKSUMS:
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
 
-PODFILE CHECKSUM: e400f83034c148ecf4074fcb863f89c348ecd5ef
+PODFILE CHECKSUM: ce607e5547e70aacb32c11b48c8c7bc75a27e8c6
 
 COCOAPODS: 1.15.2

@@ -105,6 +105,65 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
       );
     }
 
+    if (item.imageURL) {
+      return (
+        <div className="ion-padding w-full">
+          <IonCard>
+            <IonCardContent>
+              <img
+                src={item.imageURL}
+                style={{
+                  maxHeight: "225px",
+                  width: "100%",
+                  objectFit: "cover",
+                  borderTopLeftRadius: "8px",
+                  borderTopRightRadius: "8px",
+                }}
+                alt="Preview"
+              />
+            </IonCardContent>
+          </IonCard>
+          <div className="flex-1 flex justify-content-end">
+            <IonButton
+              color="medium"
+              fill="clear"
+              size="small"
+              onClick={(e) => {
+                try {
+                  e.stopPropagation();
+                  presentAlert({
+                    header: "Delete Item",
+                    message: "Are you sure you want to delete this item?",
+                    buttons: [
+                      "Cancel",
+                      {
+                        text: "Delete",
+                        handler: () => {
+                          if (item) {
+                            deleteItem(item);
+                            present({
+                              message: "Item deleted successfully",
+                              duration: 1500,
+                              position: "top",
+                              color: "success",
+                            });
+                          }
+                        },
+                      },
+                    ],
+                  });
+                } catch (error) {}
+              }}
+              // routerLink={`item/${item.id}`}
+            >
+              <IonIcon slot="start" icon={trashOutline} />
+              Delete
+            </IonButton>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="ion-padding w-full">
         <IonSkeletonText
@@ -112,6 +171,43 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
           style={{ height: "200px" }}
           animated={true}
         />
+        <div className="flex-1 flex justify-content-end">
+          <IonButton
+            color="medium"
+            fill="clear"
+            size="small"
+            onClick={(e) => {
+              try {
+                e.stopPropagation();
+                presentAlert({
+                  header: "Delete Item",
+                  message: "Are you sure you want to delete this item?",
+                  buttons: [
+                    "Cancel",
+                    {
+                      text: "Delete",
+                      handler: () => {
+                        if (item) {
+                          deleteItem(item);
+                          present({
+                            message: "Item deleted successfully",
+                            duration: 1500,
+                            position: "top",
+                            color: "success",
+                          });
+                        }
+                      },
+                    },
+                  ],
+                });
+              } catch (error) {}
+            }}
+            // routerLink={`item/${item.id}`}
+          >
+            <IonIcon slot="start" icon={trashOutline} />
+            Delete
+          </IonButton>
+        </div>
       </div>
     );
   }

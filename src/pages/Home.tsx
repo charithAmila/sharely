@@ -51,13 +51,14 @@ const Home = ({ isSearch }: Props) => {
   const [selectedItem, setSelectedItem] = useState<SharedItem>();
 
   const itemsCount = (tagId: string) => {
-    return sharedItems.filter((item: SharedItem) => item.tags.includes(tagId))
-      .length;
+    return sharedItems.filter((item: SharedItem) =>
+      (item.tags || []).includes(tagId)
+    ).length;
   };
 
   const itemFilterByTags = (item: SharedItem) => {
     const selectedTagIds = selectedTags.map((tag) => tag.id);
-    const itemTagIds = item.tags.map((tag) => tag);
+    const itemTagIds = (item.tags || []).map((tag) => tag);
 
     if (selectedTagIds.length === 0) {
       return true;
