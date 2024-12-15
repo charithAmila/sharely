@@ -14,50 +14,49 @@ class ShareViewController: SLComposeServiceViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        resetExtensionState() // Clear state for a fresh start
+
         if FirebaseApp.app() == nil {
-            FirebaseApp.configure()
-            retrieveAuthStateAndReauthenticate()
+            FirebaseApp.configure() // Initialize Firebase if not already configured
+            retrieveAuthStateAndReauthenticate() // Retrieve user authentication state
         }
 
-        // Ensure access to extensionItem and itemProvider
-        guard
-            let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem,
-            let itemProvider = extensionItem.attachments?.first else {
-            close()
+        // Ensure access to extension items
+        guard let extensionItems = extensionContext?.inputItems as? [NSExtensionItem] else {
+            close() // Close if no input items
             return
         }
 
-        // Handle different content types
-        let contentTypes: [String: (NSItemProvider, @escaping (Any?) -> Void) -> Void] = [
-            UTType.plainText.identifier: handleText,
-            UTType.image.identifier: handleImage,
-            UTType.url.identifier: handleURL,
-            UTType.movie.identifier: handleVideo
-        ]
-
-        for (typeIdentifier, handler) in contentTypes {
-            if itemProvider.hasItemConformingToTypeIdentifier(typeIdentifier) {
-                handler(itemProvider) { content in
-                    DispatchQueue.main.async {
-                        self.presentShareExtensionView(typeIdentifier: typeIdentifier, content: content)
-                    }
-                }
+        // Process incoming content
+        for extensionItem in extensionItems {
+            for itemProvider in extensionItem.attachments ?? [] {
+                handleIncomingContent(itemProvider: itemProvider) // Handle each attachment
                 return
             }
         }
 
-        close()
+        close() // Close if no content was handled
+    }
+
+    private func resetExtensionState() {
+        // Reset all states to ensure a clean session
+        self.pendingUploadFileURL = nil
+        self.userId = nil
+        self.isUserAuthenticated = false
+        self.view.subviews.forEach { $0.removeFromSuperview() } // Remove old views
     }
 
     func close() {
+        // Complete the extension request
         self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
     }
 
     override func isContentValid() -> Bool {
-        return true
+        return true // Always return true as no custom validation is required
     }
 
     private func uploadToFirebaseStorage(fileData: Data, fileName: String, contentType: String, completion: @escaping (Result<URL, Error>) -> Void) {
+        // Upload file data to Firebase Storage
         let storageRef = Storage.storage().reference().child("uploads/\(fileName)")
         let metadata = StorageMetadata()
         metadata.contentType = contentType
@@ -77,7 +76,30 @@ class ShareViewController: SLComposeServiceViewController {
         }
     }
 
+    private func handleIncomingContent(itemProvider: NSItemProvider) {
+        // Define handlers for each content type
+        let contentTypes: [String: (NSItemProvider, @escaping (Any?) -> Void) -> Void] = [
+            UTType.plainText.identifier: handleText,
+            UTType.image.identifier: handleImage,
+            UTType.url.identifier: handleURL,
+            UTType.movie.identifier: handleVideo
+        ]
+
+        for (typeIdentifier, handler) in contentTypes {
+            if itemProvider.hasItemConformingToTypeIdentifier(typeIdentifier) {
+                handler(itemProvider) { content in
+                    DispatchQueue.main.async {
+                        self.presentShareExtensionView(typeIdentifier: typeIdentifier, content: content) // Present UI
+                    }
+                }
+                return
+            }
+        }
+        close() // Close if no matching content type
+    }
+
     private func handleText(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
+        // Handle plain text content
         itemProvider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { (item, error) in
             if let error = error {
                 print("Error loading text: \(error)")
@@ -89,21 +111,50 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     private func handleImage(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
+        // Handle image content
         itemProvider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { (item, error) in
             if let error = error {
                 print("Error loading image: \(error)")
                 completion(nil)
             } else if let url = item as? URL {
-                self.pendingUploadFileURL = url
-                completion(url) // Pass file URL to content view
+                self.pendingUploadFileURL = url // Store the file URL
+                completion(url)
+            } else if let imageData = item as? Data {
+                let fileName = UUID().uuidString + ".jpg"
+                self.uploadToFirebaseStorage(fileData: imageData, fileName: fileName, contentType: "image/jpeg") { result in
+                    switch result {
+                    case .success(let downloadURL):
+                        completion(downloadURL)
+                    case .failure(let error):
+                        print("Error uploading image: \(error)")
+                        completion(nil)
+                    }
+                }
+            } else if let image = item as? UIImage {
+                if let jpegData = image.jpegData(compressionQuality: 0.8) {
+                    let fileName = UUID().uuidString + ".jpg"
+                    self.uploadToFirebaseStorage(fileData: jpegData, fileName: fileName, contentType: "image/jpeg") { result in
+                        switch result {
+                        case .success(let downloadURL):
+                            completion(downloadURL)
+                        case .failure(let error):
+                            print("Error uploading UIImage: \(error)")
+                            completion(nil)
+                        }
+                    }
+                } else {
+                    print("Error converting UIImage to JPEG data")
+                    completion(nil)
+                }
             } else {
-                print("Unexpected item type")
+                print("Unexpected image type")
                 completion(nil)
             }
         }
     }
 
     private func handleURL(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
+        // Handle URL content
         itemProvider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { (item, error) in
             if let error = error {
                 print("Error loading URL: \(error)")
@@ -115,6 +166,7 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     private func handleVideo(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
+        // Handle video content
         itemProvider.loadItem(forTypeIdentifier: UTType.movie.identifier, options: nil) { (item, error) in
             if let error = error {
                 print("Error loading video: \(error)")
@@ -144,6 +196,7 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     private func presentShareExtensionView(typeIdentifier: String, content: Any?) {
+        // Authenticate user if needed
         if self.userId == nil {
             self.userId = getAuthUidFromKeychain()
             self.isUserAuthenticated = true
@@ -155,6 +208,7 @@ class ShareViewController: SLComposeServiceViewController {
             return
         }
 
+        // Determine content type
         let contentType: ContentType
         switch typeIdentifier {
         case UTType.plainText.identifier:
@@ -174,10 +228,11 @@ class ShareViewController: SLComposeServiceViewController {
             return
         }
 
+        // Present the ShareExtensionView
         let shareView = ShareExtensionView(
             contentType: contentType,
             onSave: { [weak self] data in
-                self?.handleOnSave(data: data)
+                self?.handleOnSave(data: data) // Handle save action
             },
             isUserAuthenticated: isUserAuthenticated,
             userId: userId
@@ -197,6 +252,7 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     private func handleOnSave(data: [String: Any]) {
+        // Save content to Firestore
         var updatedData = data
         if let fileURL = pendingUploadFileURL {
             do {
@@ -222,6 +278,7 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     private func saveToFirestore(data: [String: Any]) {
+        // Save metadata to Firestore
         var dataToSave = data
         if let userId = userId {
             dataToSave["userId"] = userId
@@ -239,6 +296,7 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     func retrieveAuthStateAndReauthenticate() {
+        // Reauthenticate user using stored UID
         guard let uid = getAuthUidFromKeychain() else {
             print("No auth token found")
             return
@@ -248,6 +306,7 @@ class ShareViewController: SLComposeServiceViewController {
     }
 
     func getAuthUidFromKeychain() -> String? {
+        // Retrieve UID from Keychain
         let key = "uid"
         let query: [String: Any] = [
             kSecClass as String: kSecClassGenericPassword,
