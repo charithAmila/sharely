@@ -4,7 +4,6 @@ import {
   IonCardSubtitle,
   IonCardContent,
   IonChip,
-  IonSkeletonText,
   IonAvatar,
   IonIcon,
   IonText,
@@ -15,16 +14,10 @@ import {
 } from "@ionic/react";
 import { createOutline, openOutline, trashOutline } from "ionicons/icons";
 import { isUrl, truncateText } from "../helpers";
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import ThinDivider from "./ThinDivider";
 import { useAppContext } from "../context/MainContext";
-
-interface Metadata {
-  title?: string;
-  description?: string;
-  image?: string;
-  url?: string;
-}
+import MediaPreview from "./MideaPreview";
 
 type Props = {
   item: SharedItem;
@@ -34,8 +27,6 @@ type Props = {
 };
 
 const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
-  const { metadata } = item;
-
   const { push } = useIonRouter();
 
   const linkRef = useRef<HTMLAnchorElement>(null);
@@ -90,39 +81,40 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
     );
   };
 
-  if (!metadata) {
-    if (item.content) {
-      return (
-        <IonCard>
-          <div className="ion-padding">
-            <IonText>{truncateText(item.content, 100)}</IonText>
+  const cardFooter = () => {
+    return (
+      <div className="flex flex-column gap-5">
+        {renderChips()}
+        <ThinDivider />
+        <div className="flex align-items-center">
+          <div className="flex-1 flex justify-content-start">
+            <IonButton
+              onClick={(e) => {
+                e.stopPropagation();
+                onClickEdit();
+              }}
+              color="medium"
+              fill="clear"
+              size="small"
+            >
+              <IonIcon slot="start" icon={createOutline} />
+              Edit
+            </IonButton>
           </div>
-
-          {renderChips()}
-
-          {renderLink()}
-        </IonCard>
-      );
-    }
-
-    if (item.imageURL) {
-      return (
-        <div className="ion-padding w-full">
-          <IonCard>
-            <IonCardContent>
-              <img
-                src={item.imageURL}
-                style={{
-                  maxHeight: "225px",
-                  width: "100%",
-                  objectFit: "cover",
-                  borderTopLeftRadius: "8px",
-                  borderTopRightRadius: "8px",
-                }}
-                alt="Preview"
-              />
-            </IonCardContent>
-          </IonCard>
+          <div className="flex-1 flex justify-content-center">
+            <IonButton
+              color="medium"
+              fill="clear"
+              size="small"
+              onClick={(e) => {
+                e.stopPropagation();
+                linkRef.current?.click();
+              }}
+            >
+              <IonIcon slot="start" icon={openOutline} />
+              Open
+            </IonButton>
+          </div>
           <div className="flex-1 flex justify-content-end">
             <IonButton
               color="medium"
@@ -161,56 +153,32 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
             </IonButton>
           </div>
         </div>
-      );
-    }
-
-    return (
-      <div className="ion-padding w-full">
-        <IonSkeletonText
-          className="w-full"
-          style={{ height: "200px" }}
-          animated={true}
-        />
-        <div className="flex-1 flex justify-content-end">
-          <IonButton
-            color="medium"
-            fill="clear"
-            size="small"
-            onClick={(e) => {
-              try {
-                e.stopPropagation();
-                presentAlert({
-                  header: "Delete Item",
-                  message: "Are you sure you want to delete this item?",
-                  buttons: [
-                    "Cancel",
-                    {
-                      text: "Delete",
-                      handler: () => {
-                        if (item) {
-                          deleteItem(item);
-                          present({
-                            message: "Item deleted successfully",
-                            duration: 1500,
-                            position: "top",
-                            color: "success",
-                          });
-                        }
-                      },
-                    },
-                  ],
-                });
-              } catch (error) {}
-            }}
-            // routerLink={`item/${item.id}`}
-          >
-            <IonIcon slot="start" icon={trashOutline} />
-            Delete
-          </IonButton>
-        </div>
       </div>
     );
-  }
+  };
+
+  const metadata = useMemo(() => {
+    if (item.metadata) {
+      return {
+        ...item.metadata,
+        contentType: "image",
+      };
+    }
+    let metadata: any = {};
+    if (item.fileURL) {
+      metadata.image = {
+        url: item.fileURL,
+      };
+    }
+
+    metadata.contentType = item?.contentType || "image";
+
+    if (item.contentType === "text") {
+      metadata.description = item.content;
+    }
+
+    return metadata;
+  }, [item.metadata]);
 
   return (
     <>
@@ -251,16 +219,9 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
                       </IonAvatar>
                     </div>
                   )}
-                  <img
-                    src={metadata?.image?.url}
-                    style={{
-                      maxHeight: "225px",
-                      width: "100%",
-                      objectFit: "cover",
-                      borderTopLeftRadius: "8px",
-                      borderTopRightRadius: "8px",
-                    }}
-                    alt="Preview"
+                  <MediaPreview
+                    url={metadata?.image?.url}
+                    type={metadata.contentType}
                   />
                 </div>
               )}
@@ -289,77 +250,7 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
                 </IonCardContent>
               </div>
             </div>
-            <div className="flex flex-column gap-5">
-              {renderChips()}
-              <ThinDivider />
-              <div className="flex align-items-center">
-                <div className="flex-1 flex justify-content-start">
-                  <IonButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onClickEdit();
-                    }}
-                    color="medium"
-                    fill="clear"
-                    size="small"
-                  >
-                    <IonIcon slot="start" icon={createOutline} />
-                    Edit
-                  </IonButton>
-                </div>
-                <div className="flex-1 flex justify-content-center">
-                  <IonButton
-                    color="medium"
-                    fill="clear"
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      linkRef.current?.click();
-                    }}
-                  >
-                    <IonIcon slot="start" icon={openOutline} />
-                    Open
-                  </IonButton>
-                </div>
-                <div className="flex-1 flex justify-content-end">
-                  <IonButton
-                    color="medium"
-                    fill="clear"
-                    size="small"
-                    onClick={(e) => {
-                      try {
-                        e.stopPropagation();
-                        presentAlert({
-                          header: "Delete Item",
-                          message: "Are you sure you want to delete this item?",
-                          buttons: [
-                            "Cancel",
-                            {
-                              text: "Delete",
-                              handler: () => {
-                                if (item) {
-                                  deleteItem(item);
-                                  present({
-                                    message: "Item deleted successfully",
-                                    duration: 1500,
-                                    position: "top",
-                                    color: "success",
-                                  });
-                                }
-                              },
-                            },
-                          ],
-                        });
-                      } catch (error) {}
-                    }}
-                    // routerLink={`item/${item.id}`}
-                  >
-                    <IonIcon slot="start" icon={trashOutline} />
-                    Delete
-                  </IonButton>
-                </div>
-              </div>
-            </div>
+            {cardFooter()}
           </IonCard>
           {renderLink()}
         </>

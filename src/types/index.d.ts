@@ -42,7 +42,8 @@ type SharedItem = {
   userId: string;
   metadata?: any;
   note?: string;
-  imageURL?: string;
+  fileURL?: string;
+  contentType?: "url" | "text" | "image" | "video" | "pdf";
 };
 
 type GroupedSharedItem = {

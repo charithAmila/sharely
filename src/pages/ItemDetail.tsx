@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   IonAvatar,
   IonBackButton,
@@ -26,6 +26,7 @@ import { isUrl } from "../helpers";
 import dayjs from "dayjs";
 import { getOrdinalSuffix } from "../utils/constant";
 import ThinDivider from "../components/ThinDivider";
+import MediaPreview from "../components/MideaPreview";
 
 type Params = {
   id: string;
@@ -118,6 +119,30 @@ const ItemDetail = () => {
     );
   };
 
+  const metadata = useMemo(() => {
+    if (!item) return;
+    if (item.metadata) {
+      return {
+        ...item.metadata,
+        contentType: "image",
+      };
+    }
+    let metadata: any = {};
+    if (item.fileURL) {
+      metadata.image = {
+        url: item.fileURL,
+      };
+    }
+
+    metadata.contentType = item?.contentType || "image";
+
+    if (item.contentType === "text") {
+      metadata.description = item.content;
+    }
+
+    return metadata;
+  }, [item]);
+
   return (
     <IonPage>
       <IonHeader>
@@ -165,9 +190,9 @@ const ItemDetail = () => {
               backgroundColor: "#EEF0F5",
             }}
           >
-            {item?.metadata.image && (
+            {metadata.image && (
               <div className="relative">
-                {item?.metadata.logo && (
+                {metadata.logo && (
                   <div
                     className="absolute flex justify-content-center align-items-center shadow-1"
                     style={{
@@ -182,20 +207,15 @@ const ItemDetail = () => {
                     <IonAvatar style={{ width: "50px", height: "50px" }}>
                       <img
                         alt="Silhouette of a person's head"
-                        src={item?.metadata.logo.url}
+                        src={metadata.logo.url}
                       />
                     </IonAvatar>
                   </div>
                 )}
-                <img
-                  src={item?.metadata?.image?.url}
-                  style={{
-                    maxHeight: "225px",
-                    width: "100%",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                  }}
-                  alt="Preview"
+
+                <MediaPreview
+                  url={metadata?.image?.url}
+                  type={metadata.contentType}
                 />
               </div>
             )}
@@ -225,8 +245,8 @@ const ItemDetail = () => {
                 />
               </IonAvatar>
             )}
-            {item?.metadata.publisher && (
-              <IonText className="">{item?.metadata.publisher}</IonText>
+            {metadata.publisher && (
+              <IonText className="">{metadata.publisher}</IonText>
             )}
             <div style={{ marginLeft: "auto" }} className="font-bold">
               <IonButton
@@ -296,29 +316,6 @@ const ItemDetail = () => {
             ))}
           </div>
         </div>
-        {/* <div className="flex flex-column gap-5">
-          <IonList>
-            {menu.map((item) => (
-              <IonItem
-                key={item.label}
-                onClick={item.onClick || (() => {})}
-                button
-              >
-                <IonIcon slot="start" icon={item.icon} />
-                <IonLabel>{item.label}</IonLabel>
-              </IonItem>
-            ))}
-          </IonList>
-
-          {item?.note && (
-            <div className="ion-padding bg-light">
-              <IonText color="dark">
-                <h1>Note</h1>
-              </IonText>
-              <IonText>{item?.note}</IonText>
-            </div>
-          )}
-        </div> */}
       </IonContent>
       <IonModal isOpen={isOpen}>
         {modalType === "note" ? (

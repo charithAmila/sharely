@@ -10,7 +10,9 @@ class ShareViewController: SLComposeServiceViewController {
 
     private var isUserAuthenticated = false
     private var userId: String?
-    private var pendingUploadFileURL: URL? // To hold image URL temporarily
+    private var pendingUploadImageData: Data? // Temporarily store image data for upload
+    private var pendingFileExtension: String? // Store file extension dynamically
+    private var pendingContentType: String? // Store the content type dynamically
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,7 +42,9 @@ class ShareViewController: SLComposeServiceViewController {
 
     private func resetExtensionState() {
         // Reset all states to ensure a clean session
-        self.pendingUploadFileURL = nil
+        self.pendingUploadImageData = nil
+        self.pendingFileExtension = nil
+        self.pendingContentType = nil
         self.userId = nil
         self.isUserAuthenticated = false
         self.view.subviews.forEach { $0.removeFromSuperview() } // Remove old views
@@ -55,34 +59,14 @@ class ShareViewController: SLComposeServiceViewController {
         return true // Always return true as no custom validation is required
     }
 
-    private func uploadToFirebaseStorage(fileData: Data, fileName: String, contentType: String, completion: @escaping (Result<URL, Error>) -> Void) {
-        // Upload file data to Firebase Storage
-        let storageRef = Storage.storage().reference().child("uploads/\(fileName)")
-        let metadata = StorageMetadata()
-        metadata.contentType = contentType
-
-        storageRef.putData(fileData, metadata: metadata) { _, error in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            storageRef.downloadURL { url, error in
-                if let error = error {
-                    completion(.failure(error))
-                } else if let url = url {
-                    completion(.success(url))
-                }
-            }
-        }
-    }
-
     private func handleIncomingContent(itemProvider: NSItemProvider) {
         // Define handlers for each content type
         let contentTypes: [String: (NSItemProvider, @escaping (Any?) -> Void) -> Void] = [
             UTType.plainText.identifier: handleText,
             UTType.image.identifier: handleImage,
             UTType.url.identifier: handleURL,
-            UTType.movie.identifier: handleVideo
+            UTType.movie.identifier: handleVideo,
+            UTType.pdf.identifier: handlePDF
         ]
 
         for (typeIdentifier, handler) in contentTypes {
@@ -100,6 +84,7 @@ class ShareViewController: SLComposeServiceViewController {
 
     private func handleText(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
         // Handle plain text content
+        pendingContentType = "text"
         itemProvider.loadItem(forTypeIdentifier: UTType.plainText.identifier, options: nil) { (item, error) in
             if let error = error {
                 print("Error loading text: \(error)")
@@ -112,40 +97,28 @@ class ShareViewController: SLComposeServiceViewController {
 
     private func handleImage(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
         // Handle image content
+        pendingContentType = "image"
         itemProvider.loadItem(forTypeIdentifier: UTType.image.identifier, options: nil) { (item, error) in
             if let error = error {
                 print("Error loading image: \(error)")
                 completion(nil)
             } else if let url = item as? URL {
-                self.pendingUploadFileURL = url // Store the file URL
-                completion(url)
-            } else if let imageData = item as? Data {
-                let fileName = UUID().uuidString + ".jpg"
-                self.uploadToFirebaseStorage(fileData: imageData, fileName: fileName, contentType: "image/jpeg") { result in
-                    switch result {
-                    case .success(let downloadURL):
-                        completion(downloadURL)
-                    case .failure(let error):
-                        print("Error uploading image: \(error)")
-                        completion(nil)
-                    }
+                do {
+                    let imageData = try Data(contentsOf: url)
+                    self.pendingUploadImageData = imageData // Temporarily store image data
+                    self.pendingFileExtension = "jpg" // Default extension for images
+                } catch {
+                    print("Error reading image data from URL: \(error)")
                 }
+                completion(nil)
             } else if let image = item as? UIImage {
                 if let jpegData = image.jpegData(compressionQuality: 0.8) {
-                    let fileName = UUID().uuidString + ".jpg"
-                    self.uploadToFirebaseStorage(fileData: jpegData, fileName: fileName, contentType: "image/jpeg") { result in
-                        switch result {
-                        case .success(let downloadURL):
-                            completion(downloadURL)
-                        case .failure(let error):
-                            print("Error uploading UIImage: \(error)")
-                            completion(nil)
-                        }
-                    }
+                    self.pendingUploadImageData = jpegData // Temporarily store UIImage data
+                    self.pendingFileExtension = "jpg" // Default extension for images
                 } else {
                     print("Error converting UIImage to JPEG data")
-                    completion(nil)
                 }
+                completion(nil)
             } else {
                 print("Unexpected image type")
                 completion(nil)
@@ -155,18 +128,23 @@ class ShareViewController: SLComposeServiceViewController {
 
     private func handleURL(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
         // Handle URL content
+        pendingContentType = "url"
         itemProvider.loadItem(forTypeIdentifier: UTType.url.identifier, options: nil) { (item, error) in
             if let error = error {
                 print("Error loading URL: \(error)")
                 completion(nil)
+            } else if let url = item as? URL {
+                completion(url)
             } else {
-                completion(item as? URL)
+                print("Unexpected URL type")
+                completion(nil)
             }
         }
     }
 
     private func handleVideo(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
         // Handle video content
+        pendingContentType = "video"
         itemProvider.loadItem(forTypeIdentifier: UTType.movie.identifier, options: nil) { (item, error) in
             if let error = error {
                 print("Error loading video: \(error)")
@@ -174,23 +152,58 @@ class ShareViewController: SLComposeServiceViewController {
             } else if let url = item as? URL {
                 do {
                     let data = try Data(contentsOf: url)
-                    let fileName = UUID().uuidString + ".mp4"
-                    self.uploadToFirebaseStorage(fileData: data, fileName: fileName, contentType: "video/mp4") { result in
-                        switch result {
-                        case .success(let downloadURL):
-                            completion(downloadURL)
-                        case .failure(let error):
-                            print("Error uploading video: \(error)")
-                            completion(nil)
-                        }
-                    }
+                    self.pendingUploadImageData = data // Store video data
+                    self.pendingFileExtension = "mp4" // Set file extension for videos
                 } catch {
                     print("Error loading video data: \(error)")
-                    completion(nil)
                 }
+                completion(nil)
             } else {
                 print("Unexpected item type")
                 completion(nil)
+            }
+        }
+    }
+
+    private func handlePDF(itemProvider: NSItemProvider, completion: @escaping (Any?) -> Void) {
+        // Handle PDF content
+        pendingContentType = "pdf"
+        itemProvider.loadItem(forTypeIdentifier: UTType.pdf.identifier, options: nil) { (item, error) in
+            if let error = error {
+                print("Error loading PDF: \(error)")
+                completion(nil)
+            } else if let url = item as? URL {
+                do {
+                    let data = try Data(contentsOf: url)
+                    self.pendingUploadImageData = data // Store PDF data
+                    self.pendingFileExtension = "pdf" // Set file extension for PDFs
+                } catch {
+                    print("Error reading PDF data: \(error)")
+                }
+                completion(nil)
+            } else {
+                print("Unexpected PDF type")
+                completion(nil)
+            }
+        }
+    }
+
+    private func uploadToFirebaseStorage(fileData: Data, fileName: String, contentType: String, completion: @escaping (Result<URL, Error>) -> Void) {
+        let storageRef = Storage.storage().reference().child("uploads/\(fileName)")
+        let metadata = StorageMetadata()
+        metadata.contentType = contentType
+
+        storageRef.putData(fileData, metadata: metadata) { _, error in
+            if let error = error {
+                completion(.failure(error))
+                return
+            }
+            storageRef.downloadURL { url, error in
+                if let error = error {
+                    completion(.failure(error))
+                } else if let url = url {
+                    completion(.success(url))
+                }
             }
         }
     }
@@ -214,15 +227,13 @@ class ShareViewController: SLComposeServiceViewController {
         case UTType.plainText.identifier:
             contentType = .text(content as? String ?? "")
         case UTType.image.identifier:
-            if let fileURL = content as? URL {
-                contentType = .image(fileURL)
-            } else {
-                contentType = .image(nil)
-            }
+            contentType = .image(nil) // Image upload will be triggered on share button press
         case UTType.url.identifier:
             contentType = .url(content as? URL)
         case UTType.movie.identifier:
-            contentType = .video(content as? URL)
+            contentType = .video(nil) // Video upload will be triggered on share button press
+        case UTType.pdf.identifier:
+            contentType = .text("PDF File") // Represent PDF as text placeholder for now
         default:
             close()
             return
@@ -254,26 +265,31 @@ class ShareViewController: SLComposeServiceViewController {
     private func handleOnSave(data: [String: Any]) {
         // Save content to Firestore
         var updatedData = data
-        if let fileURL = pendingUploadFileURL {
-            do {
-                let imageData = try Data(contentsOf: fileURL)
-                let fileName = UUID().uuidString + ".jpg"
-                uploadToFirebaseStorage(fileData: imageData, fileName: fileName, contentType: "image/jpeg") { result in
-                    switch result {
-                    case .success(let downloadURL):
-                        updatedData["imageURL"] = downloadURL.absoluteString
-                        self.saveToFirestore(data: updatedData)
-                    case .failure(let error):
-                        print("Error uploading image: \(error)")
-                        self.close()
-                    }
+        if let fileData = pendingUploadImageData, let fileExtension = pendingFileExtension {
+            let fileName = UUID().uuidString + ".\(fileExtension)"
+            uploadToFirebaseStorage(fileData: fileData, fileName: fileName, contentType: determineContentType(for: fileExtension)) { result in
+                switch result {
+                case .success(let downloadURL):
+                    updatedData["fileURL"] = downloadURL.absoluteString
+                    updatedData["contentType"] = self.pendingContentType ?? "unknown"
+                    self.saveToFirestore(data: updatedData)
+                case .failure(let error):
+                    print("Error uploading file: \(error)")
+                    self.close()
                 }
-            } catch {
-                print("Error reading image data: \(error)")
-                close()
             }
         } else {
+            updatedData["contentType"] = self.pendingContentType ?? "unknown"
             saveToFirestore(data: updatedData)
+        }
+    }
+
+    private func determineContentType(for fileExtension: String) -> String {
+        switch fileExtension {
+        case "jpg", "jpeg": return "image/jpeg"
+        case "mp4": return "video/mp4"
+        case "pdf": return "application/pdf"
+        default: return "application/octet-stream"
         }
     }
 
