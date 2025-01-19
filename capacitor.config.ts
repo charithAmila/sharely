@@ -1,9 +1,9 @@
-import type { CapacitorConfig } from '@capacitor/cli';
+import type { CapacitorConfig } from "@capacitor/cli";
 
 const config: CapacitorConfig = {
-  appId: 'io.ionic.starter',
-  appName: 'Sharely',
-  webDir: 'dist'
+  appId: "io.sharely.app",
+  appName: "Sharely",
+  webDir: "dist",
 };
 
 export default config;
