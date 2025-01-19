@@ -3,12 +3,10 @@ import {
   IonChip,
   IonCol,
   IonIcon,
-  IonItem,
   IonLabel,
   IonModal,
   IonRow,
   IonText,
-  IonTextarea,
   useIonToast,
 } from "@ionic/react";
 import CompactCard from "./CompactCard";
@@ -93,7 +91,7 @@ const LinkEdit = ({ item, tags, closeModal }: Props) => {
       <IonRow>
         <IonCol>
           <IonText color="dark" className="font-bold font-large">
-            <p>Edit Link</p>
+            <p>Edit</p>
           </IonText>
         </IonCol>
         <IonCol className="flex justify-content-end">

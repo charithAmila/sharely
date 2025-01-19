@@ -77,7 +77,7 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
         rel="noopener noreferrer"
         ref={linkRef}
         style={{ display: "none" }}
-      ></a>
+      />
     );
   };
 

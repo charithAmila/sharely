@@ -3,9 +3,23 @@ import ReactPlayer from "react-player";
 type Props = {
   url: string;
   type: "image" | "video" | "url";
+  contentType?: string;
 };
 
-const MediaPreview = ({ url, type }: Props) => {
+const MediaPreview = ({ url, type, contentType }: Props) => {
+  if (contentType === "image") {
+    // Set full size image
+    return (
+      <img
+        src={url}
+        style={{
+          width: "100%",
+        }}
+        alt="Preview"
+      />
+    );
+  }
+
   if (type === "image" || type === "url") {
     return (
       <img

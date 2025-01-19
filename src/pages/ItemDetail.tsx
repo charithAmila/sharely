@@ -58,6 +58,8 @@ const ItemDetail = () => {
   const title = () => {
     if (!item) return;
 
+    console.log("item.createdAt", item.createdAt);
+
     let _title = `${dayjs(item.createdAt).format("DD")} ${getOrdinalSuffix(
       dayjs(item.createdAt).date()
     )}, ${dayjs(item.createdAt).format("dddd")} `;
@@ -115,7 +117,7 @@ const ItemDetail = () => {
         rel="noopener noreferrer"
         ref={linkRef}
         style={{ display: "none" }}
-      ></a>
+      />
     );
   };
 
@@ -183,14 +185,14 @@ const ItemDetail = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent scrollY={true}>
+      <IonContent style={{ background: "#EEF0F5" }} fullscreen scrollY={true}>
         <IonCard className="main-card">
           <div
             style={{
               backgroundColor: "#EEF0F5",
             }}
           >
-            {metadata.image && (
+            {metadata?.image && (
               <div className="relative">
                 {metadata.logo && (
                   <div
@@ -216,6 +218,7 @@ const ItemDetail = () => {
                 <MediaPreview
                   url={metadata?.image?.url}
                   type={metadata.contentType}
+                  contentType={item?.contentType}
                 />
               </div>
             )}
@@ -232,36 +235,46 @@ const ItemDetail = () => {
             <IonText>{item?.metadata?.description}</IonText>
           </div>
         </div>
-        <div className="ion-padding">
-          <ThinDivider />
-        </div>
-        <div className="flex ion-padding flex-column gap-4">
-          <div className="flex-1 flex gap-5 align-items-center">
-            {item?.metadata?.logo && (
-              <IonAvatar style={{ width: "25px", height: "25px" }}>
-                <img
-                  alt="Silhouette of a person's head"
-                  src={item.metadata.logo.url}
-                />
-              </IonAvatar>
-            )}
-            {metadata.publisher && (
-              <IonText className="">{metadata.publisher}</IonText>
-            )}
-            <div style={{ marginLeft: "auto" }} className="font-bold">
-              <IonButton
-                className="font-bold"
-                fill="clear"
-                onClick={writeToClipboard}
-              >
-                Copy Link
-              </IonButton>
+
+        {item && item?.contentType !== "image" && (
+          <>
+            <div className="ion-padding">
+              <ThinDivider />
             </div>
-          </div>
-        </div>
-        <div className="ion-padding">
-          <IonText color={"primary"}>{item?.url || item?.content}</IonText>
-        </div>
+            <div className="flex ion-padding flex-column gap-4">
+              <div className="flex-1 flex gap-5 align-items-center">
+                {item?.metadata?.logo && (
+                  <IonAvatar style={{ width: "25px", height: "25px" }}>
+                    <img
+                      alt="Silhouette of a person's head"
+                      src={item.metadata.logo.url}
+                    />
+                  </IonAvatar>
+                )}
+                {metadata.publisher && (
+                  <IonText className="">{metadata.publisher}</IonText>
+                )}
+                <div style={{ marginLeft: "auto" }} className="font-bold">
+                  <IonButton
+                    className="font-bold"
+                    fill="clear"
+                    onClick={writeToClipboard}
+                  >
+                    Copy Link
+                  </IonButton>
+                </div>
+              </div>
+            </div>
+            <div className="ion-padding">
+              <IonText
+                onClick={() => linkRef?.current?.click()}
+                color={"primary"}
+              >
+                {item?.url || item?.content}
+              </IonText>
+            </div>
+          </>
+        )}
         <div className="ion-padding">
           <ThinDivider />
         </div>
@@ -339,6 +352,7 @@ const ItemDetail = () => {
           />
         )}
       </IonModal>
+      {renderLink()}
     </IonPage>
   );
 };
