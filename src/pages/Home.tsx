@@ -51,13 +51,14 @@ const Home = ({ isSearch }: Props) => {
   const [selectedItem, setSelectedItem] = useState<SharedItem>();
 
   const itemsCount = (tagId: string) => {
-    return sharedItems.filter((item: SharedItem) => item.tags.includes(tagId))
-      .length;
+    return sharedItems.filter((item: SharedItem) =>
+      (item.tags || []).includes(tagId)
+    ).length;
   };
 
   const itemFilterByTags = (item: SharedItem) => {
     const selectedTagIds = selectedTags.map((tag) => tag.id);
-    const itemTagIds = item.tags.map((tag) => tag);
+    const itemTagIds = (item.tags || []).map((tag) => tag);
 
     if (selectedTagIds.length === 0) {
       return true;
@@ -233,54 +234,58 @@ const Home = ({ isSearch }: Props) => {
       </IonHeader>
       <IonContent className="" style={{ position: "relative" }} fullscreen>
         {listArray &&
-          listArray.map((item: GroupedSharedItem, index: number) => (
-            <Fragment key={index}>
-              <div className="flex flex-column">
-                <div
-                  className="flex justify-content-center pb-3 ion-padding"
-                  style={{
-                    marginTop: "20px",
-                    borderBottom: "1px solid #ccc",
-                    position: "-webkit-sticky",
-                  }}
-                >
-                  <div className="flex flex-column w-full">
-                    <IonText color="dark font-lg" style={{}}>
-                      {dayjs().isSame(item.createdAt, "day")
-                        ? "Today"
-                        : dayjs()
-                            .subtract(1, "day")
-                            .isSame(item.createdAt, "day")
-                        ? "Yesterday"
-                        : dayjs(item.createdAt).format("MMMM, YYYY")}
-                    </IonText>
-                    <IonText color="dark font-2xl font-bold" className="w-full">
-                      {dayjs(item.createdAt).format("DD")}
-                      {getOrdinalSuffix(dayjs(item.createdAt).date())},{" "}
-                      {dayjs(item.createdAt).format("dddd")}
-                    </IonText>
+          listArray.map((item: GroupedSharedItem, index: number) => {
+            const createdAt = dayjs(item.data[0].createdAt);
+            return (
+              <Fragment key={index}>
+                <div className="flex flex-column">
+                  <div
+                    className="flex justify-content-center pb-3 ion-padding"
+                    style={{
+                      marginTop: "20px",
+                      borderBottom: "1px solid #ccc",
+                      position: "-webkit-sticky",
+                    }}
+                  >
+                    <div className="flex flex-column w-full">
+                      <IonText color="dark font-lg" style={{}}>
+                        {dayjs().isSame(createdAt, "day")
+                          ? "Today"
+                          : dayjs().subtract(1, "day").isSame(createdAt, "day")
+                          ? "Yesterday"
+                          : dayjs(createdAt).format("MMMM, YYYY")}
+                      </IonText>
+                      <IonText
+                        color="dark font-2xl font-bold"
+                        className="w-full"
+                      >
+                        {dayjs(createdAt).format("DD")}
+                        {getOrdinalSuffix(dayjs(createdAt).date())},{" "}
+                        {dayjs(createdAt).format("dddd")}
+                      </IonText>
+                    </div>
+                  </div>
+                  <div className="ion-padding">
+                    {item.data.map((_d: any) => (
+                      <div key={_d.id} className="w-full">
+                        <LinkPreview
+                          tags={tags}
+                          selectedTags={selectedTags}
+                          item={_d}
+                          onClickEdit={() => {
+                            setSelectedItem(_d);
+                            setModelType("edit");
+                            modal.current?.present();
+                          }}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="ion-padding">
-                  {item.data.map((_d: any) => (
-                    <div key={_d.id} className="w-full">
-                      <LinkPreview
-                        tags={tags}
-                        selectedTags={selectedTags}
-                        item={_d}
-                        onClickEdit={() => {
-                          setSelectedItem(_d);
-                          setModelType("edit");
-                          modal.current?.present();
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {index < listArray.length - 1 && <IonItemDivider />}
-            </Fragment>
-          ))}
+                {index < listArray.length - 1 && <IonItemDivider />}
+              </Fragment>
+            );
+          })}
         <div className="c-modal-container">
           <IonModal
             ref={modal}

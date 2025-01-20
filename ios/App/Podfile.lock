@@ -1153,7 +1153,7 @@ PODS:
   - BoringSSL-GRPC/Interface (0.0.36)
   - Capacitor (6.1.1):
     - CapacitorCordova
-  - CapacitorApp (6.0.0):
+  - CapacitorApp (6.0.2):
     - Capacitor
   - CapacitorClipboard (6.0.1):
     - Capacitor
@@ -1176,6 +1176,9 @@ PODS:
   - Firebase/Firestore (11.0.0):
     - Firebase/CoreOnly
     - FirebaseFirestore (~> 11.0.0)
+  - Firebase/Storage (11.0.0):
+    - Firebase/CoreOnly
+    - FirebaseStorage (~> 11.0.0)
   - FirebaseAnalytics (11.0.0):
     - FirebaseAnalytics/AdIdSupport (= 11.0.0)
     - FirebaseCore (~> 11.0)
@@ -1239,6 +1242,13 @@ PODS:
     - GoogleUtilities/UserDefaults (~> 8.0)
     - PromisesObjC (~> 2.4)
   - FirebaseSharedSwift (11.0.0)
+  - FirebaseStorage (11.0.0):
+    - FirebaseAppCheckInterop (~> 11.0)
+    - FirebaseAuthInterop (~> 11.0)
+    - FirebaseCore (~> 11.0)
+    - FirebaseCoreExtension (~> 11.0)
+    - GoogleUtilities/Environment (~> 8.0)
+    - GTMSessionFetcher/Core (~> 3.4)
   - GoogleAppMeasurement (11.0.0):
     - GoogleAppMeasurement/AdIdSupport (= 11.0.0)
     - GoogleUtilities/AppDelegateSwizzler (~> 8.0)
@@ -1404,6 +1414,7 @@ DEPENDENCIES:
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - Firebase/Core
   - Firebase/Firestore
+  - Firebase/Storage
   - FirebaseAuth
   - "RevenuecatPurchasesCapacitor (from `../../node_modules/@revenuecat/purchases-capacitor`)"
 
@@ -1423,6 +1434,7 @@ SPEC REPOS:
     - FirebaseFirestoreInternal
     - FirebaseInstallations
     - FirebaseSharedSwift
+    - FirebaseStorage
     - GoogleAppMeasurement
     - GoogleUtilities
     - "gRPC-C++"
@@ -1461,7 +1473,7 @@ SPEC CHECKSUMS:
   abseil: d121da9ef7e2ff4cab7666e76c5a3e0915ae08c3
   BoringSSL-GRPC: ca6a8e5d04812fce8ffd6437810c2d46f925eaeb
   Capacitor: 8941aba4364ba9d1b22188569001f2ce45cc2b00
-  CapacitorApp: 9d53aec7101f7b030a950c5bdc4df8612576b279
+  CapacitorApp: 2a8c3a0b0814322e5e6e15fe595f02c3808f0f8b
   CapacitorClipboard: 756cd7e83e8d5d19b0c74f40b57517c287bd5fe2
   CapacitorCommunityAppleSignIn: c8bba4ca8ff6ff843367ece13ee8af24e9266eb9
   CapacitorCommunityContacts: 04d749aa9202f1ecedf64f51ecc599ac6aedcfde
@@ -1481,6 +1493,7 @@ SPEC CHECKSUMS:
   FirebaseFirestoreInternal: 9fcc0ccb987ab73163f2249444e4bfd9eac63748
   FirebaseInstallations: 833536e8ff1dfadd4b5f80e8dfef69e8edbd071d
   FirebaseSharedSwift: 9d0e7130af2f0cf162ecd136971f9661f2a3f769
+  FirebaseStorage: f9e2bf027d549db18b6195a37b31c85f56e40200
   GoogleAppMeasurement: 6e49ffac7d3f2c3ded9cc663f912a13b67bbd0de
   GoogleUtilities: 52f677b52b0d2bed24e7b9c94455b1f7353a09f8
   "gRPC-C++": ee7ad8da2f509e22126e2c24797eea5ed46f953f
@@ -1494,6 +1507,6 @@ SPEC CHECKSUMS:
   RevenueCat: fd13e14159aefb128a8e822451d08418e04fdda3
   RevenuecatPurchasesCapacitor: 163e9a6631aff7df63836ee2dca0d71b0bb2cb8a
 
-PODFILE CHECKSUM: e4211c5a99afba74b0d03d628d63e524bf7411df
+PODFILE CHECKSUM: ce607e5547e70aacb32c11b48c8c7bc75a27e8c6
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

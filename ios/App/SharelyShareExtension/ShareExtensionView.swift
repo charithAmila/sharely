@@ -36,7 +36,7 @@ struct ShareExtensionView: View {
                 
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 10) {
-                        ForEach(filteredTags, id: \.id) { tag in
+                        ForEach(filteredTags, id: \ .id) { tag in
                             TagView(tag: tag, isSelected: selectedTags.contains(where: { $0.id == tag.id })) {
                                 if selectedTags.contains(where: { $0.id == tag.id }) {
                                     selectedTags.removeAll(where: { $0.id == tag.id })
@@ -52,20 +52,20 @@ struct ShareExtensionView: View {
                 Button(action: {
                     var data: [String: Any] = [:]
                     switch self.contentType {
-                        case .text(let text):
-                            data["content"] = text
-                        case .image(let url):
-                            if let url = url {
-                                data["imagePath"] = url.path
-                            }
-                        case .url(let url):
-                            if let url = url {
-                                data["url"] = url.absoluteString
-                            }
-                        case .video(let url):
-                            if let url = url {
-                                data["videoPath"] = url.path
-                            }
+                    case .text(let text):
+                        data["content"] = text
+                    case .image(let url):
+                        if let url = url {
+                            data["imagePath"] = url.path
+                        }
+                    case .url(let url):
+                        if let url = url {
+                            data["url"] = url.absoluteString
+                        }
+                    case .video(let url):
+                        if let url = url {
+                            data["videoPath"] = url.path
+                        }
                     }
                     data["tags"] = selectedTags.map { $0.id }
                     self.onSave(data)
@@ -123,7 +123,7 @@ struct ShareExtensionView: View {
                     .background(Color(.systemGray6))
                     .cornerRadius(8)
                     .padding(.horizontal, 10)
-                    .frame(height: 40) // Set a specific height
+                    .frame(height: 40)
             }
             .padding(.top, 10)
         }
@@ -155,10 +155,9 @@ struct ShareExtensionView: View {
             textField.delegate = context.coordinator
             textField.returnKeyType = .done
             
-            // Set the size constraints
             textField.translatesAutoresizingMaskIntoConstraints = false
             NSLayoutConstraint.activate([
-                textField.heightAnchor.constraint(equalToConstant: 40) // Set a specific height
+                textField.heightAnchor.constraint(equalToConstant: 40)
             ])
             
             return textField

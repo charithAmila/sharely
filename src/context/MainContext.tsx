@@ -74,7 +74,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     const linkCountMap: { [tagId: string]: number } = {};
 
     sharedItems.forEach((item) => {
-      item.tags.forEach((tagId) => {
+      (item.tags || []).forEach((tagId) => {
         if (linkCountMap[tagId]) {
           linkCountMap[tagId]++;
         } else {

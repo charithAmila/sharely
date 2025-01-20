@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   IonAvatar,
   IonBackButton,
@@ -26,6 +26,7 @@ import { isUrl } from "../helpers";
 import dayjs from "dayjs";
 import { getOrdinalSuffix } from "../utils/constant";
 import ThinDivider from "../components/ThinDivider";
+import MediaPreview from "../components/MideaPreview";
 
 type Params = {
   id: string;
@@ -56,6 +57,8 @@ const ItemDetail = () => {
 
   const title = () => {
     if (!item) return;
+
+    console.log("item.createdAt", item.createdAt);
 
     let _title = `${dayjs(item.createdAt).format("DD")} ${getOrdinalSuffix(
       dayjs(item.createdAt).date()
@@ -114,9 +117,33 @@ const ItemDetail = () => {
         rel="noopener noreferrer"
         ref={linkRef}
         style={{ display: "none" }}
-      ></a>
+      />
     );
   };
+
+  const metadata = useMemo(() => {
+    if (!item) return;
+    if (item.metadata) {
+      return {
+        ...item.metadata,
+        contentType: "image",
+      };
+    }
+    let metadata: any = {};
+    if (item.fileURL) {
+      metadata.image = {
+        url: item.fileURL,
+      };
+    }
+
+    metadata.contentType = item?.contentType || "image";
+
+    if (item.contentType === "text") {
+      metadata.description = item.content;
+    }
+
+    return metadata;
+  }, [item]);
 
   return (
     <IonPage>
@@ -158,16 +185,16 @@ const ItemDetail = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent scrollY={true}>
+      <IonContent style={{ background: "#EEF0F5" }} fullscreen scrollY={true}>
         <IonCard className="main-card">
           <div
             style={{
               backgroundColor: "#EEF0F5",
             }}
           >
-            {item?.metadata.image && (
+            {metadata?.image && (
               <div className="relative">
-                {item?.metadata.logo && (
+                {metadata.logo && (
                   <div
                     className="absolute flex justify-content-center align-items-center shadow-1"
                     style={{
@@ -182,20 +209,16 @@ const ItemDetail = () => {
                     <IonAvatar style={{ width: "50px", height: "50px" }}>
                       <img
                         alt="Silhouette of a person's head"
-                        src={item?.metadata.logo.url}
+                        src={metadata.logo.url}
                       />
                     </IonAvatar>
                   </div>
                 )}
-                <img
-                  src={item?.metadata?.image?.url}
-                  style={{
-                    maxHeight: "225px",
-                    width: "100%",
-                    objectFit: "cover",
-                    borderRadius: "8px",
-                  }}
-                  alt="Preview"
+
+                <MediaPreview
+                  url={metadata?.image?.url}
+                  type={metadata.contentType}
+                  contentType={item?.contentType}
                 />
               </div>
             )}
@@ -212,36 +235,46 @@ const ItemDetail = () => {
             <IonText>{item?.metadata?.description}</IonText>
           </div>
         </div>
-        <div className="ion-padding">
-          <ThinDivider />
-        </div>
-        <div className="flex ion-padding flex-column gap-4">
-          <div className="flex-1 flex gap-5 align-items-center">
-            {item?.metadata?.logo && (
-              <IonAvatar style={{ width: "25px", height: "25px" }}>
-                <img
-                  alt="Silhouette of a person's head"
-                  src={item.metadata.logo.url}
-                />
-              </IonAvatar>
-            )}
-            {item?.metadata.publisher && (
-              <IonText className="">{item?.metadata.publisher}</IonText>
-            )}
-            <div style={{ marginLeft: "auto" }} className="font-bold">
-              <IonButton
-                className="font-bold"
-                fill="clear"
-                onClick={writeToClipboard}
-              >
-                Copy Link
-              </IonButton>
+
+        {item && item?.contentType !== "image" && (
+          <>
+            <div className="ion-padding">
+              <ThinDivider />
             </div>
-          </div>
-        </div>
-        <div className="ion-padding">
-          <IonText color={"primary"}>{item?.url || item?.content}</IonText>
-        </div>
+            <div className="flex ion-padding flex-column gap-4">
+              <div className="flex-1 flex gap-5 align-items-center">
+                {item?.metadata?.logo && (
+                  <IonAvatar style={{ width: "25px", height: "25px" }}>
+                    <img
+                      alt="Silhouette of a person's head"
+                      src={item.metadata.logo.url}
+                    />
+                  </IonAvatar>
+                )}
+                {metadata.publisher && (
+                  <IonText className="">{metadata.publisher}</IonText>
+                )}
+                <div style={{ marginLeft: "auto" }} className="font-bold">
+                  <IonButton
+                    className="font-bold"
+                    fill="clear"
+                    onClick={writeToClipboard}
+                  >
+                    Copy Link
+                  </IonButton>
+                </div>
+              </div>
+            </div>
+            <div className="ion-padding">
+              <IonText
+                onClick={() => linkRef?.current?.click()}
+                color={"primary"}
+              >
+                {item?.url || item?.content}
+              </IonText>
+            </div>
+          </>
+        )}
         <div className="ion-padding">
           <ThinDivider />
         </div>
@@ -296,29 +329,6 @@ const ItemDetail = () => {
             ))}
           </div>
         </div>
-        {/* <div className="flex flex-column gap-5">
-          <IonList>
-            {menu.map((item) => (
-              <IonItem
-                key={item.label}
-                onClick={item.onClick || (() => {})}
-                button
-              >
-                <IonIcon slot="start" icon={item.icon} />
-                <IonLabel>{item.label}</IonLabel>
-              </IonItem>
-            ))}
-          </IonList>
-
-          {item?.note && (
-            <div className="ion-padding bg-light">
-              <IonText color="dark">
-                <h1>Note</h1>
-              </IonText>
-              <IonText>{item?.note}</IonText>
-            </div>
-          )}
-        </div> */}
       </IonContent>
       <IonModal isOpen={isOpen}>
         {modalType === "note" ? (
@@ -342,6 +352,7 @@ const ItemDetail = () => {
           />
         )}
       </IonModal>
+      {renderLink()}
     </IonPage>
   );
 };

@@ -26,6 +26,7 @@ target 'App' do
   # Add your Pods here
   pod 'Firebase/Firestore'
   pod 'Firebase/Core'
+  pod 'Firebase/Storage'
 end
 
 target 'SharelyShareExtension' do
@@ -33,6 +34,7 @@ target 'SharelyShareExtension' do
   pod 'Firebase/Firestore'
   pod 'Firebase/Core'
   pod 'FirebaseAuth'
+  pod 'Firebase/Storage'
 end
 
 post_install do |installer|
