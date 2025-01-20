@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<incidents format="6" by="lint 8.2.1" type="partial_results">
+    <map id="UnsafeIntentLaunch">
+            <map id="unprotected">
+                <entry
+                    name="io.sharely.app.MainActivity"
+                    boolean="true"/>
+                <entry
+                    name="io.sharely.app.ShareHandlerActivity"
+                    boolean="true"/>
+            </map>
+    </map>
+    <map id="UnusedResources">
+        <location id="R.style.AppTheme_NoActionBar"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/styles.xml"
+            line="12"
+            column="12"
+            startOffset="420"
+            endLine="12"
+            endColumn="39"
+            endOffset="447"/>
+        <location id="R.string.custom_url_scheme"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="6"
+            column="13"
+            startOffset="220"
+            endLine="6"
+            endColumn="37"
+            endOffset="244"/>
+        <location id="R.drawable.ic_launcher_foreground"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/drawable-v24/ic_launcher_foreground.xml"
+            line="1"
+            column="1"
+            startOffset="0"
+            endLine="34"
+            endColumn="10"
+            endOffset="1879"/>
+        <location id="R.string.package_name"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/values/strings.xml"
+            line="5"
+            column="13"
+            startOffset="164"
+            endLine="5"
+            endColumn="32"
+            endOffset="183"/>
+        <location id="R.xml.config"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/xml/config.xml"
+            line="2"
+            column="1"
+            startOffset="39"
+            endLine="6"
+            endColumn="10"
+            endOffset="185"/>
+        <entry
+            name="model"
+            string="color[colorPrimary(R),colorPrimaryDark(R),colorAccent(R),ic_launcher_background(U)],drawable[ic_launcher_foreground(D),ic_launcher_background(D),ic_launcher_foreground_1(E),splash(U)],id[tag_input(U),text_description(D),share_button(U)],layout[activity_main(D),activity_share_handler(U)],mipmap[ic_launcher_round(U),ic_launcher_foreground(U),ic_launcher(U)],string[title_activity_main(U),app_name(U),custom_url_scheme(D),package_name(D)],style[Theme_AppCompat_Light_DarkActionBar(R),AppTheme_NoActionBarLaunch(U),Theme_SplashScreen(R),Theme_AppCompat_DayNight_NoActionBar(E),Widget_MaterialComponents_BottomSheet_Modal(R),Theme_MaterialComponents_Light_BottomSheetDialog(R),Theme_MaterialComponents_BottomSheetDialog(U),AppTheme(U),AppTheme_NoActionBar(D)],xml[file_paths(U),config(D)];4^6,d^3^e,f^3^e,15^16^7,1a^19^18^0^2,1b^14^0^1^2,1c^17;;;"/>
+        <location id="R.drawable.ic_launcher_background"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/drawable/ic_launcher_background.xml"
+            line="2"
+            column="1"
+            startOffset="39"
+            endLine="170"
+            endColumn="10"
+            endOffset="5605"/>
+        <location id="R.layout.activity_main"
+            file="${:app*debug*MAIN*sourceProvider*0*resDir*0}/layout/activity_main.xml"
+            line="2"
+            column="1"
+            startOffset="39"
+            endLine="12"
+            endColumn="55"
+            endOffset="534"/>
+    </map>
+
+</incidents>
