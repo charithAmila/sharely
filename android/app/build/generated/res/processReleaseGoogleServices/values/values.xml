@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="gcm_defaultSenderId" translatable="false">427879207334</string>
+    <string name="google_api_key" translatable="false">AIzaSyBzynMgy6U8Cake4RFlDxIOWoboFBUw3I0</string>
+    <string name="google_app_id" translatable="false">1:427879207334:android:ea48b62900f94224afff67</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBzynMgy6U8Cake4RFlDxIOWoboFBUw3I0</string>
+    <string name="google_storage_bucket" translatable="false">snap-link-424d4.appspot.com</string>
+    <string name="project_id" translatable="false">snap-link-424d4</string>
+</resources>
