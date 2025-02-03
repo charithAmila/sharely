@@ -1,5 +1,6 @@
 import {
   IonButton,
+  IonButtons,
   IonContent,
   IonHeader,
   IonIcon,
@@ -11,18 +12,22 @@ import ExpandedLogo from "../assets/svg/ExpandedLogo";
 import { checkmarkOutline } from "ionicons/icons";
 import ProPlanLogo from "../assets/svg/ProPlanLogo";
 
-import { Purchases, LOG_LEVEL } from "@revenuecat/purchases-capacitor";
-import { useEffect } from "react";
+import {
+  Purchases,
+  LOG_LEVEL,
+  PurchasesOffering,
+} from "@revenuecat/purchases-capacitor";
+import { useEffect, useState } from "react";
 import { useAuthContext } from "../context/AuthContext";
 
 const apiKey = "appl_roiSUnYYgptdygPKkRfydtBphQu";
 
 const ProConnect = () => {
-  const { user } = useAuthContext();
+  const { user, updateUser } = useAuthContext();
+  const [offerings, setOfferings] = useState<PurchasesOffering | null>(null);
+
   useEffect(() => {
     if (!user) return;
-
-    console.log("+++++ apiKey", apiKey);
 
     (async function () {
       try {
@@ -31,18 +36,39 @@ const ProConnect = () => {
           apiKey: apiKey,
           appUserID: user.id,
         });
-      } catch (error) {
-        console.log("+++++ error", error);
-        console.error("++++++++++++++++++++Error configuring Purchases", error);
-      }
+        const offerings = await Purchases.getOfferings();
+        if (offerings.current) {
+          setOfferings(offerings.current);
+        }
+      } catch (error) {}
     })();
   }, [user]);
 
   const onClickActivate = async () => {
     try {
       if (!user) return;
-      const logInResult = await Purchases.logIn({ appUserID: user?.id });
-      console.log("+++++ result", logInResult);
+
+      if (offerings?.availablePackages[0]) {
+        await Purchases.purchasePackage({
+          aPackage: offerings.availablePackages[0],
+        });
+
+        if (user.email) {
+          await Purchases.setEmail({
+            email: user.email,
+          });
+        }
+
+        updateUser({
+          userType: "PRO",
+        });
+      }
+    } catch (error) {}
+  };
+
+  const onClickSkip = async () => {
+    try {
+      await updateUser({ userType: "FREE" });
     } catch (error) {
       console.log("+++++ error", error);
     }
@@ -53,6 +79,9 @@ const ProConnect = () => {
       <IonHeader>
         <IonToolbar className="p-3 white-header">
           <ExpandedLogo />
+          <IonButtons slot="end">
+            <IonButton onClick={() => onClickSkip()}>Skip</IonButton>
+          </IonButtons>
         </IonToolbar>
       </IonHeader>
       <IonContent>

@@ -4,7 +4,8 @@ type AuthUser = {
   email: string;
   photo?: string;
   phone?: string;
-  friends?: AuthUserFriend[];
+  isOnBoarded: boolean;
+  userType?: "FREE" | "PRO";
   createdAt?: string;
   updatedAt?: string;
 };
