@@ -58,6 +58,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           id: user.uid,
           email: user.email ?? "",
           name: user.displayName ?? "",
+          isOnBoarded: false,
         };
 
         const userService = new UserService();
@@ -66,16 +67,10 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           try {
             const userDoc = await userService.findByDocument(user.uid);
             if (userDoc) {
-              let friends: AuthUserFriend[] = [];
-              if (userDoc.exists() && userDoc.data().friends) {
-                friends = userDoc.data().friends;
-              }
-
               setUser({
                 ...authUser,
                 ...(userDoc.exists() ? userDoc.data() : {}),
                 id: user.uid,
-                friends,
               });
               setAuthenticated(true);
 
@@ -123,6 +118,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         id: user.user.uid,
         email: user.user.email ?? "",
         name: user.user.displayName ?? "",
+        isOnBoarded: false,
       };
       return Promise.resolve(authUser);
     } catch (error) {
@@ -139,6 +135,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       id: user.user.uid,
       name: user.user.displayName ?? "",
       email: user.user.email ?? "",
+      isOnBoarded: false,
     };
 
     const userService = new UserService();
@@ -163,6 +160,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         id: user.user.uid,
         name: name,
         email: user.user.email ?? "",
+        isOnBoarded: false,
       };
 
       const userService = new UserService();

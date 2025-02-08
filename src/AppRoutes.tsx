@@ -1,4 +1,4 @@
-import { Redirect, Route, useHistory, useLocation } from "react-router";
+import { Redirect, Route } from "react-router";
 import { useAuthContext } from "./context/AuthContext";
 import {
   IonTabs,
@@ -22,7 +22,6 @@ import Groups from "./pages/Groups";
 import Group from "./pages/Group";
 import GroupForm from "./pages/GroupForm";
 import OnBoard from "./pages/Onboard";
-import { useState } from "react";
 import Search from "./pages/Search";
 import Subscription from "./pages/Subscription";
 import ExpandedLogoWhite from "./assets/svg/ExpandedLogoWhite";
@@ -31,6 +30,7 @@ import TabHomeActive from "./assets/icons/tab-home-active.svg";
 import TabProfile from "./assets/icons/tab-profile.svg";
 import TabHome from "./assets/icons/tab-home.svg";
 import TabProfileActive from "./assets/icons/tab-profile-active.svg";
+import ProConnect from "./pages/ProConnect";
 
 addIcons({
   "tab-home": TabHome,
@@ -40,19 +40,18 @@ addIcons({
 });
 
 const AuthRoutes = () => {
-  const { user, activeTab } = useAuthContext();
+  const { user, activeTab, updateUser } = useAuthContext();
 
-  const st: string | null = localStorage.getItem("isOnBoarded");
-
-  const [isOnBoarded, setIsOnBoarded] = useState<string>(st ?? "NO");
-
-  const onBoard = () => {
-    localStorage.setItem("isOnBoarded", "YES");
-    setIsOnBoarded("YES");
+  const onBoard = async () => {
+    await updateUser({ isOnBoarded: true });
   };
 
-  if (isOnBoarded === "NO") {
+  if (user?.isOnBoarded === false) {
     return <OnBoard onBoardDone={onBoard} />;
+  }
+
+  if (!user?.userType) {
+    return <ProConnect />;
   }
 
   return (

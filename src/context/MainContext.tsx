@@ -3,7 +3,6 @@ import { ItemService } from "../services/ItemServices";
 import { TagService } from "../services/TagService";
 import { Omit } from "react-router";
 import { GroupService } from "../services/GroupService";
-import { UserService } from "../services/UserService";
 import { groupByCreatedAt } from "../helpers";
 
 type AppContextProviderProps = {
@@ -26,8 +25,6 @@ type ContextProps = {
   ) => Promise<void>;
   updateGroup: (group: Partial<Group>, id: string) => Promise<void>;
   deleteGroup: (group: Group) => Promise<void>;
-  friends: Member[];
-  getFriends: () => Promise<void>;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -250,31 +247,6 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     }
   };
 
-  const getFriends = async () => {
-    if (!user || !user.friends) {
-      return;
-    }
-
-    const friendsIds: string[] = user.friends.map((f) => f.id);
-
-    const userService = new UserService();
-
-    const data: AuthUser[] = await userService.findByFieldsArrayIn(
-      "id",
-      friendsIds
-    );
-
-    const _friends: Member[] = data.map((d) => {
-      return {
-        id: d.id,
-        name: d.name,
-        email: d.email,
-      };
-    });
-
-    setFriends(_friends);
-  };
-
   const values: ContextProps = {
     items,
     tags,
@@ -289,8 +261,6 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     createGroup,
     updateGroup,
     deleteGroup,
-    friends,
-    getFriends,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;
