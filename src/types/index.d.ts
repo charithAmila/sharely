@@ -41,7 +41,13 @@ type SharedItem = {
   content?: string;
   tags: string[];
   userId: string;
-  metadata?: any;
+  metadata?: {
+    title?: string;
+    description?: string;
+    publisher?: string;
+    author?: string;
+    [key: string]: any;
+  };
   note?: string;
   fileURL?: string;
   contentType?: "url" | "text" | "image" | "video" | "pdf";
