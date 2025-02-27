@@ -19,7 +19,7 @@ const ProPlan = () => {
 
     (async function () {
       try {
-        await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG }); // Enable to get debug logs
+        await Purchases.setLogLevel({ level: LOG_LEVEL.VERBOSE }); // Enable to get debug logs
         await Purchases.configure({
           apiKey: REVENUCAT_APPLE_API_KEY,
           appUserID: user.id,
@@ -100,10 +100,10 @@ const ProPlan = () => {
         </div>
         <div className="flex flex-column gap-5">
           {[
-            "Unlimited tags",
+            "Unlimited Tags",
+            "Unlimited Content Archive",
+            "Advanced Search options",
             "Priority support",
-            "Advanced link management",
-            "Access to premium features",
           ].map((item, index) => (
             <div key={index} className="flex gap-5 align-items-center">
               <IonIcon

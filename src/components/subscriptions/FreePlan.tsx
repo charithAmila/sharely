@@ -2,9 +2,11 @@ import { IonChip, IonText, IonIcon } from "@ionic/react";
 import { checkmarkOutline } from "ionicons/icons";
 import FreePlanLogo from "../../assets/svg/FreePlanLogo";
 import { useAuthContext } from "../../context/AuthContext";
+import { useAppContext } from "../../context/MainContext";
 
 const FreePlan = () => {
   const { user } = useAuthContext();
+  const { settings } = useAppContext();
   return (
     <>
       <div
@@ -37,20 +39,22 @@ const FreePlan = () => {
           </IonText>
         </div>
         <div className="flex flex-column gap-5">
-          {["Limited tags", "Basic link management", "Standard support"].map(
-            (item, index) => (
-              <div key={index} className="flex gap-5 align-items-center">
-                <IonIcon
-                  className="font-base font-bold"
-                  color="primary"
-                  icon={checkmarkOutline}
-                />
-                <IonText className="font-regular">
-                  <span>{item}</span>
-                </IonText>
-              </div>
-            )
-          )}
+          {[
+            `Limited Tags (${settings?.maxTagCount || 5})`,
+            "Limited Content Archive",
+            "Standard Support",
+          ].map((item, index) => (
+            <div key={index} className="flex gap-5 align-items-center">
+              <IonIcon
+                className="font-base font-bold"
+                color="primary"
+                icon={checkmarkOutline}
+              />
+              <IonText className="font-regular">
+                <span>{item}</span>
+              </IonText>
+            </div>
+          ))}
         </div>
         <div className="w-full flex ">
           <div className="flex flex-1">

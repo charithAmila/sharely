@@ -103,13 +103,13 @@ const TagForm = ({ onSuccess, initialValue, hideModal }: Props) => {
               }}
             >
               <IonText className="font-large">
-                Sorry, Tag limit exceeded
+                You've reached your free tag limit!
               </IonText>
               <IonText className="font-bold">
-                Max Tags: {settings?.maxTagCount}
+                Your free plan includes up to {settings?.maxTagCount} tags.
               </IonText>
               <IonText className="font-sm">
-                Upgrade your plan to add more tags
+                Upgrade to Pro for unlimited tagging and premium features!
               </IonText>
             </div>
 
@@ -122,7 +122,7 @@ const TagForm = ({ onSuccess, initialValue, hideModal }: Props) => {
               expand="block"
               color="primary"
             >
-              Upgrade
+              Upgrade to Pro & Unlock Unlimited Tags!
             </IonButton>
           </div>
         ) : (
