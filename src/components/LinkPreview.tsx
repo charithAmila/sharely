@@ -186,6 +186,10 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
         <>
           <IonCard
             onClick={() => {
+              if (item.type === "HOW_TO_USE") {
+                push(`/tabs/how-to-use`);
+                return;
+              }
               push(`/tabs/item/${item.id}`);
             }}
             className="main-card"
@@ -250,7 +254,7 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
                 </IonCardContent>
               </div>
             </div>
-            {cardFooter()}
+            {item.type === "HOW_TO_USE" ? <></> : cardFooter()}
           </IonCard>
           {renderLink()}
         </>

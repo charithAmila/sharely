@@ -59,6 +59,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           email: user.email ?? "",
           name: user.displayName ?? "",
           isOnBoarded: false,
+          createdAt: user.metadata.creationTime ?? "",
         };
 
         const userService = new UserService();
@@ -119,6 +120,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         email: user.user.email ?? "",
         name: user.user.displayName ?? "",
         isOnBoarded: false,
+        createdAt: user.user.metadata.creationTime ?? "",
       };
       return Promise.resolve(authUser);
     } catch (error) {
@@ -136,6 +138,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
       name: user.user.displayName ?? "",
       email: user.user.email ?? "",
       isOnBoarded: false,
+      createdAt: user.user.metadata.creationTime ?? "",
     };
 
     const userService = new UserService();
@@ -161,6 +164,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         name: name,
         email: user.user.email ?? "",
         isOnBoarded: false,
+        createdAt: user.user.metadata.creationTime ?? "",
       };
 
       const userService = new UserService();

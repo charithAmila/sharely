@@ -31,6 +31,7 @@ import TabProfile from "./assets/icons/tab-profile.svg";
 import TabHome from "./assets/icons/tab-home.svg";
 import TabProfileActive from "./assets/icons/tab-profile-active.svg";
 import ProConnect from "./pages/ProConnect";
+import HowToUseDetail from "./pages/HowToUseDetail";
 
 addIcons({
   "tab-home": TabHome,
@@ -67,6 +68,7 @@ const AuthRoutes = () => {
             <Route exact path="/tabs/home" component={Home} />
             <Route exact path="/tabs/search" component={Search} />
             <Route exact path="/tabs/item/:id" component={ItemDetail} />
+            <Route exact path="/tabs/how-to-use" component={HowToUseDetail} />
             <Route exact path="/tabs/profile" component={Profile} />
             <Route exact path="/tabs/tags" component={Tags} />
             <Route exact path="/tabs/groups" component={Groups} />

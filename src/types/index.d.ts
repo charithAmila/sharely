@@ -7,7 +7,7 @@ type AuthUser = {
   isOnBoarded: boolean;
   userType?: "FREE" | "PRO";
   maxTagCount?: number;
-  createdAt?: string;
+  createdAt: string;
   updatedAt?: string;
 };
 
@@ -42,6 +42,7 @@ type SharedItem = {
   content?: string;
   tags: string[];
   userId: string;
+  type: "CONTENT" | "HOW_TO_USE";
   metadata?: {
     title?: string;
     description?: string;
@@ -76,4 +77,18 @@ type Group = {
 type Settings = {
   id: string;
   maxTagCount: number;
+  howToUse: HowToUse;
+};
+
+type HowToUse = {
+  title: string;
+  description: string;
+  image?: {
+    url: string;
+  };
+  video?: {
+    muted: boolean;
+    playing: boolean;
+    url: string;
+  };
 };

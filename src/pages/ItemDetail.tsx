@@ -58,8 +58,6 @@ const ItemDetail = () => {
   const title = () => {
     if (!item) return;
 
-    console.log("item.createdAt", item.createdAt);
-
     let _title = `${dayjs(item.createdAt).format("DD")} ${getOrdinalSuffix(
       dayjs(item.createdAt).date()
     )}, ${dayjs(item.createdAt).format("dddd")} `;
