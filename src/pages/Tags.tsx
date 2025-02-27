@@ -126,6 +126,7 @@ const Tags = () => {
           breakpoints={[0, 0.5, 0.75, 1]}
         >
           <TagForm
+            hideModal={() => modal.current?.dismiss()}
             onSuccess={() => {
               if (selectedTag) {
                 setSelectedTag(undefined);

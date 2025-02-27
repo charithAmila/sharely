@@ -4,6 +4,7 @@ import { TagService } from "../services/TagService";
 import { Omit } from "react-router";
 import { GroupService } from "../services/GroupService";
 import { groupByCreatedAt } from "../helpers";
+import { SettingService } from "../services/SettingService";
 
 type AppContextProviderProps = {
   children: React.ReactNode;
@@ -25,6 +26,7 @@ type ContextProps = {
   ) => Promise<void>;
   updateGroup: (group: Partial<Group>, id: string) => Promise<void>;
   deleteGroup: (group: Group) => Promise<void>;
+  settings: Settings | null;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -36,6 +38,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [friends, setFriends] = useState<Member[]>([]);
   const [linksCount, setLinksCount] = useState<LinkCount[]>([]);
+  const [settings, setSettings] = useState<Settings | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -62,6 +65,19 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
       }
     };
 
+    const fetchSettings = async () => {
+      try {
+        const settingService = new SettingService();
+        const res = await settingService.findByDocument("v-1");
+        if (res?.exists()) {
+          setSettings(res.data() as Settings);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchSettings();
     fetchGroups();
     fetchTags();
   }, [user]);
@@ -261,6 +277,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     createGroup,
     updateGroup,
     deleteGroup,
+    settings,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

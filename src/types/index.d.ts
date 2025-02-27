@@ -6,6 +6,7 @@ type AuthUser = {
   phone?: string;
   isOnBoarded: boolean;
   userType?: "FREE" | "PRO";
+  maxTagCount?: number;
   createdAt?: string;
   updatedAt?: string;
 };
@@ -70,4 +71,9 @@ type Group = {
   tags?: Tag[];
   createdAt?: string;
   updatedAt?: string;
+};
+
+type Settings = {
+  id: string;
+  maxTagCount: number;
 };

@@ -32,6 +32,7 @@ const TagsFilter = ({
       <div className="h-50vh">
         {showForm ? (
           <TagForm
+            hideModal={() => closeModal()}
             onSuccess={() => {
               if (showAddForm) {
                 closeModal();
