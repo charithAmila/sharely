@@ -8,12 +8,10 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { useAuthContext } from "../context/AuthContext";
 import ProPlan from "../components/subscriptions/ProPlan";
 import FreePlan from "../components/subscriptions/FreePlan";
 
 export default function Subscription() {
-  const { user } = useAuthContext();
   return (
     <IonPage>
       <IonHeader>
@@ -24,7 +22,7 @@ export default function Subscription() {
           <IonTitle>Subscription Plans</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="ion-padding">
+      <IonContent className="ion-padding" style={{ background: "#EEF0F5" }}>
         <IonText className="font-bold">
           <p>Upgrade you experience</p>
         </IonText>

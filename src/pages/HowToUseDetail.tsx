@@ -25,7 +25,7 @@ const HowToUseDetail = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent fullscreen>
+      <IonContent fullscreen style={{ background: "#EEF0F5" }}>
         <ReactPlayer
           {...(item?.metadata?.video || {})}
           controls
