@@ -8,8 +8,7 @@ import {
   Purchases,
   PurchasesOffering,
 } from "@revenuecat/purchases-capacitor";
-
-const apiKey = "appl_roiSUnYYgptdygPKkRfydtBphQu";
+import { REVENUCAT_APPLE_API_KEY } from "../../utils/env";
 
 const ProPlan = () => {
   const { user, updateUser } = useAuthContext();
@@ -22,7 +21,7 @@ const ProPlan = () => {
       try {
         await Purchases.setLogLevel({ level: LOG_LEVEL.DEBUG }); // Enable to get debug logs
         await Purchases.configure({
-          apiKey: apiKey,
+          apiKey: REVENUCAT_APPLE_API_KEY,
           appUserID: user.id,
         });
         const offerings = await Purchases.getOfferings();
