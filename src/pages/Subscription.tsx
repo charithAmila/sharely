@@ -29,6 +29,7 @@ export default function Subscription() {
         <IonText className="font-regular text-medium">
           <p>Unlock premium features to manage your links more efficiently</p>
         </IonText>
+
         <div className="flex flex-column" style={{ gap: "2rem" }}>
           <ProPlan />
           <FreePlan />

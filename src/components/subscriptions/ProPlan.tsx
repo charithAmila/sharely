@@ -19,7 +19,7 @@ const ProPlan = () => {
 
     (async function () {
       try {
-        await Purchases.setLogLevel({ level: LOG_LEVEL.VERBOSE }); // Enable to get debug logs
+        await Purchases.setLogLevel({ level: LOG_LEVEL.VERBOSE });
         await Purchases.configure({
           apiKey: REVENUCAT_APPLE_API_KEY,
           appUserID: user.id,
@@ -59,7 +59,7 @@ const ProPlan = () => {
       const customerInfo = await Purchases.getCustomerInfo();
 
       if (customerInfo.customerInfo.managementURL) {
-        window.open(customerInfo.customerInfo.managementURL, "_blank"); // Opens in a new tab
+        window.open(customerInfo.customerInfo.managementURL, "_blank");
       } else {
         alert("No active subscription found.");
       }
@@ -125,16 +125,40 @@ const ProPlan = () => {
           </div>
           <div className="w-full">
             {user?.userType !== "PRO" ? (
-              <IonButton
-                className="ion-text-end font-bold"
-                expand="block"
-                color="primary"
-                onClick={() => {
-                  onClickActivate();
-                }}
-              >
-                Subscribe
-              </IonButton>
+              <>
+                <IonButton
+                  className="ion-text-end font-bold"
+                  expand="block"
+                  color="primary"
+                  onClick={() => {
+                    onClickActivate();
+                  }}
+                  style={{ marginBottom: "12px" }} // Added spacing below the button
+                >
+                  Subscribe
+                </IonButton>
+                <div className="ion-text-center" style={{ marginTop: "4px" }}>
+                  {" "}
+                  {/* Adjusted spacing */}
+                  <IonText color="medium" className="font-small">
+                    By subscribing, you agree to our{" "}
+                    <a
+                      href="https://sharelyapp.my.canva.site/terms-and-conditions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{
+                        textDecoration: "underline",
+                        color: "#007bff",
+                        display: "inline-block",
+                        marginTop: "4px", // Added space between button and text
+                      }}
+                    >
+                      Terms & Conditions
+                    </a>
+                    .
+                  </IonText>
+                </div>
+              </>
             ) : (
               <IonButton
                 className="ion-text-end font-bold"
