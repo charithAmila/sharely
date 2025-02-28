@@ -139,11 +139,10 @@ const ProPlan = () => {
                 </IonButton>
                 <div className="ion-text-center" style={{ marginTop: "4px" }}>
                   {" "}
-                  {/* Adjusted spacing */}
                   <IonText color="medium" className="font-small">
                     By subscribing, you agree to our{" "}
                     <a
-                      href="https://sharelyapp.my.canva.site/terms-and-conditions"
+                      href="https://sharelyplatform.com/terms-and-conditions"
                       target="_blank"
                       rel="noopener noreferrer"
                       style={{
