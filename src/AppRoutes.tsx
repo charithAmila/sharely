@@ -154,7 +154,7 @@ const AppRoutes = () => {
           render={() =>
             authenticated === true ? <AuthRoutes /> : <Redirect to="/login" />
           }
-        ></Route>
+        />
       </IonRouterOutlet>
     </IonReactRouter>
   );

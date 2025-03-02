@@ -8,6 +8,7 @@ import {
   initializeAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  deleteUser,
 } from "firebase/auth";
 import {
   FIREBASE_API_KEY,
@@ -48,4 +49,5 @@ export {
   signInWithCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  deleteUser,
 };

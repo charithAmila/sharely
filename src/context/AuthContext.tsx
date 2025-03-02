@@ -5,6 +5,7 @@ import {
   signInWithCredential,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  deleteUser,
 } from "../firebase";
 import { UserService } from "../services/UserService";
 import Echo from "../plugins/Echo";
@@ -40,6 +41,7 @@ type ContextProps = {
   resetPassword: (newPassword: string) => Promise<void>;
   activeTab: "home" | "profile" | "search";
   setActiveTab: (tab: "home" | "profile" | "search") => void;
+  deleteAuthUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -189,6 +191,16 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   };
 
+  const deleteAuthUser = async () => {
+    try {
+      await deleteUser(auth.currentUser!);
+      setUser(null);
+      setAuthenticated(false);
+    } catch (error) {
+      throw new Error("Error logging out");
+    }
+  };
+
   const updateUser = async (data: Partial<AuthUser>) => {
     try {
       if (!user) {
@@ -229,6 +241,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     resetPassword,
     activeTab,
     setActiveTab,
+    deleteAuthUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

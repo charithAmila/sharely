@@ -2,9 +2,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { ItemService } from "../services/ItemServices";
 import { TagService } from "../services/TagService";
 import { Omit } from "react-router";
-import { GroupService } from "../services/GroupService";
 import { groupByCreatedAt } from "../helpers";
 import { SettingService } from "../services/SettingService";
+import { UserService } from "../services/UserService";
+import { useAuthContext } from "./AuthContext";
 
 type AppContextProviderProps = {
   children: React.ReactNode;
@@ -21,6 +22,7 @@ type ContextProps = {
   updateItem: (item: Partial<SharedItem>, id: string) => Promise<void>;
   deleteItem: (item: SharedItem) => Promise<void>;
   settings: Settings | null;
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -31,6 +33,8 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const [sharedItems, setSharedItems] = useState<SharedItem[]>([]);
   const [linksCount, setLinksCount] = useState<LinkCount[]>([]);
   const [settings, setSettings] = useState<Settings | null>(null);
+
+  const { deleteAuthUser } = useAuthContext();
 
   useEffect(() => {
     if (!user) {
@@ -217,6 +221,27 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     }
   };
 
+  const deleteAccount = async () => {
+    if (!user) return;
+    try {
+      // Delete all items
+      const itemService = new ItemService();
+      await itemService.deleteAllByUserId(user.id);
+
+      // Delete all tags
+      const tagService = new TagService();
+      await tagService.deleteAllByUserId(user.id);
+
+      // Delete user
+      const userService = new UserService();
+      await userService.delete(user.id);
+
+      await deleteAuthUser();
+    } catch (error: any) {
+      throw new Error(error);
+    }
+  };
+
   const values: ContextProps = {
     items,
     tags,
@@ -228,6 +253,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     updateItem,
     settings,
     deleteItem,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

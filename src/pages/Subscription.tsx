@@ -1,40 +1,41 @@
-import {
-  IonBackButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonText,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
-import ProPlan from "../components/subscriptions/ProPlan";
-import FreePlan from "../components/subscriptions/FreePlan";
+import { useEffect, useRef } from "react";
+import { IonContent, IonModal, IonPage, useIonRouter } from "@ionic/react";
+import Pro from "./Pro";
 
-export default function Subscription() {
+type Props = {
+  onClickSkip?: () => void;
+};
+export default function Subscription({ onClickSkip }: Props) {
+  const modal = useRef<HTMLIonModalElement>(null);
+  const { goBack } = useIonRouter();
+
+  useEffect(() => {
+    modal.current?.present();
+  }, []);
+
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar className="white-header">
-          <IonButtons slot="start">
-            <IonBackButton />
-          </IonButtons>
-          <IonTitle>Subscription Plans</IonTitle>
-        </IonToolbar>
-      </IonHeader>
-      <IonContent className="ion-padding" style={{ background: "#EEF0F5" }}>
-        <IonText className="font-bold">
-          <p>Upgrade you experience</p>
-        </IonText>
-        <IonText className="font-regular text-medium">
-          <p>Unlock premium features to manage your links more efficiently</p>
-        </IonText>
+      <IonContent
+        className="ion-padding"
+        style={{
+          background:
+            "linear-gradient(to top,rgb(8, 102, 216) 0%, #0172fc 100%)",
+        }}
+      >
+        <IonModal ref={modal} trigger="open-modal">
+          <Pro
+            closeModal={() => {
+              if (onClickSkip) {
+                modal.current?.dismiss();
+                onClickSkip();
+                return;
+              }
 
-        <div className="flex flex-column" style={{ gap: "2rem" }}>
-          <ProPlan />
-          <FreePlan />
-        </div>
-        <br />
+              modal.current?.dismiss();
+              goBack();
+            }}
+          />
+        </IonModal>
       </IonContent>
     </IonPage>
   );
