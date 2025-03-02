@@ -51,10 +51,6 @@ const Profile = () => {
       name: "Subscription Plans",
       icon: personCircleOutline,
       url: "/tabs/subscribe",
-      // onClick: () => {
-      //   setModalType("subscribe");
-      //   modal.current?.present();
-      // },
     },
     {
       name: "Privacy Policy",

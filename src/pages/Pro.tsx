@@ -89,8 +89,7 @@ const Pro = ({ closeModal }: Props) => {
       fullscreen
       className="ion-padding"
       style={{
-        background:
-          "linear-gradient(to top, rgb(8, 102, 216) 0%, #0172fc 100%)",
+        background: "linear-gradient(to top, rgb(3, 23, 48) 0%, #0172fc 100%)",
       }}
     >
       {/* Close Button */}
