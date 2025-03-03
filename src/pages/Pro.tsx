@@ -120,7 +120,6 @@ const Pro = ({ closeModal }: Props) => {
       </div>
 
       <br />
-      <br />
 
       {/* Features List */}
       <div
@@ -139,7 +138,6 @@ const Pro = ({ closeModal }: Props) => {
 
       {/* Pricing and CTA */}
       <div className="flex flex-1 flex-column">
-        <br />
         <br />
         <br />
         <div className="flex flex-column align-items-center">
