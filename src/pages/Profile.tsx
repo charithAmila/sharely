@@ -60,8 +60,9 @@ const Profile = () => {
       },
     },
     {
-      name: "Terms & Conditions",
+      name: "Terms of Use",
       icon: openOutline,
+
       onClick: () => {
         window.open(
           "https://sharelyplatform.com/terms-and-conditions",

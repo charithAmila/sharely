@@ -170,7 +170,7 @@ const Pro = ({ closeModal }: Props) => {
               }
               color="light"
             >
-              Terms & Conditions
+              Terms of Use
             </IonText>
           </div>
           <div className="flex-1">
