@@ -145,7 +145,11 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
     const userService = new UserService();
 
-    await userService.setDoc(authUser.id, authUser);
+    const userDoc = await userService.findByDocument(user.user.uid);
+
+    if (!userDoc?.exists()) {
+      await userService.setDoc(authUser.id, authUser);
+    }
 
     return Promise.resolve(authUser);
   };

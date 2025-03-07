@@ -18,6 +18,7 @@ import { useMemo, useRef } from "react";
 import ThinDivider from "./ThinDivider";
 import { useAppContext } from "../context/MainContext";
 import MediaPreview from "./MideaPreview";
+import _ from "lodash";
 
 type Props = {
   item: SharedItem;
@@ -158,7 +159,7 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
   };
 
   const metadata = useMemo(() => {
-    if (item.metadata) {
+    if (!_.isEmpty(item.metadata)) {
       return {
         ...item.metadata,
         contentType: "image",
