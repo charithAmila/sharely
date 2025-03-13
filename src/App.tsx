@@ -32,6 +32,7 @@ import "./theme/variables.css";
 import "./theme/styles.css";
 import AppRoutes from "./AppRoutes";
 import { AuthContextProvider } from "./context/AuthContext";
+import { FirebaseAnalytics } from "@capacitor-community/firebase-analytics";
 
 setupIonicReact();
 
