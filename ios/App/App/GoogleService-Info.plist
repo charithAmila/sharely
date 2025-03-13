@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>427879207334-m658apv0nl28jtij7hlg2fmc23nmpflu.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.427879207334-m658apv0nl28jtij7hlg2fmc23nmpflu</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBLz-dl7NwuBvarXtaOkTQnwpKFlfiMkyc</string>
+	<key>GCM_SENDER_ID</key>
+	<string>427879207334</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>io.sharely.app</string>
+	<key>PROJECT_ID</key>
+	<string>snap-link-424d4</string>
+	<key>STORAGE_BUCKET</key>
+	<string>snap-link-424d4.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:427879207334:ios:87b34bce0b7f2f18afff67</string>
+</dict>
+</plist>
