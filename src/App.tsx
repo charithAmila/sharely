@@ -32,15 +32,32 @@ import "./theme/variables.css";
 import "./theme/styles.css";
 import AppRoutes from "./AppRoutes";
 import { AuthContextProvider } from "./context/AuthContext";
+import { FirebaseAnalytics } from "@capacitor-firebase/analytics";
+import { useEffect } from "react";
 
 setupIonicReact();
 
-const App: React.FC = () => (
-  <IonApp>
-    <AuthContextProvider>
-      <AppRoutes />
-    </AuthContextProvider>
-  </IonApp>
-);
+const App: React.FC = () => {
+  useEffect(() => {
+    const logEvent = async () => {
+      try {
+        await FirebaseAnalytics.logEvent({
+          name: "app_open",
+        });
+        console.log("App open did work 🐤");
+      } catch (error) {
+        console.log("App open did not work 🙈", error);
+      }
+    };
+    logEvent();
+  }, []);
+  return (
+    <IonApp>
+      <AuthContextProvider>
+        <AppRoutes />
+      </AuthContextProvider>
+    </IonApp>
+  );
+};
 
 export default App;
