@@ -165,11 +165,8 @@ export default function Login() {
             </div>
           </form>
           <SocialAuth />
-          <div className="flex flex-column justify-content-start align-items-center flex-grow-1">
-            <IonButton fill="clear" routerLink="/sign-up">
-              <IonText color="dark" style={{ marginRight: "5px" }}>
-                <p className="">Don't have an account? </p>
-              </IonText>{" "}
+          <div className="">
+            <IonButton expand="block" fill="outline" routerLink="/sign-up">
               Create New Account
             </IonButton>
           </div>
