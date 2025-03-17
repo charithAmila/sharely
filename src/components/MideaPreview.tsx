@@ -37,7 +37,19 @@ const MediaPreview = ({ url, type, contentType }: Props) => {
   }
 
   if (type === "video") {
-    return <ReactPlayer url={url} controls width="100%" height="225px" />;
+    return (
+      <ReactPlayer
+        url={url}
+        controls
+        width="100%"
+        height="225px"
+        config={{
+          youtube: {
+            playerVars: { showinfo: 1 },
+          },
+        }}
+      />
+    );
   }
 
   return <></>;

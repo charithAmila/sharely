@@ -19,6 +19,7 @@ import ThinDivider from "./ThinDivider";
 import { useAppContext } from "../context/MainContext";
 import MediaPreview from "./MideaPreview";
 import _ from "lodash";
+import Logo from "./feed/Logo";
 
 type Props = {
   item: SharedItem;
@@ -174,7 +175,21 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
 
     metadata.contentType = item?.contentType || "image";
 
+    const isUrlYoutube = (url: string) => {
+      return url?.includes("youtube.com");
+    };
+
     if (item.contentType === "text") {
+      if (isUrlYoutube(item.url || item.content || "")) {
+        metadata = {
+          ...metadata,
+          image: {
+            url: item.url || item.content,
+          },
+          contentType: "video",
+        };
+      }
+
       metadata.description = item.content;
     }
 
@@ -204,26 +219,7 @@ const LinkPreview = ({ item, tags, onClickEdit }: Props) => {
             >
               {metadata.image && (
                 <div className="relative">
-                  {metadata.logo && (
-                    <div
-                      className="absolute flex justify-content-center align-items-center shadow-1"
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        top: "40%",
-                        right: "40%",
-                        borderRadius: "50%",
-                        backgroundColor: "white",
-                      }}
-                    >
-                      <IonAvatar style={{ width: "50px", height: "50px" }}>
-                        <img
-                          alt="Silhouette of a person's head"
-                          src={metadata.logo.url}
-                        />
-                      </IonAvatar>
-                    </div>
-                  )}
+                  {metadata.logo && <Logo url={metadata.logo.url} />}
                   <MediaPreview
                     url={metadata?.image?.url}
                     type={metadata.contentType}

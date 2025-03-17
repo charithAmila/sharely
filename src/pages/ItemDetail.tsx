@@ -27,6 +27,7 @@ import dayjs from "dayjs";
 import { getOrdinalSuffix } from "../utils/constant";
 import ThinDivider from "../components/ThinDivider";
 import MediaPreview from "../components/MideaPreview";
+import _ from "lodash";
 
 type Params = {
   id: string;
@@ -121,7 +122,7 @@ const ItemDetail = () => {
 
   const metadata = useMemo(() => {
     if (!item) return;
-    if (item.metadata) {
+    if (!_.isEmpty(item.metadata)) {
       return {
         ...item.metadata,
         contentType: "image",
@@ -136,8 +137,24 @@ const ItemDetail = () => {
 
     metadata.contentType = item?.contentType || "image";
 
+    const isUrlYoutube = (url: string) => {
+      return url?.includes("youtube.com");
+    };
+
     if (item.contentType === "text") {
-      metadata.description = item.content;
+      if (isUrlYoutube(item.url || item.content || "")) {
+        metadata = {
+          ...metadata,
+          image: {
+            url: item.url || item.content,
+          },
+          contentType: "video",
+        };
+      }
+
+      if (!metadata.description) {
+        metadata.description = item.url || item.content;
+      }
     }
 
     return metadata;
