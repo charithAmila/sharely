@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import {
   IonButton,
   IonContent,
@@ -9,6 +8,7 @@ import {
   IonPage,
   IonSpinner,
   IonText,
+  useIonRouter,
   useIonToast,
 } from "@ionic/react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
@@ -36,6 +36,7 @@ export default function SignUp() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [present] = useIonToast();
+  const router = useIonRouter();
 
   const onSubmit: SubmitHandler<IFormInput> = async (data: IFormInput) => {
     try {
@@ -59,7 +60,12 @@ export default function SignUp() {
 
   return (
     <IonPage>
-      <IonContent className="ion-padding" fullscreen scrollY={false}>
+      <IonContent
+        className="ion-padding"
+        style={{ backgroundColor: "#f5f5f5" }}
+        fullscreen
+        scrollY={false}
+      >
         <div className="flex flex-column h-100vh">
           <AuthHeader
             title={
@@ -202,12 +208,13 @@ export default function SignUp() {
             </div>
           </form>
           <SocialAuth />
-          <div className="flex flex-column justify-content-center align-items-center flex-grow-1">
-            <IonText className="pb-4 mt-auto">
-              <p className="ion-text-center">
-                Already have a account? <Link to="/login">Login</Link>
-              </p>
-            </IonText>
+          <div className="flex flex-row justify-content-center align-items-center">
+            <IonButton fill="clear" onClick={() => router.goBack()}>
+              <IonText color="dark" style={{ marginRight: "5px" }}>
+                <p className="">Already have a account?</p>
+              </IonText>{" "}
+              Login
+            </IonButton>
           </div>
         </div>
       </IonContent>
