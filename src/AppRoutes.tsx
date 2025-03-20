@@ -87,6 +87,12 @@ const AuthRoutes = () => {
             </IonTabButton>
             <IonTabButton
               className="main-search-icon"
+              style={{
+                "--background":
+                  activeTab === "search"
+                    ? "var(--ion-color-primary)"
+                    : "#6f9bff",
+              }}
               tab="tab2"
               href="/tabs/search"
             >
