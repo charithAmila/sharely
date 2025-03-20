@@ -147,16 +147,31 @@ export class FirebaseAbstract {
     }
   }
 
-  public async onDocumentChange(userId: string, callback: any) {
-    const q = query(
-      collection(db, this.collection),
-      where("userId", "==", userId),
-      orderBy("createdAt", "desc")
-    );
-    return onSnapshot(q, (querySnapshot) => {
-      const dataArray = this.querySnapshotToArray(querySnapshot);
-      callback(dataArray);
-    });
+  public async onDocumentChange(
+    userId: string,
+    needSort: boolean,
+    callback: any
+  ) {
+    if (needSort) {
+      const q = query(
+        collection(db, this.collection),
+        where("userId", "==", userId),
+        orderBy("createdAt", "desc")
+      );
+      return onSnapshot(q, (querySnapshot) => {
+        const dataArray = this.querySnapshotToArray(querySnapshot);
+        callback(dataArray);
+      });
+    } else {
+      const q = query(
+        collection(db, this.collection),
+        where("userId", "==", userId)
+      );
+      return onSnapshot(q, (querySnapshot) => {
+        const dataArray = this.querySnapshotToArray(querySnapshot);
+        callback(dataArray);
+      });
+    }
   }
 
   public async deleteAllByUserId(userId: string): Promise<void> {

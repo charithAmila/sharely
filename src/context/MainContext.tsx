@@ -41,15 +41,20 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
       return;
     }
 
-    const fetchTags = async () => {
-      try {
-        const tag = new TagService();
-        const data = await tag.findByField("userId", user.id);
+    const unsubscribe = () => {
+      const tagService = new TagService();
+      tagService.onDocumentChange(user.id, true, (data: Tag[]) => {
         setTags(data.sort((a, b) => (a.name > b.name ? 1 : -1)));
-      } catch (error) {
-        console.error(error);
-      }
+      });
     };
+
+    return unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
 
     const fetchSettings = async () => {
       try {
@@ -64,8 +69,6 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     };
 
     fetchSettings();
-
-    fetchTags();
   }, [user]);
 
   // calculate links count for each tag
@@ -96,7 +99,7 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     }
     const unsubscribe = () => {
       const itemService = new ItemService();
-      itemService.onDocumentChange(user.id, (data: SharedItem[]) => {
+      itemService.onDocumentChange(user.id, true, (data: SharedItem[]) => {
         const howToUseItem: SharedItem = {
           id: "how-to-use",
           metadata: {

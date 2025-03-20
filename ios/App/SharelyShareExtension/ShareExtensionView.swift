@@ -70,7 +70,7 @@ struct ShareExtensionView: View {
                         )
 
                         // 🔹 Show the most recently created tag right after "Add New"
-                        ForEach(recentlyCreatedTags + filteredTags, id: \.id) { tag in
+                        ForEach(filteredTags, id: \.id) { tag in
                             TagView(tag: tag, isSelected: selectedTags.contains(where: { $0.id == tag.id })) {
                                 toggleTagSelection(tag)
                             }
@@ -139,15 +139,21 @@ struct ShareExtensionView: View {
     }
 
     /// 🔹 Adds a new tag and selects it automatically
-    private func addNewTag() {
+   private func addNewTag() {
         guard !newTagName.isEmpty else { return }
-        let newTag = UserTag(id: UUID().uuidString, name: newTagName)
 
-        viewModel.createTag(name: newTagName) { success in
-            if success {
-                self.selectedTags.append(newTag) // Auto-select new tag
-                self.viewModel.tags.insert(newTag, at: 0) // Show new tag at the top
-                self.newTagName = ""
+        viewModel.createTag(name: newTagName) { success, newTagId in
+            if success, let newTagId = newTagId {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.viewModel.fetchTags {
+                        // Ensure we fetch the latest tags before selecting
+                        if let newTag = self.viewModel.tags.first(where: { $0.id == newTagId }) {
+                            self.selectedTags.append(newTag) // ✅ Auto-select the new tag
+                            print("✅ Auto-selected new tag:", newTag.name)
+                        }
+                        self.newTagName = ""
+                    }
+                }
             }
         }
     }
@@ -218,20 +224,30 @@ struct TagView: View {
         VStack {
             ZStack {
                 Circle()
-                    .fill(isSelected ? Color.blue : Color.gray)
-                    .frame(width: 60, height: 60)
-
+                    .fill(isSelected ? Color.blue : Color.gray) // Keep size consistent
+                    .frame(width: 60, height: 60) // ✅ Ensure fixed size
+                
                 Text(tag.name.prefix(1))
                     .foregroundColor(.white)
                     .font(.system(size: 24, weight: .bold))
             }
+            .frame(width: 60, height: 60) // ✅ Prevent expansion
+            .overlay(
+                Circle()
+                    .stroke(isSelected ? Color.white : Color.clear, lineWidth: 1) // ✅ Optional border for selection
+            )
+
             Text(tag.name)
                 .font(.caption)
                 .foregroundColor(.primary)
+                .lineLimit(1) // ✅ Prevents text from taking extra space
+                .frame(width: 60) // ✅ Keeps text width constant
+                .multilineTextAlignment(.center)
         }
-        .padding()
+        .padding(5) // ✅ Consistent padding to avoid layout shifts
         .onTapGesture {
             onTap()
         }
     }
 }
+
