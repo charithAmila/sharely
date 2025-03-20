@@ -89,7 +89,7 @@ const AuthRoutes = () => {
               className="main-search-icon"
               style={{
                 "--background":
-                  activeTab === "search"
+                  activeTab === "search" || activeTab === "home"
                     ? "var(--ion-color-primary)"
                     : "#6f9bff",
               }}
