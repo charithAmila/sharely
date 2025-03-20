@@ -12,7 +12,6 @@ import {
 import { IonReactRouter } from "@ionic/react-router";
 import { searchOutline } from "ionicons/icons";
 import Login from "./pages/Login";
-import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import { AppContextProvider } from "./context/MainContext";
@@ -27,10 +26,11 @@ import Subscription from "./pages/Subscription";
 import ExpandedLogoWhite from "./assets/svg/ExpandedLogoWhite";
 import { addIcons } from "ionicons";
 import TabHomeActive from "./assets/icons/tab-home-active.svg";
+import TabTag from "./assets/icons/tab-tag.svg";
+import TabTagActive from "./assets/icons/tab-tag-active.svg";
 import TabProfile from "./assets/icons/tab-profile.svg";
 import TabHome from "./assets/icons/tab-home.svg";
 import TabProfileActive from "./assets/icons/tab-profile-active.svg";
-import ProConnect from "./pages/ProConnect";
 import HowToUseDetail from "./pages/HowToUseDetail";
 
 addIcons({
@@ -38,6 +38,8 @@ addIcons({
   "tab-home-active": TabHomeActive,
   "tab-profile": TabProfile,
   "tab-profile-active": TabProfileActive,
+  "tab-tag": TabTag,
+  "tab-tag-active": TabTagActive,
 });
 
 const AuthRoutes = () => {
@@ -51,10 +53,6 @@ const AuthRoutes = () => {
     return <OnBoard onBoardDone={onBoard} />;
   }
 
-  if (!user?.userType) {
-    return <ProConnect />;
-  }
-
   return (
     <AppContextProvider user={user}>
       <IonReactRouter>
@@ -65,7 +63,7 @@ const AuthRoutes = () => {
               path="/tabs"
               render={() => <Redirect to="/tabs/home" />}
             />
-            <Route exact path="/tabs/home" component={Home} />
+            <Route exact path="/tabs/home" component={Search} />
             <Route exact path="/tabs/search" component={Search} />
             <Route exact path="/tabs/item/:id" component={ItemDetail} />
             <Route exact path="/tabs/how-to-use" component={HowToUseDetail} />
@@ -80,11 +78,11 @@ const AuthRoutes = () => {
             <IonTabButton
               className="tab-btn tab-btn-home"
               tab="tab1"
-              href="/tabs/home"
+              href="/tabs/tags"
             >
               <IonIcon
                 aria-hidden="true"
-                icon={activeTab === "home" ? "tab-home-active" : "tab-home"}
+                icon={activeTab === "tags" ? "tab-tag-active" : "tab-tag"}
               />
             </IonTabButton>
             <IonTabButton
@@ -92,7 +90,7 @@ const AuthRoutes = () => {
               tab="tab2"
               href="/tabs/search"
             >
-              <IonIcon aria-hidden="true" icon={searchOutline} />
+              <IonIcon aria-hidden="true" icon={"tab-home"} />
             </IonTabButton>
             <IonTabButton
               className="tab-btn tab-btn-profile"

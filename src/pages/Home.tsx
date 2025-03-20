@@ -177,7 +177,7 @@ const Home = ({ isSearch, onChangeSearch, searchText = "" }: Props) => {
       <IonHeader>
         <IonToolbar className="p-3 white-header">
           <ExpandedLogo />
-          <IonButtons slot="end">
+          {/* <IonButtons slot="end">
             <IonButton
               onClick={() => {
                 setShowAddForm(false);
@@ -187,7 +187,7 @@ const Home = ({ isSearch, onChangeSearch, searchText = "" }: Props) => {
             >
               <IonIcon icon={"filter-icon"} />
             </IonButton>
-          </IonButtons>
+          </IonButtons> */}
         </IonToolbar>
         {isSearch && (
           <IonToolbar className="white-header">

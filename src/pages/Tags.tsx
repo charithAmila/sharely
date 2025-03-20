@@ -21,6 +21,7 @@ import { addIcons } from "ionicons";
 import ThickPencil from "../assets/icons/thick-pencil.svg";
 import TagForm from "../components/TagForm";
 import dayjs from "dayjs";
+import { useTabIcon } from "../hooks/useTabIcon";
 
 addIcons({
   "thick-pencil": ThickPencil,
@@ -32,13 +33,12 @@ const Tags = () => {
   const modal = useRef<HTMLIonModalElement>(null);
   const [presentAlert] = useIonAlert();
 
+  useTabIcon();
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot="start">
-            <IonBackButton />
-          </IonButtons>
           <IonTitle>Tags</IonTitle>
           <IonButtons slot="end">
             <IonButton

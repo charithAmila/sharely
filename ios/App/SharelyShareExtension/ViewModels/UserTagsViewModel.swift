@@ -16,7 +16,7 @@ class UserTagsViewModel: ObservableObject {
         db.collection("tags").whereField("userId", isEqualTo: userId).getDocuments { (querySnapshot, error) in
             guard let documents = querySnapshot?.documents else {
                 print("No documents")
-                self.tags = [UserTag(id: "untitled", name: "Untitled")]
+                self.tags = []
                 return
             }
             
@@ -25,9 +25,25 @@ class UserTagsViewModel: ObservableObject {
                 let name = data["name"] as? String ?? "Untitled"
                 return UserTag(id: docSnapshot.documentID, name: name)
             }
-            
-            if self.tags.isEmpty {
-                self.tags = [UserTag(id: "untitled", name: "Untitled")]
+        }
+    }
+    
+    func createTag(name: String, completion: @escaping (Bool) -> Void) {
+        let newTagRef = db.collection("tags").document()
+        let tagData: [String: Any] = [
+            "id": newTagRef.documentID,
+            "name": name,
+            "userId": userId
+        ]
+        
+        newTagRef.setData(tagData) { error in
+            if let error = error {
+                print("Error adding tag: \(error)")
+                completion(false)
+            } else {
+                print("Tag added successfully")
+                self.fetchTags() // Refresh tag list
+                completion(true)
             }
         }
     }

@@ -39,8 +39,8 @@ type ContextProps = {
   appleSignIn: (token: string) => Promise<AuthUser>;
   updateUser: (user: Partial<AuthUser>) => Promise<void>;
   resetPassword: (newPassword: string) => Promise<void>;
-  activeTab: "home" | "profile" | "search";
-  setActiveTab: (tab: "home" | "profile" | "search") => void;
+  activeTab: "home" | "profile" | "search" | "tags";
+  setActiveTab: (tab: "home" | "profile" | "search" | "tags") => void;
   deleteAuthUser: () => Promise<void>;
 };
 
@@ -49,9 +49,9 @@ const AuthContext = createContext<ContextProps | undefined>(undefined);
 const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [activeTab, setActiveTab] = useState<"home" | "profile" | "search">(
-    "home"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "home" | "profile" | "search" | "tags"
+  >("home");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
