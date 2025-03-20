@@ -16,6 +16,9 @@
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		7F840CA4BDC74473E7F86D0D /* Pods_SharelyShareExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 71984470A53C5610E8E873B0 /* Pods_SharelyShareExtension.framework */; };
 		A084ECDBA7D38E1E42DFC39D /* Pods_App.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */; };
+		CB07FA972D8C5AB9008CF068 /* CustomAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB07FA962D8C5AB4008CF068 /* CustomAlert.swift */; };
+		CB07FA992D8C5AFE008CF068 /* TagView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB07FA982D8C5AFC008CF068 /* TagView.swift */; };
+		CB07FA9B2D8C5B1C008CF068 /* SearchBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB07FA9A2D8C5B1A008CF068 /* SearchBar.swift */; };
 		CB1FD58C2C5C8FE400568BC5 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB1FD58B2C5C8FE400568BC5 /* ShareViewController.swift */; };
 		CB1FD58F2C5C8FE400568BC5 /* Base in Resources */ = {isa = PBXBuildFile; fileRef = CB1FD58E2C5C8FE400568BC5 /* Base */; };
 		CB1FD5932C5C8FE400568BC5 /* SharelyShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = CB1FD5892C5C8FE400568BC5 /* SharelyShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -67,6 +70,9 @@
 		AF277DCFFFF123FFC6DF26C7 /* Pods_App.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_App.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AF51FD2D460BCFE21FA515B2 /* Pods-App.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.release.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.release.xcconfig"; sourceTree = "<group>"; };
 		B6E4BEA983E3A601D26E8EEA /* Pods-SharelyShareExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-SharelyShareExtension.release.xcconfig"; path = "Pods/Target Support Files/Pods-SharelyShareExtension/Pods-SharelyShareExtension.release.xcconfig"; sourceTree = "<group>"; };
+		CB07FA962D8C5AB4008CF068 /* CustomAlert.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomAlert.swift; sourceTree = "<group>"; };
+		CB07FA982D8C5AFC008CF068 /* TagView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TagView.swift; sourceTree = "<group>"; };
+		CB07FA9A2D8C5B1A008CF068 /* SearchBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchBar.swift; sourceTree = "<group>"; };
 		CB1FD5892C5C8FE400568BC5 /* SharelyShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SharelyShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB1FD58B2C5C8FE400568BC5 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		CB1FD58E2C5C8FE400568BC5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
@@ -166,6 +172,9 @@
 		CB1FD58A2C5C8FE400568BC5 /* SharelyShareExtension */ = {
 			isa = PBXGroup;
 			children = (
+				CB07FA9A2D8C5B1A008CF068 /* SearchBar.swift */,
+				CB07FA982D8C5AFC008CF068 /* TagView.swift */,
+				CB07FA962D8C5AB4008CF068 /* CustomAlert.swift */,
 				CB779C8A2C61B7790097B303 /* ViewModels */,
 				CB779C842C61B6C60097B303 /* Models */,
 				CB5814B72C5EA9AA00BBD9C2 /* SharelyShareExtension.entitlements */,
@@ -373,10 +382,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB07FA9B2D8C5B1C008CF068 /* SearchBar.swift in Sources */,
 				CB779C8C2C61B7A70097B303 /* UserTagsViewModel.swift in Sources */,
 				CB1FD5992C5C929800568BC5 /* ShareExtensionView.swift in Sources */,
 				CB779C892C61B74B0097B303 /* UserTag.swift in Sources */,
 				CB1FD58C2C5C8FE400568BC5 /* ShareViewController.swift in Sources */,
+				CB07FA972D8C5AB9008CF068 /* CustomAlert.swift in Sources */,
+				CB07FA992D8C5AFE008CF068 /* TagView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -533,13 +545,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 45;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = 95MQ45G2B6;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Sharely;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = io.sharely.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -561,13 +573,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 45;
+				CURRENT_PROJECT_VERSION = 46;
 				DEVELOPMENT_TEAM = 95MQ45G2B6;
 				INFOPLIST_FILE = App/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Sharely;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				MARKETING_VERSION = 1.0.3;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = io.sharely.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
