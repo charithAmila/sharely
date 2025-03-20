@@ -67,8 +67,8 @@ struct ShareExtensionView: View {
                                 isPresented: $showAlert,
                                 text: $newTagName,
                                 onConfirm: addNewTag,
-                                isFreeTagLimitExceeded: $isFreeTagLimitExceeded
-                                // existingTags: viewModel.tags.map { $0.name }
+                                isFreeTagLimitExceeded: $isFreeTagLimitExceeded,
+                                existingTags: viewModel.tags.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() } // 🔥 Ensure it's always updated
                             )
                         )
 
@@ -110,15 +110,20 @@ struct ShareExtensionView: View {
 
     /// 🔹 Checks tag limit before showing the alert
     private func checkMaxTagLimitBeforeShowingAlert() {
-        let currentTagCount = viewModel.tags.count
-        
-        checkUserMaxTagLimitExceeded(currentTagCount: currentTagCount) { isExceeded in
+        viewModel.fetchTags {  // 🔹 Fetch the latest tags before showing the alert
             DispatchQueue.main.async {
-                self.isFreeTagLimitExceeded = isExceeded
-                self.showAlert = true
+                let currentTagCount = viewModel.tags.count
+                
+                checkUserMaxTagLimitExceeded(currentTagCount: currentTagCount) { isExceeded in
+                    DispatchQueue.main.async {
+                        self.isFreeTagLimitExceeded = isExceeded
+                        self.showAlert = true // 🔥 Now, show alert after fetching tags
+                    }
+                }
             }
         }
     }
+
 
     /// ✅ Determines if the user has exceeded the max tag limit
     private func checkUserMaxTagLimitExceeded(currentTagCount: Int, completion: @escaping (Bool) -> Void) {
