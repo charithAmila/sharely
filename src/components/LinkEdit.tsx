@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import NoteForm from "./NoteForm";
 import TagSelector from "./TagSelector";
 import { truncateText } from "../helpers";
+import _ from "lodash";
 
 type Props = {
   item: SharedItem;
@@ -66,7 +67,7 @@ const LinkEdit = ({ item, tags, closeModal }: Props) => {
           outline
         >
           <IonIcon icon={add} size="small"></IonIcon>
-          <IonLabel>Add New Tag</IonLabel>
+          <IonLabel>Select Tags</IonLabel>
         </IonChip>
         {(tags.filter((tag) => selectedItem.tags.includes(tag.id)) || []).map(
           (tag: Tag) => (
@@ -106,9 +107,14 @@ const LinkEdit = ({ item, tags, closeModal }: Props) => {
         </IonCol>
       </IonRow>
 
-      {item && <CompactCard item={item} />}
-      <br />
-      <ThinDivider />
+      {item && !_.isEmpty(item.metadata) && (
+        <>
+          <CompactCard item={item} />
+          <br />
+          <ThinDivider />
+        </>
+      )}
+
       <IonText color="dark">
         <h5>Tags</h5>
       </IonText>

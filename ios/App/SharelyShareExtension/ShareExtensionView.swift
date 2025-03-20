@@ -1,4 +1,7 @@
 import SwiftUI
+import FirebaseFirestore
+import UIKit
+
 
 enum ContentType {
     case text(String)
@@ -12,7 +15,10 @@ struct ShareExtensionView: View {
     @ObservedObject var viewModel: UserTagsViewModel
     @State private var searchText = ""
     @State private var selectedTags: [UserTag] = []
-    
+    @State private var isFreeTagLimitExceeded = false
+    @State private var showAlert = false
+    @State private var newTagName = ""
+
     var onSave: ([String: Any]) -> Void
     var isUserAuthenticated: Bool
     var userId: String?
@@ -33,43 +39,50 @@ struct ShareExtensionView: View {
                     .padding()
             } else {
                 SearchBar(text: $searchText)
-                
+
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], spacing: 10) {
-                        ForEach(filteredTags, id: \ .id) { tag in
-                            TagView(tag: tag, isSelected: selectedTags.contains(where: { $0.id == tag.id })) {
-                                if selectedTags.contains(where: { $0.id == tag.id }) {
-                                    selectedTags.removeAll(where: { $0.id == tag.id })
-                                } else {
-                                    selectedTags.append(tag)
+                        // 🔹 "Add New" Button
+                        Button(action: {
+                            checkMaxTagLimitBeforeShowingAlert()
+                        }) {
+                            VStack {
+                                ZStack {
+                                    Circle()
+                                        .fill(Color.blue.opacity(0.8))
+                                        .frame(width: 60, height: 60)
+
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 24, weight: .bold))
+                                        .foregroundColor(.white)
                                 }
+                                Text("Add New")
+                                    .font(.caption)
+                                    .foregroundColor(.primary)
+                            }
+                        }
+                        .padding()
+                        .background(
+                            CustomAlert(
+                                isPresented: $showAlert,
+                                text: $newTagName,
+                                onConfirm: addNewTag,
+                                isFreeTagLimitExceeded: $isFreeTagLimitExceeded,
+                                existingTags: viewModel.tags.map { $0.name.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() } // 🔥 Ensure it's always updated
+                            )
+                        )
+
+                        // 🔹 Show the most recently created tags
+                        ForEach(filteredTags, id: \.id) { tag in
+                            TagView(tag: tag, isSelected: selectedTags.contains(where: { $0.id == tag.id })) {
+                                toggleTagSelection(tag)
                             }
                         }
                     }
                     .padding()
                 }
-                
-                Button(action: {
-                    var data: [String: Any] = [:]
-                    switch self.contentType {
-                    case .text(let text):
-                        data["content"] = text
-                    case .image(let url):
-                        if let url = url {
-                            data["imagePath"] = url.path
-                        }
-                    case .url(let url):
-                        if let url = url {
-                            data["url"] = url.absoluteString
-                        }
-                    case .video(let url):
-                        if let url = url {
-                            data["videoPath"] = url.path
-                        }
-                    }
-                    data["tags"] = selectedTags.map { $0.id }
-                    self.onSave(data)
-                }) {
+
+                Button(action: saveContent) {
                     Text("Share")
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -85,94 +98,132 @@ struct ShareExtensionView: View {
             viewModel.fetchTags()
         }
     }
-    
-    struct TagView: View {
-        let tag: UserTag
-        let isSelected: Bool
-        let onTap: () -> Void
-        
-        var body: some View {
-            VStack {
-                ZStack {
-                    Circle()
-                        .fill(isSelected ? Color.blue : Color.gray)
-                        .frame(width: 60, height: 60)
-                    
-                    Text(tag.name.prefix(1))
-                        .foregroundColor(.white)
-                        .font(.system(size: 24, weight: .bold))
-                }
-                Text(tag.name)
-                    .font(.caption)
-                    .foregroundColor(.primary)
-            }
-            .padding()
-            .onTapGesture {
-                onTap()
-            }
-        }
-    }
 
-    struct SearchBar: View {
-        @Binding var text: String
-
-        var body: some View {
-            HStack {
-                CustomTextField(text: $text, placeholder: "Search tags")
-                    .padding(7)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(8)
-                    .padding(.horizontal, 10)
-                    .frame(height: 40)
-            }
-            .padding(.top, 10)
-        }
-    }
-
-    struct CustomTextField: UIViewRepresentable {
-        @Binding var text: String
-        var placeholder: String
-
-        class Coordinator: NSObject, UITextFieldDelegate {
-            @Binding var text: String
-
-            init(text: Binding<String>) {
-                _text = text
-            }
-
-            func textFieldDidChangeSelection(_ textField: UITextField) {
-                text = textField.text ?? ""
-            }
-        }
-
-        func makeCoordinator() -> Coordinator {
-            return Coordinator(text: $text)
-        }
-
-        func makeUIView(context: Context) -> UITextField {
-            let textField = UITextField()
-            textField.placeholder = placeholder
-            textField.delegate = context.coordinator
-            textField.returnKeyType = .done
-            
-            textField.translatesAutoresizingMaskIntoConstraints = false
-            NSLayoutConstraint.activate([
-                textField.heightAnchor.constraint(equalToConstant: 40)
-            ])
-            
-            return textField
-        }
-
-        func updateUIView(_ uiView: UITextField, context: Context) {
-            uiView.text = text
-        }
-    }
-    
-    var filteredTags: [UserTag] {
+    /// 🔹 Filters tags based on search text
+    private var filteredTags: [UserTag] {
         if searchText.isEmpty {
             return viewModel.tags
         } else {
             return viewModel.tags.filter { $0.name.lowercased().contains(searchText.lowercased()) }
+        }
+    }
+
+    /// 🔹 Checks tag limit before showing the alert
+    private func checkMaxTagLimitBeforeShowingAlert() {
+        viewModel.fetchTags {  // 🔹 Fetch the latest tags before showing the alert
+            DispatchQueue.main.async {
+                let currentTagCount = viewModel.tags.count
+                
+                checkUserMaxTagLimitExceeded(currentTagCount: currentTagCount) { isExceeded in
+                    DispatchQueue.main.async {
+                        self.isFreeTagLimitExceeded = isExceeded
+                        self.showAlert = true // 🔥 Now, show alert after fetching tags
+                    }
+                }
+            }
+        }
+    }
+
+
+    /// ✅ Determines if the user has exceeded the max tag limit
+    private func checkUserMaxTagLimitExceeded(currentTagCount: Int, completion: @escaping (Bool) -> Void) {
+        guard let userId = userId else {
+            print("❌ User ID not found")
+            completion(false)
+            return
+        }
+
+        let userRef = Firestore.firestore().collection("users").document(userId)
+
+        userRef.getDocument { (document, error) in
+            if let error = error {
+                print("❌ Error fetching user data: \(error)")
+                completion(false)
+                return
+            }
+
+            guard let document = document, document.exists, let userData = document.data() else {
+                print("❌ No user data found")
+                completion(false)
+                return
+            }
+
+            let userType = userData["userType"] as? String ?? "FREE"
+
+            if userType == "PRO" {
+                completion(false)
+                return
+            }
+
+            if let userMaxTagCount = userData["maxTagCount"] as? Int {
+                completion(currentTagCount >= userMaxTagCount)
+                return
+            }
+
+            let settingsRef = Firestore.firestore().collection("settings").document("v-1")
+
+            settingsRef.getDocument { (settingsDocument, settingsError) in
+                if let settingsError = settingsError {
+                    print("❌ Error fetching settings data: \(settingsError)")
+                    completion(false)
+                    return
+                }
+
+                guard let settingsData = settingsDocument?.data(),
+                      let defaultMaxTagCount = settingsData["maxTagCount"] as? Int else {
+                    completion(currentTagCount >= 5)
+                    return
+                }
+
+                completion(currentTagCount >= defaultMaxTagCount)
+            }
+        }
+    }
+
+        /// 🔹 Toggles selection state of a tag
+    private func toggleTagSelection(_ tag: UserTag) {
+        if let index = selectedTags.firstIndex(where: { $0.id == tag.id }) {
+            selectedTags.remove(at: index)
+        } else {
+            selectedTags.append(tag)
+        }
+    }
+
+    /// 🔹 Saves selected content and tags
+    private func saveContent() {
+        var data: [String: Any] = [:]
+
+        switch contentType {
+        case .text(let text):
+            data["content"] = text
+        case .image(let url):
+            if let url = url { data["imagePath"] = url.path }
+        case .url(let url):
+            if let url = url { data["url"] = url.absoluteString }
+        case .video(let url):
+            if let url = url { data["videoPath"] = url.path }
+        }
+
+        data["tags"] = selectedTags.map { $0.id }
+        onSave(data)
+    }
+
+
+    /// 🔹 Adds a new tag
+    private func addNewTag() {
+        guard !newTagName.isEmpty else { return }
+
+        viewModel.createTag(name: newTagName) { success, newTagId in
+            if success, let newTagId = newTagId {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    self.viewModel.fetchTags {
+                        if let newTag = self.viewModel.tags.first(where: { $0.id == newTagId }) {
+                            self.selectedTags.append(newTag)
+                        }
+                        self.newTagName = ""
+                    }
+                }
+            }
         }
     }
 }

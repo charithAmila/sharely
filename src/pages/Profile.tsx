@@ -21,7 +21,6 @@ import {
   openOutline,
   pencil,
   personCircleOutline,
-  pricetagsOutline,
   trashOutline,
 } from "ionicons/icons";
 import { useMemo, useRef, useState } from "react";
@@ -46,7 +45,6 @@ const Profile = () => {
   >("editUser");
 
   const menu = [
-    { name: "Tags", url: "/tabs/tags", icon: pricetagsOutline },
     {
       name: "Subscription Plans",
       icon: personCircleOutline,
