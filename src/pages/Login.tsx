@@ -154,10 +154,14 @@ export default function Login() {
                 </>
               )}
             />
-            <IonText className="ion-text-end font-bold" color="primary">
-              <p>Forgot password?</p>
-            </IonText>
-            <div className="pt-4">
+            <div className="flex justify-content-end">
+              <div>
+                <IonButton fill="clear" routerLink="/forgot-password">
+                  Forgot password?
+                </IonButton>
+              </div>
+            </div>
+            <div className="pt-2">
               <IonButton type="submit" color={"primary"} expand="block">
                 {loading && <IonSpinner slot="start" name="lines-small" />}{" "}
                 <IonText color="light">Sign In</IonText>

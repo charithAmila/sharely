@@ -10,7 +10,12 @@ import {
 import { UserService } from "../services/UserService";
 import Echo from "../plugins/Echo";
 import { Capacitor } from "@capacitor/core";
-import { getAuth, updatePassword, UserCredential } from "firebase/auth";
+import {
+  getAuth,
+  updatePassword,
+  UserCredential,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 
 type AuthContextProviderProps = {
   children: React.ReactNode;
@@ -42,6 +47,7 @@ type ContextProps = {
   activeTab: "home" | "profile" | "search" | "tags";
   setActiveTab: (tab: "home" | "profile" | "search" | "tags") => void;
   deleteAuthUser: () => Promise<void>;
+  sendResetPasswordEmail: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -234,6 +240,14 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   };
 
+  const sendResetPasswordEmail = async (email: string): Promise<void> => {
+    try {
+      return await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+    }
+  };
+
   const value: ContextProps = {
     authenticated,
     user,
@@ -246,6 +260,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     activeTab,
     setActiveTab,
     deleteAuthUser,
+    sendResetPasswordEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

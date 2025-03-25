@@ -32,6 +32,7 @@ import TabProfile from "./assets/icons/tab-profile.svg";
 import TabHome from "./assets/icons/tab-home.svg";
 import TabProfileActive from "./assets/icons/tab-profile-active.svg";
 import HowToUseDetail from "./pages/HowToUseDetail";
+import ForgotPassword from "./pages/ForgotPassword";
 
 addIcons({
   "tab-home": TabHome,
@@ -151,6 +152,18 @@ const AppRoutes = () => {
             authenticated === true ? <Redirect to="/tabs/home" /> : <SignUp />
           }
           component={SignUp}
+        />
+        <Route
+          exact
+          path="/forgot-password"
+          render={() =>
+            authenticated === true ? (
+              <Redirect to="/tabs/home" />
+            ) : (
+              <ForgotPassword />
+            )
+          }
+          component={ForgotPassword}
         />
         <Route
           exact
