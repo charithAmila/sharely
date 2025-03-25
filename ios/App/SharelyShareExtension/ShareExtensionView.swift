@@ -23,20 +23,21 @@ struct ShareExtensionView: View {
     var isUserAuthenticated: Bool
     var userId: String?
 
+//    userId can be String or nill
     init(contentType: ContentType, onSave: @escaping ([String: Any]) -> Void, isUserAuthenticated: Bool, userId: String) {
         self.onSave = onSave
         self.isUserAuthenticated = isUserAuthenticated
         self.userId = userId
         self._contentType = State(initialValue: contentType)
+        // check is userId exist
+        
         self.viewModel = UserTagsViewModel(userId: userId)
     }
     
     var body: some View {
         VStack {
-            if !isUserAuthenticated {
-                Text("User not authenticated")
-                    .foregroundColor(.red)
-                    .padding()
+            if !isUserAuthenticated || userId == "no-uid" {
+                EmptyView()
             } else {
                 SearchBar(text: $searchText)
 

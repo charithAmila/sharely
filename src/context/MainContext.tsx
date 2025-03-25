@@ -227,18 +227,6 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const deleteAccount = async () => {
     if (!user) return;
     try {
-      // Delete all items
-      const itemService = new ItemService();
-      await itemService.deleteAllByUserId(user.id);
-
-      // Delete all tags
-      const tagService = new TagService();
-      await tagService.deleteAllByUserId(user.id);
-
-      // Delete user
-      const userService = new UserService();
-      await userService.delete(user.id);
-
       await deleteAuthUser();
     } catch (error: any) {
       throw new Error(error);

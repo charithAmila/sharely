@@ -215,11 +215,11 @@ class ShareViewController: SLComposeServiceViewController {
             self.isUserAuthenticated = true
         }
 
-        guard let userId = userId else {
-            print("User not authenticated")
-            close()
-            return
-        }
+//        guard let userId = userId else {
+//            print("User not authenticated")
+//            close()
+//            return
+//        }
 
         // Determine content type
         let contentType: ContentType
@@ -246,7 +246,7 @@ class ShareViewController: SLComposeServiceViewController {
                 self?.handleOnSave(data: data) // Handle save action
             },
             isUserAuthenticated: isUserAuthenticated,
-            userId: userId
+            userId: userId ?? "no-uid"
         )
 
         let hostingController = UIHostingController(rootView: shareView)
@@ -315,6 +315,8 @@ class ShareViewController: SLComposeServiceViewController {
         // Reauthenticate user using stored UID
         guard let uid = getAuthUidFromKeychain() else {
             print("No auth token found")
+            self.isUserAuthenticated = false
+            self.userId = "no-uid"
             return
         }
         self.isUserAuthenticated = true

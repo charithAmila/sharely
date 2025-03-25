@@ -193,6 +193,9 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
   const logout = async (): Promise<void> => {
     try {
+      if (Capacitor.getPlatform() === "ios") {
+        Echo.deleteFromKeyChain({ key: "uid" });
+      }
       await auth.signOut();
       setUser(null);
       setAuthenticated(false);
@@ -203,9 +206,10 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
   const deleteAuthUser = async () => {
     try {
+      if (Capacitor.getPlatform() === "ios") {
+        Echo.deleteFromKeyChain({ key: "uid" });
+      }
       await deleteUser(auth.currentUser!);
-      setUser(null);
-      setAuthenticated(false);
     } catch (error) {
       throw new Error("Error logging out");
     }
