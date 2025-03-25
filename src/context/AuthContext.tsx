@@ -11,6 +11,7 @@ import { UserService } from "../services/UserService";
 import Echo from "../plugins/Echo";
 import { Capacitor } from "@capacitor/core";
 import { getAuth, updatePassword, UserCredential } from "firebase/auth";
+import { Device, DeviceInfo, DevicePlugin } from "@capacitor/device";
 
 type AuthContextProviderProps = {
   children: React.ReactNode;
@@ -42,6 +43,7 @@ type ContextProps = {
   activeTab: "home" | "profile" | "search" | "tags";
   setActiveTab: (tab: "home" | "profile" | "search" | "tags") => void;
   deleteAuthUser: () => Promise<void>;
+  device: DeviceInfo | undefined;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -52,6 +54,15 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [activeTab, setActiveTab] = useState<
     "home" | "profile" | "search" | "tags"
   >("home");
+  const [device, setDevice] = useState<DeviceInfo>();
+
+  useEffect(() => {
+    const getDevice = async () => {
+      const info: DeviceInfo = await Device.getInfo();
+      setDevice(info);
+    };
+    getDevice();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -235,6 +246,7 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   };
 
   const value: ContextProps = {
+    device,
     authenticated,
     user,
     login,

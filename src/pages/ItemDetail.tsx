@@ -28,6 +28,7 @@ import { getOrdinalSuffix } from "../utils/constant";
 import ThinDivider from "../components/ThinDivider";
 import MediaPreview from "../components/MideaPreview";
 import _ from "lodash";
+import DeviceWrapper from "../components/DeviceWrapper";
 
 type Params = {
   id: string;
@@ -201,149 +202,151 @@ const ItemDetail = () => {
         </IonToolbar>
       </IonHeader>
       <IonContent style={{ background: "#EEF0F5" }} fullscreen scrollY={true}>
-        <IonCard className="main-card">
-          <div
-            style={{
-              backgroundColor: "#EEF0F5",
-            }}
-          >
-            {metadata?.image && (
-              <div className="relative">
-                {metadata.logo && (
-                  <div
-                    className="absolute flex justify-content-center align-items-center shadow-1"
-                    style={{
-                      width: "60px",
-                      height: "60px",
-                      top: "40%",
-                      right: "40%",
-                      borderRadius: "50%",
-                      backgroundColor: "white",
-                    }}
-                  >
-                    <IonAvatar style={{ width: "50px", height: "50px" }}>
+        <DeviceWrapper>
+          <IonCard className="main-card">
+            <div
+              style={{
+                backgroundColor: "#EEF0F5",
+              }}
+            >
+              {metadata?.image && (
+                <div className="relative">
+                  {metadata.logo && (
+                    <div
+                      className="absolute flex justify-content-center align-items-center shadow-1"
+                      style={{
+                        width: "60px",
+                        height: "60px",
+                        top: "40%",
+                        right: "40%",
+                        borderRadius: "50%",
+                        backgroundColor: "white",
+                      }}
+                    >
+                      <IonAvatar style={{ width: "50px", height: "50px" }}>
+                        <img
+                          alt="Silhouette of a person's head"
+                          src={metadata.logo.url}
+                        />
+                      </IonAvatar>
+                    </div>
+                  )}
+
+                  <MediaPreview
+                    url={metadata?.image?.url}
+                    type={metadata.contentType}
+                    contentType={item?.contentType}
+                  />
+                </div>
+              )}
+            </div>
+          </IonCard>
+
+          <div className="ion-padding flex flex-column gap-5">
+            <div>
+              <IonText className="text-lg font-large">
+                {item?.metadata?.title}
+              </IonText>
+            </div>
+            <div>
+              <IonText>{item?.metadata?.description}</IonText>
+            </div>
+          </div>
+
+          {item && item?.contentType !== "image" && (
+            <>
+              <div className="ion-padding">
+                <ThinDivider />
+              </div>
+              <div className="flex ion-padding flex-column gap-4">
+                <div className="flex-1 flex gap-5 align-items-center">
+                  {item?.metadata?.logo && (
+                    <IonAvatar style={{ width: "25px", height: "25px" }}>
                       <img
                         alt="Silhouette of a person's head"
-                        src={metadata.logo.url}
+                        src={item.metadata.logo.url}
                       />
                     </IonAvatar>
+                  )}
+                  {metadata.publisher && (
+                    <IonText className="">{metadata.publisher}</IonText>
+                  )}
+                  <div style={{ marginLeft: "auto" }} className="font-bold">
+                    <IonButton
+                      className="font-bold"
+                      fill="clear"
+                      onClick={writeToClipboard}
+                    >
+                      Copy Link
+                    </IonButton>
                   </div>
-                )}
-
-                <MediaPreview
-                  url={metadata?.image?.url}
-                  type={metadata.contentType}
-                  contentType={item?.contentType}
-                />
-              </div>
-            )}
-          </div>
-        </IonCard>
-
-        <div className="ion-padding flex flex-column gap-5">
-          <div>
-            <IonText className="text-lg font-large">
-              {item?.metadata?.title}
-            </IonText>
-          </div>
-          <div>
-            <IonText>{item?.metadata?.description}</IonText>
-          </div>
-        </div>
-
-        {item && item?.contentType !== "image" && (
-          <>
-            <div className="ion-padding">
-              <ThinDivider />
-            </div>
-            <div className="flex ion-padding flex-column gap-4">
-              <div className="flex-1 flex gap-5 align-items-center">
-                {item?.metadata?.logo && (
-                  <IonAvatar style={{ width: "25px", height: "25px" }}>
-                    <img
-                      alt="Silhouette of a person's head"
-                      src={item.metadata.logo.url}
-                    />
-                  </IonAvatar>
-                )}
-                {metadata.publisher && (
-                  <IonText className="">{metadata.publisher}</IonText>
-                )}
-                <div style={{ marginLeft: "auto" }} className="font-bold">
-                  <IonButton
-                    className="font-bold"
-                    fill="clear"
-                    onClick={writeToClipboard}
-                  >
-                    Copy Link
-                  </IonButton>
                 </div>
               </div>
+              <div className="ion-padding">
+                <IonText
+                  onClick={() => linkRef?.current?.click()}
+                  color={"primary"}
+                >
+                  {item?.url || item?.content}
+                </IonText>
+              </div>
+            </>
+          )}
+          <div className="ion-padding">
+            <ThinDivider />
+          </div>
+          <div className="ion-padding flex flex-column gap-5">
+            <div className="flex align-items-center">
+              <div>
+                <IonText className="font-sx">Note</IonText>
+              </div>
+              <div style={{ marginLeft: "auto" }} className="font-bold">
+                <IonText
+                  onClick={() => {
+                    setModalType("note");
+                    setIsOpen(true);
+                  }}
+                  color={"primary"}
+                >
+                  Edit
+                </IonText>
+              </div>
             </div>
-            <div className="ion-padding">
-              <IonText
-                onClick={() => linkRef?.current?.click()}
-                color={"primary"}
-              >
-                {item?.url || item?.content}
-              </IonText>
-            </div>
-          </>
-        )}
-        <div className="ion-padding">
-          <ThinDivider />
-        </div>
-        <div className="ion-padding flex flex-column gap-5">
-          <div className="flex align-items-center">
             <div>
-              <IonText className="font-sx">Note</IonText>
-            </div>
-            <div style={{ marginLeft: "auto" }} className="font-bold">
-              <IonText
-                onClick={() => {
-                  setModalType("note");
-                  setIsOpen(true);
-                }}
-                color={"primary"}
-              >
-                Edit
+              <IonText className="font-sx" color="medium">
+                {item?.note || "No note"}
               </IonText>
             </div>
           </div>
-          <div>
-            <IonText className="font-sx" color="medium">
-              {item?.note || "No note"}
-            </IonText>
+          <div className="ion-padding">
+            <ThinDivider />
           </div>
-        </div>
-        <div className="ion-padding">
-          <ThinDivider />
-        </div>
-        <div className="ion-padding flex flex-column gap-5">
-          <div className="flex align-items-center">
+          <div className="ion-padding flex flex-column gap-5">
+            <div className="flex align-items-center">
+              <div>
+                <IonText className="font-sx">Tags</IonText>
+              </div>
+              <div style={{ marginLeft: "auto" }} className="font-bold">
+                <IonText
+                  onClick={() => {
+                    setModalType("tags");
+                    setIsOpen(true);
+                  }}
+                  color={"primary"}
+                >
+                  Edit
+                </IonText>
+              </div>
+            </div>
             <div>
-              <IonText className="font-sx">Tags</IonText>
-            </div>
-            <div style={{ marginLeft: "auto" }} className="font-bold">
-              <IonText
-                onClick={() => {
-                  setModalType("tags");
-                  setIsOpen(true);
-                }}
-                color={"primary"}
-              >
-                Edit
-              </IonText>
+              {item?.tags?.map((tag) => (
+                <IonChip key={tag}>
+                  {tags.find((t) => t.id === tag)?.name}
+                </IonChip>
+              ))}
             </div>
           </div>
-          <div>
-            {item?.tags?.map((tag) => (
-              <IonChip key={tag}>
-                {tags.find((t) => t.id === tag)?.name}
-              </IonChip>
-            ))}
-          </div>
-        </div>
+        </DeviceWrapper>
       </IonContent>
       <IonModal isOpen={isOpen}>
         {modalType === "note" ? (

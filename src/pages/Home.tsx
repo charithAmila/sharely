@@ -27,6 +27,7 @@ import dayjs from "dayjs";
 import LinkEdit from "../components/LinkEdit";
 import { useTabIcon } from "../hooks/useTabIcon";
 import Fuse from "fuse.js";
+import DeviceWrapper from "../components/DeviceWrapper";
 
 addIcons({
   "filter-icon": FilterSvg,
@@ -177,17 +178,6 @@ const Home = ({ isSearch, onChangeSearch, searchText = "" }: Props) => {
       <IonHeader>
         <IonToolbar className="p-3 white-header">
           <ExpandedLogo />
-          {/* <IonButtons slot="end">
-            <IonButton
-              onClick={() => {
-                setShowAddForm(false);
-                setModelType("tag-filter");
-                modal.current?.present();
-              }}
-            >
-              <IonIcon icon={"filter-icon"} />
-            </IonButton>
-          </IonButtons> */}
         </IonToolbar>
         {isSearch && (
           <IonToolbar className="white-header">
@@ -203,7 +193,7 @@ const Home = ({ isSearch, onChangeSearch, searchText = "" }: Props) => {
             </form>
           </IonToolbar>
         )}
-        <IonToolbar className="white-header pl-2">
+        {/* <IonToolbar className="white-header pl-2">
           <div className="chips-container">
             <IonChip
               onClick={() => {
@@ -278,58 +268,63 @@ const Home = ({ isSearch, onChangeSearch, searchText = "" }: Props) => {
                 );
               })}
           </div>
-        </IonToolbar>
+        </IonToolbar> */}
       </IonHeader>
       <IonContent fullscreen style={{ position: "relative" }}>
-        {finalList.map((group: GroupedSharedItem, index: number) => {
-          const createdAt = dayjs(group.data[0].createdAt);
-          return (
-            <Fragment key={index}>
-              <div className="flex flex-column">
-                <div
-                  className="flex justify-content-center pb-3 ion-padding"
-                  style={{
-                    marginTop: "20px",
-                    borderBottom: "1px solid #ccc",
-                    position: "-webkit-sticky",
-                  }}
-                >
-                  <div className="flex flex-column w-full">
-                    <IonText color="dark" className="font-lg">
-                      {dayjs().isSame(createdAt, "day")
-                        ? "Today"
-                        : dayjs().subtract(1, "day").isSame(createdAt, "day")
-                        ? "Yesterday"
-                        : dayjs(createdAt).format("MMMM, YYYY")}
-                    </IonText>
-                    <IonText color="dark" className="font-2xl font-bold w-full">
-                      {dayjs(createdAt).format("DD")}
-                      {getOrdinalSuffix(dayjs(createdAt).date())},{" "}
-                      {dayjs(createdAt).format("dddd")}
-                    </IonText>
+        <DeviceWrapper>
+          {finalList.map((group: GroupedSharedItem, index: number) => {
+            const createdAt = dayjs(group.data[0].createdAt);
+            return (
+              <Fragment key={index}>
+                <div className="flex flex-column">
+                  <div
+                    className="flex justify-content-center pb-3 ion-padding"
+                    style={{
+                      marginTop: "20px",
+                      borderBottom: "1px solid #ccc",
+                      position: "-webkit-sticky",
+                    }}
+                  >
+                    <div className="flex flex-column w-full">
+                      <IonText color="dark" className="font-lg">
+                        {dayjs().isSame(createdAt, "day")
+                          ? "Today"
+                          : dayjs().subtract(1, "day").isSame(createdAt, "day")
+                          ? "Yesterday"
+                          : dayjs(createdAt).format("MMMM, YYYY")}
+                      </IonText>
+                      <IonText
+                        color="dark"
+                        className="font-2xl font-bold w-full"
+                      >
+                        {dayjs(createdAt).format("DD")}
+                        {getOrdinalSuffix(dayjs(createdAt).date())},{" "}
+                        {dayjs(createdAt).format("dddd")}
+                      </IonText>
+                    </div>
+                  </div>
+                  <div className="ion-padding">
+                    {group.data.map((item: SharedItem) => (
+                      <div key={item.id} className="w-full">
+                        <LinkPreview
+                          tags={tags}
+                          selectedTags={selectedTags}
+                          item={item}
+                          onClickEdit={() => {
+                            setSelectedItem(item);
+                            setModelType("edit");
+                            modal.current?.present();
+                          }}
+                        />
+                      </div>
+                    ))}
                   </div>
                 </div>
-                <div className="ion-padding">
-                  {group.data.map((item: SharedItem) => (
-                    <div key={item.id} className="w-full">
-                      <LinkPreview
-                        tags={tags}
-                        selectedTags={selectedTags}
-                        item={item}
-                        onClickEdit={() => {
-                          setSelectedItem(item);
-                          setModelType("edit");
-                          modal.current?.present();
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              {index < finalList.length - 1 && <IonItemDivider />}
-            </Fragment>
-          );
-        })}
+                {index < finalList.length - 1 && <IonItemDivider />}
+              </Fragment>
+            );
+          })}
+        </DeviceWrapper>
         <div className="c-modal-container">
           <IonModal
             ref={modal}

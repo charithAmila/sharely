@@ -10,7 +10,6 @@ import {
   IonPage,
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
-import { searchOutline } from "ionicons/icons";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
@@ -43,7 +42,7 @@ addIcons({
 });
 
 const AuthRoutes = () => {
-  const { user, activeTab, updateUser } = useAuthContext();
+  const { user, activeTab, updateUser, device } = useAuthContext();
 
   const onBoard = async () => {
     await updateUser({ isOnBoarded: true });
@@ -51,6 +50,32 @@ const AuthRoutes = () => {
 
   if (user?.isOnBoarded === false) {
     return <OnBoard onBoardDone={onBoard} />;
+  }
+
+  if (device?.platform === "web") {
+    return (
+      <AppContextProvider user={user}>
+        <IonReactRouter>
+          <IonRouterOutlet>
+            <Route
+              exact
+              path="/tabs"
+              render={() => <Redirect to="/tabs/home" />}
+            />
+            <Route exact path="/tabs/home" component={Search} />
+            <Route exact path="/tabs/search" component={Search} />
+            <Route exact path="/tabs/item/:id" component={ItemDetail} />
+            <Route exact path="/tabs/how-to-use" component={HowToUseDetail} />
+            <Route exact path="/tabs/profile" component={Profile} />
+            <Route exact path="/tabs/tags" component={Tags} />
+            <Route exact path="/tabs/groups" component={Groups} />
+            <Route exact path="/tabs/groups/:id" component={Group} />
+            <Route exact path="/tabs/group-form" component={GroupForm} />
+            <Route exact path="/tabs/subscribe" component={Subscription} />
+          </IonRouterOutlet>
+        </IonReactRouter>
+      </AppContextProvider>
+    );
   }
 
   return (
