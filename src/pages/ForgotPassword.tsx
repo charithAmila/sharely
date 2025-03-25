@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   IonButton,
   IonContent,
@@ -6,46 +5,46 @@ import {
   IonItem,
   IonPage,
   IonSpinner,
+  IonText,
   useIonRouter,
   useIonToast,
 } from "@ionic/react";
 import { useAuthContext } from "../context/AuthContext";
-import AuthHeader from "../components/auth/AuthHeader"; // same header used in login
+import AuthHeader from "../components/auth/AuthHeader";
+import { useForm, Controller } from "react-hook-form";
+import { EMAIL_REGEX } from "../utils/constant"; // Make sure you have this defined
 
-const ForgotPassword: React.FC = () => {
+interface IFormInput {
+  email: string;
+}
+
+const ForgotPassword = () => {
   const { sendResetPasswordEmail } = useAuthContext();
-  const [email, setEmail] = useState("");
   const [present] = useIonToast();
   const router = useIonRouter();
-  const [loading, setLoading] = useState(false);
 
-  const handleReset = async () => {
-    if (!email) {
-      present({
-        color: "danger",
-        duration: 2000,
-        message: "Please enter your email",
-      });
-      return;
-    }
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+    reset,
+  } = useForm<IFormInput>();
 
+  const onSubmit = async (data: IFormInput) => {
     try {
-      setLoading(true);
-      await sendResetPasswordEmail(email);
-      setEmail("");
+      await sendResetPasswordEmail(data.email);
+      reset();
       present({
         color: "success",
         duration: 2000,
         message: "Password reset link sent to your email",
       });
-      setLoading(false);
     } catch (error: any) {
       present({
         color: "danger",
         duration: 2000,
         message: "Error sending password reset link",
       });
-      setLoading(false);
     }
   };
 
@@ -60,24 +59,48 @@ const ForgotPassword: React.FC = () => {
         <div className="flex flex-column h-100vh">
           <AuthHeader title="Reset your Password" />
 
-          <div className="pt-5">
-            <IonItem>
-              <IonInput
-                label="Email"
-                labelPlacement="floating"
-                placeholder="Enter your email"
-                value={email}
-                onIonInput={(e) => setEmail(e.detail.value!)}
-              />
-            </IonItem>
-          </div>
+          <form className="pt-5" onSubmit={handleSubmit(onSubmit)}>
+            <Controller
+              name="email"
+              control={control}
+              rules={{
+                required: "Email is required",
+                pattern: {
+                  value: EMAIL_REGEX,
+                  message: "Invalid email address",
+                },
+              }}
+              render={({ field: { onChange, onBlur, value } }) => (
+                <>
+                  <IonItem className={errors.email ? "error-item" : ""}>
+                    <IonInput
+                      label="Email"
+                      labelPlacement="floating"
+                      placeholder="Enter your email"
+                      onIonInput={onChange}
+                      onBlur={onBlur}
+                      value={value}
+                    />
+                  </IonItem>
+                  {errors.email && (
+                    <IonText
+                      className="ion-text-start ion-padding-start font-regular font-xxs"
+                      color="danger"
+                    >
+                      {errors.email.message}
+                    </IonText>
+                  )}
+                </>
+              )}
+            />
 
-          <div className="pt-4">
-            <IonButton expand="block" onClick={handleReset}>
-              {loading && <IonSpinner slot="start" name="lines-small" />} Send
-              Reset Link
-            </IonButton>
-          </div>
+            <div className="pt-4">
+              <IonButton type="submit" expand="block" disabled={isSubmitting}>
+                {isSubmitting && <IonSpinner slot="start" name="lines-small" />}
+                Send Reset Link
+              </IonButton>
+            </div>
+          </form>
 
           <div className="pt-2">
             <IonButton
