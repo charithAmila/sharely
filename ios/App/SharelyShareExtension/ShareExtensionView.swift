@@ -20,11 +20,12 @@ struct ShareExtensionView: View {
     @State private var newTagName = ""
 
     var onSave: ([String: Any]) -> Void
+    var close: () -> Void
     var isUserAuthenticated: Bool
     var userId: String?
 
 //    userId can be String or nill
-    init(contentType: ContentType, onSave: @escaping ([String: Any]) -> Void, isUserAuthenticated: Bool, userId: String) {
+    init(contentType: ContentType, onSave: @escaping ([String: Any]) -> Void, isUserAuthenticated: Bool, userId: String, close: @escaping () -> Void) {
         self.onSave = onSave
         self.isUserAuthenticated = isUserAuthenticated
         self.userId = userId
@@ -32,12 +33,14 @@ struct ShareExtensionView: View {
         // check is userId exist
         
         self.viewModel = UserTagsViewModel(userId: userId)
+        self.close = close
     }
     
     var body: some View {
         VStack {
             if !isUserAuthenticated || userId == "no-uid" {
-                EmptyView()
+                // We should pass close function to EmptyView
+                EmptyView(close: close)
             } else {
                 SearchBar(text: $searchText)
 

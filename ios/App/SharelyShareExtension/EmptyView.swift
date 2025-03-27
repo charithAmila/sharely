@@ -2,6 +2,8 @@ import SwiftUI
 
 struct EmptyView: View {
     @Environment(\.openURL) var openURL // 👈 this is the SwiftUI-native way
+    
+    let close: () -> Void
 
     var body: some View {
         VStack {
@@ -21,6 +23,11 @@ struct EmptyView: View {
                 Button(action: {
                     if let url = URL(string: "sharely://login") {
                         openURL(url) // 👈 this opens your app if installed
+                        // Add 2 seconds to close the share extension
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                            close()
+                        }
+                        
                     }
                 }) {
                     Text("Log In")

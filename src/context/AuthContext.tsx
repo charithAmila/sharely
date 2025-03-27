@@ -139,25 +139,39 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const appleSignIn = async (idToken: string): Promise<AuthUser> => {
     const provider = new OAuthProvider("apple.com");
     const credential = provider.credential({ idToken });
-    const user: UserCredential = await signInWithCredential(auth, credential);
+    const userCredential = await signInWithCredential(auth, credential);
 
     const authUser: AuthUser = {
-      id: user.user.uid,
-      name: user.user.displayName ?? "",
-      email: user.user.email ?? "",
+      id: userCredential.user.uid,
+      name: userCredential.user.displayName ?? "",
+      email: userCredential.user.email ?? "",
       isOnBoarded: false,
-      createdAt: user.user.metadata.creationTime ?? "",
+      createdAt: userCredential.user.metadata.creationTime ?? "",
     };
 
     const userService = new UserService();
-
-    const userDoc = await userService.findByDocument(user.user.uid);
+    const userDoc = await userService.findByDocument(authUser.id);
 
     if (!userDoc?.exists()) {
       await userService.setDoc(authUser.id, authUser);
     }
 
-    return Promise.resolve(authUser);
+    // ✅ Fix: update context manually right after Apple login
+    setUser({
+      ...authUser,
+      ...(userDoc?.exists() ? userDoc.data() : {}),
+    });
+    setAuthenticated(true);
+
+    // ✅ Save to keychain on iOS
+    if (Capacitor.getPlatform() === "ios") {
+      const savedUserId = await Echo.readFromKeyChain({ key: "uid" });
+      if (savedUserId.value !== authUser.id) {
+        await Echo.saveToKeyChain({ key: "uid", value: authUser.id });
+      }
+    }
+
+    return authUser;
   };
 
   const signup = async ({

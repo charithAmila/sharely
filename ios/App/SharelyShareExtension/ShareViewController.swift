@@ -246,7 +246,10 @@ class ShareViewController: SLComposeServiceViewController {
                 self?.handleOnSave(data: data) // Handle save action
             },
             isUserAuthenticated: isUserAuthenticated,
-            userId: userId ?? "no-uid"
+            userId: userId ?? "no-uid",
+            close: { [weak self] in
+                self?.close() // Handle close action
+            }
         )
 
         let hostingController = UIHostingController(rootView: shareView)
