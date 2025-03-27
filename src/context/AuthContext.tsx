@@ -5,11 +5,17 @@ import {
   signInWithCredential,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  deleteUser,
 } from "../firebase";
 import { UserService } from "../services/UserService";
 import Echo from "../plugins/Echo";
 import { Capacitor } from "@capacitor/core";
-import { getAuth, updatePassword, UserCredential } from "firebase/auth";
+import {
+  getAuth,
+  updatePassword,
+  UserCredential,
+  sendPasswordResetEmail,
+} from "firebase/auth";
 
 type AuthContextProviderProps = {
   children: React.ReactNode;
@@ -38,8 +44,10 @@ type ContextProps = {
   appleSignIn: (token: string) => Promise<AuthUser>;
   updateUser: (user: Partial<AuthUser>) => Promise<void>;
   resetPassword: (newPassword: string) => Promise<void>;
-  activeTab: "home" | "profile" | "search";
-  setActiveTab: (tab: "home" | "profile" | "search") => void;
+  activeTab: "home" | "profile" | "search" | "tags";
+  setActiveTab: (tab: "home" | "profile" | "search" | "tags") => void;
+  deleteAuthUser: () => Promise<void>;
+  sendResetPasswordEmail: (email: string) => Promise<void>;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -47,9 +55,9 @@ const AuthContext = createContext<ContextProps | undefined>(undefined);
 const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const [authenticated, setAuthenticated] = useState<boolean | null>(null);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [activeTab, setActiveTab] = useState<"home" | "profile" | "search">(
-    "home"
-  );
+  const [activeTab, setActiveTab] = useState<
+    "home" | "profile" | "search" | "tags"
+  >("home");
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -58,6 +66,8 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           id: user.uid,
           email: user.email ?? "",
           name: user.displayName ?? "",
+          isOnBoarded: false,
+          createdAt: user.metadata.creationTime ?? "",
         };
 
         const userService = new UserService();
@@ -66,16 +76,10 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
           try {
             const userDoc = await userService.findByDocument(user.uid);
             if (userDoc) {
-              let friends: AuthUserFriend[] = [];
-              if (userDoc.exists() && userDoc.data().friends) {
-                friends = userDoc.data().friends;
-              }
-
               setUser({
                 ...authUser,
                 ...(userDoc.exists() ? userDoc.data() : {}),
                 id: user.uid,
-                friends,
               });
               setAuthenticated(true);
 
@@ -123,6 +127,8 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         id: user.user.uid,
         email: user.user.email ?? "",
         name: user.user.displayName ?? "",
+        isOnBoarded: false,
+        createdAt: user.user.metadata.creationTime ?? "",
       };
       return Promise.resolve(authUser);
     } catch (error) {
@@ -133,19 +139,39 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
   const appleSignIn = async (idToken: string): Promise<AuthUser> => {
     const provider = new OAuthProvider("apple.com");
     const credential = provider.credential({ idToken });
-    const user: UserCredential = await signInWithCredential(auth, credential);
+    const userCredential = await signInWithCredential(auth, credential);
 
     const authUser: AuthUser = {
-      id: user.user.uid,
-      name: user.user.displayName ?? "",
-      email: user.user.email ?? "",
+      id: userCredential.user.uid,
+      name: userCredential.user.displayName ?? "",
+      email: userCredential.user.email ?? "",
+      isOnBoarded: false,
+      createdAt: userCredential.user.metadata.creationTime ?? "",
     };
 
     const userService = new UserService();
+    const userDoc = await userService.findByDocument(authUser.id);
 
-    await userService.setDoc(authUser.id, authUser);
+    if (!userDoc?.exists()) {
+      await userService.setDoc(authUser.id, authUser);
+    }
 
-    return Promise.resolve(authUser);
+    // ✅ Fix: update context manually right after Apple login
+    setUser({
+      ...authUser,
+      ...(userDoc?.exists() ? userDoc.data() : {}),
+    });
+    setAuthenticated(true);
+
+    // ✅ Save to keychain on iOS
+    if (Capacitor.getPlatform() === "ios") {
+      const savedUserId = await Echo.readFromKeyChain({ key: "uid" });
+      if (savedUserId.value !== authUser.id) {
+        await Echo.saveToKeyChain({ key: "uid", value: authUser.id });
+      }
+    }
+
+    return authUser;
   };
 
   const signup = async ({
@@ -163,6 +189,8 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
         id: user.user.uid,
         name: name,
         email: user.user.email ?? "",
+        isOnBoarded: false,
+        createdAt: user.user.metadata.creationTime ?? "",
       };
 
       const userService = new UserService();
@@ -179,9 +207,23 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
 
   const logout = async (): Promise<void> => {
     try {
+      if (Capacitor.getPlatform() === "ios") {
+        Echo.deleteFromKeyChain({ key: "uid" });
+      }
       await auth.signOut();
       setUser(null);
       setAuthenticated(false);
+    } catch (error) {
+      throw new Error("Error logging out");
+    }
+  };
+
+  const deleteAuthUser = async () => {
+    try {
+      if (Capacitor.getPlatform() === "ios") {
+        Echo.deleteFromKeyChain({ key: "uid" });
+      }
+      await deleteUser(auth.currentUser!);
     } catch (error) {
       throw new Error("Error logging out");
     }
@@ -216,6 +258,14 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     }
   };
 
+  const sendResetPasswordEmail = async (email: string): Promise<void> => {
+    try {
+      return await sendPasswordResetEmail(auth, email);
+    } catch (error) {
+      console.error("Error sending password reset email:", error);
+    }
+  };
+
   const value: ContextProps = {
     authenticated,
     user,
@@ -227,6 +277,8 @@ const AuthContextProvider = ({ children }: AuthContextProviderProps) => {
     resetPassword,
     activeTab,
     setActiveTab,
+    deleteAuthUser,
+    sendResetPasswordEmail,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

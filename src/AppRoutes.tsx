@@ -1,4 +1,4 @@
-import { Redirect, Route, useHistory, useLocation } from "react-router";
+import { Redirect, Route } from "react-router";
 import { useAuthContext } from "./context/AuthContext";
 import {
   IonTabs,
@@ -12,7 +12,6 @@ import {
 import { IonReactRouter } from "@ionic/react-router";
 import { searchOutline } from "ionicons/icons";
 import Login from "./pages/Login";
-import Home from "./pages/Home";
 import SignUp from "./pages/SignUp";
 import Profile from "./pages/Profile";
 import { AppContextProvider } from "./context/MainContext";
@@ -22,36 +21,36 @@ import Groups from "./pages/Groups";
 import Group from "./pages/Group";
 import GroupForm from "./pages/GroupForm";
 import OnBoard from "./pages/Onboard";
-import { useState } from "react";
 import Search from "./pages/Search";
 import Subscription from "./pages/Subscription";
 import ExpandedLogoWhite from "./assets/svg/ExpandedLogoWhite";
 import { addIcons } from "ionicons";
 import TabHomeActive from "./assets/icons/tab-home-active.svg";
+import TabTag from "./assets/icons/tab-tag.svg";
+import TabTagActive from "./assets/icons/tab-tag-active.svg";
 import TabProfile from "./assets/icons/tab-profile.svg";
 import TabHome from "./assets/icons/tab-home.svg";
 import TabProfileActive from "./assets/icons/tab-profile-active.svg";
+import HowToUseDetail from "./pages/HowToUseDetail";
+import ForgotPassword from "./pages/ForgotPassword";
 
 addIcons({
   "tab-home": TabHome,
   "tab-home-active": TabHomeActive,
   "tab-profile": TabProfile,
   "tab-profile-active": TabProfileActive,
+  "tab-tag": TabTag,
+  "tab-tag-active": TabTagActive,
 });
 
 const AuthRoutes = () => {
-  const { user, activeTab } = useAuthContext();
+  const { user, activeTab, updateUser } = useAuthContext();
 
-  const st: string | null = localStorage.getItem("isOnBoarded");
-
-  const [isOnBoarded, setIsOnBoarded] = useState<string>(st ?? "NO");
-
-  const onBoard = () => {
-    localStorage.setItem("isOnBoarded", "YES");
-    setIsOnBoarded("YES");
+  const onBoard = async () => {
+    await updateUser({ isOnBoarded: true });
   };
 
-  if (isOnBoarded === "NO") {
+  if (user?.isOnBoarded === false) {
     return <OnBoard onBoardDone={onBoard} />;
   }
 
@@ -65,9 +64,10 @@ const AuthRoutes = () => {
               path="/tabs"
               render={() => <Redirect to="/tabs/home" />}
             />
-            <Route exact path="/tabs/home" component={Home} />
+            <Route exact path="/tabs/home" component={Search} />
             <Route exact path="/tabs/search" component={Search} />
             <Route exact path="/tabs/item/:id" component={ItemDetail} />
+            <Route exact path="/tabs/how-to-use" component={HowToUseDetail} />
             <Route exact path="/tabs/profile" component={Profile} />
             <Route exact path="/tabs/tags" component={Tags} />
             <Route exact path="/tabs/groups" component={Groups} />
@@ -79,19 +79,25 @@ const AuthRoutes = () => {
             <IonTabButton
               className="tab-btn tab-btn-home"
               tab="tab1"
-              href="/tabs/home"
+              href="/tabs/tags"
             >
               <IonIcon
                 aria-hidden="true"
-                icon={activeTab === "home" ? "tab-home-active" : "tab-home"}
+                icon={activeTab === "tags" ? "tab-tag-active" : "tab-tag"}
               />
             </IonTabButton>
             <IonTabButton
               className="main-search-icon"
+              style={{
+                "--background":
+                  activeTab === "search" || activeTab === "home"
+                    ? "var(--ion-color-primary)"
+                    : "#6f9bff",
+              }}
               tab="tab2"
               href="/tabs/search"
             >
-              <IonIcon aria-hidden="true" icon={searchOutline} />
+              <IonIcon aria-hidden="true" icon={"tab-home"} />
             </IonTabButton>
             <IonTabButton
               className="tab-btn tab-btn-profile"
@@ -149,11 +155,23 @@ const AppRoutes = () => {
         />
         <Route
           exact
+          path="/forgot-password"
+          render={() =>
+            authenticated === true ? (
+              <Redirect to="/tabs/home" />
+            ) : (
+              <ForgotPassword />
+            )
+          }
+          component={ForgotPassword}
+        />
+        <Route
+          exact
           path="/tabs/*"
           render={() =>
             authenticated === true ? <AuthRoutes /> : <Redirect to="/login" />
           }
-        ></Route>
+        />
       </IonRouterOutlet>
     </IonReactRouter>
   );

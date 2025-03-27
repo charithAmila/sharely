@@ -24,7 +24,7 @@ export default function TagList({
       <>
         <IonList>
           {tags.map((tag: Tag) => (
-            <IonItem key={tag.id}>
+            <IonItem onClick={() => onClickTag(tag)} key={tag.id}>
               <IonLabel>{tag.name}</IonLabel>
               <IonCheckbox
                 slot="end"

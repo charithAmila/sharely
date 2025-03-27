@@ -16,6 +16,7 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from "firebase/firestore";
 export class FirebaseAbstract {
   private collection: string;
@@ -146,16 +147,67 @@ export class FirebaseAbstract {
     }
   }
 
-  public async onDocumentChange(userId: string, callback: any) {
-    const q = query(
-      collection(db, this.collection),
-      where("userId", "==", userId),
-      orderBy("createdAt", "desc")
-    );
-    return onSnapshot(q, (querySnapshot) => {
-      const dataArray = this.querySnapshotToArray(querySnapshot);
-      callback(dataArray);
-    });
+  public async onDocumentChange(
+    userId: string,
+    needSort: boolean,
+    callback: any
+  ) {
+    if (needSort) {
+      const q = query(
+        collection(db, this.collection),
+        where("userId", "==", userId),
+        orderBy("createdAt", "desc")
+      );
+      return onSnapshot(q, (querySnapshot) => {
+        const dataArray = this.querySnapshotToArray(querySnapshot);
+        callback(dataArray);
+      });
+    } else {
+      const q = query(
+        collection(db, this.collection),
+        where("userId", "==", userId)
+      );
+      return onSnapshot(q, (querySnapshot) => {
+        const dataArray = this.querySnapshotToArray(querySnapshot);
+        callback(dataArray);
+      });
+    }
+  }
+
+  public async deleteAllByUserId(userId: string): Promise<void> {
+    try {
+      const _query = query(
+        collection(db, this.collection),
+        where("userId", "==", userId)
+      );
+
+      const querySnapshot = await getDocs(_query);
+
+      if (querySnapshot.empty) return; // No documents to delete
+
+      // Initialize batch
+      let batch = writeBatch(db);
+      let batchCount = 0;
+
+      for (const docSnap of querySnapshot.docs) {
+        batch.delete(doc(db, this.collection, docSnap.id));
+        batchCount++;
+
+        // Fire the batch every 500 deletes
+        if (batchCount === 500) {
+          await batch.commit(); // Execute batch
+          batch = writeBatch(db); // Start a new batch
+          batchCount = 0;
+        }
+      }
+
+      // Commit the final batch if there are any remaining documents
+      if (batchCount > 0) {
+        await batch.commit();
+      }
+    } catch (error) {
+      throw new Error("Error deleting documents for user");
+    }
   }
 
   private querySnapshotToArray(querySnapshot: any) {

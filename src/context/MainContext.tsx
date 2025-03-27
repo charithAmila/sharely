@@ -2,9 +2,10 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { ItemService } from "../services/ItemServices";
 import { TagService } from "../services/TagService";
 import { Omit } from "react-router";
-import { GroupService } from "../services/GroupService";
-import { UserService } from "../services/UserService";
 import { groupByCreatedAt } from "../helpers";
+import { SettingService } from "../services/SettingService";
+import { UserService } from "../services/UserService";
+import { useAuthContext } from "./AuthContext";
 
 type AppContextProviderProps = {
   children: React.ReactNode;
@@ -20,14 +21,8 @@ type ContextProps = {
   sharedItems: SharedItem[];
   updateItem: (item: Partial<SharedItem>, id: string) => Promise<void>;
   deleteItem: (item: SharedItem) => Promise<void>;
-  groups: Group[];
-  createGroup: (
-    data: Omit<Group, "id" | "createdAt" | "updatedAt" | "userId">
-  ) => Promise<void>;
-  updateGroup: (group: Partial<Group>, id: string) => Promise<void>;
-  deleteGroup: (group: Group) => Promise<void>;
-  friends: Member[];
-  getFriends: () => Promise<void>;
+  settings: Settings | null;
+  deleteAccount: () => Promise<void>;
 };
 
 const AuthContext = createContext<ContextProps | undefined>(undefined);
@@ -36,37 +31,44 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   const [items, setItems] = useState<GroupedSharedItem[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [sharedItems, setSharedItems] = useState<SharedItem[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [friends, setFriends] = useState<Member[]>([]);
   const [linksCount, setLinksCount] = useState<LinkCount[]>([]);
+  const [settings, setSettings] = useState<Settings | null>(null);
+
+  const { deleteAuthUser } = useAuthContext();
 
   useEffect(() => {
     if (!user) {
       return;
     }
 
-    const fetchTags = async () => {
-      try {
-        const tag = new TagService();
-        const data = await tag.findByField("userId", user.id);
+    const unsubscribe = () => {
+      const tagService = new TagService();
+      tagService.onDocumentChange(user.id, true, (data: Tag[]) => {
         setTags(data.sort((a, b) => (a.name > b.name ? 1 : -1)));
-      } catch (error) {
-        console.error(error);
-      }
+      });
     };
 
-    const fetchGroups = async () => {
+    return unsubscribe();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      return;
+    }
+
+    const fetchSettings = async () => {
       try {
-        const group = new GroupService();
-        const data = await group.findByField("userId", user.id);
-        setGroups(data);
+        const settingService = new SettingService();
+        const res = await settingService.findByDocument("v-1");
+        if (res?.exists()) {
+          setSettings(res.data() as Settings);
+        }
       } catch (error) {
         console.error(error);
       }
     };
 
-    fetchGroups();
-    fetchTags();
+    fetchSettings();
   }, [user]);
 
   // calculate links count for each tag
@@ -92,18 +94,40 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
   }, [tags, sharedItems]);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !settings) {
       return;
     }
     const unsubscribe = () => {
       const itemService = new ItemService();
-      itemService.onDocumentChange(user.id, (data: SharedItem[]) => {
-        setSharedItems([...data]);
-        setItems(groupByCreatedAt([...data]));
+      itemService.onDocumentChange(user.id, true, (data: SharedItem[]) => {
+        const howToUseItem: SharedItem = {
+          id: "how-to-use",
+          metadata: {
+            title: settings?.howToUse?.title || "How to use",
+            description:
+              settings?.howToUse?.description ||
+              "Keep all your digital assets in one place, easily organize & archive them, and access anytime. 😊",
+            image: settings?.howToUse?.image || {
+              url: "https://firebasestorage.googleapis.com/v0/b/snap-link-424d4.appspot.com/o/app-items%2Fhow-to-use.svg?alt=media&token=cf690c58-f3a1-4506-9c9b-e49b69363d77",
+            },
+            video: settings?.howToUse?.video || {
+              muted: true,
+              playing: true,
+              url: "https://firebasestorage.googleapis.com/v0/b/snap-link-424d4.appspot.com/o/uploads%2FF219DEB9-9952-47A6-8BA2-5BB74D56F962.mp4?alt=media&token=03bef9ab-8837-44b4-8668-4c104c2c0fd1",
+            },
+          },
+          tags: [],
+          type: "HOW_TO_USE",
+          userId: user.id,
+          createdAt: user.createdAt,
+        };
+        const items = [...data, howToUseItem];
+        setSharedItems([...items]);
+        setItems(groupByCreatedAt([...items]));
       });
     };
     return unsubscribe();
-  }, [user]);
+  }, [user, settings]);
 
   const isValidTag = (name: string, id: string = "") => {
     return tags
@@ -200,79 +224,13 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     }
   };
 
-  const createGroup = async (
-    data: Omit<Group, "id" | "createdAt" | "updatedAt" | "userId">
-  ) => {
-    if (!user) {
-      return;
+  const deleteAccount = async () => {
+    if (!user) return;
+    try {
+      await deleteAuthUser();
+    } catch (error: any) {
+      throw new Error(error);
     }
-
-    const group = new GroupService();
-
-    const newGroup: Omit<Group, "id"> = {
-      name: data.name,
-      userId: user.id,
-      members: data.members || [],
-      tags: data.tags || [],
-    };
-
-    const groupData = await group.create(newGroup);
-
-    if (groupData.id) {
-      setGroups([
-        {
-          id: groupData.id,
-          ...newGroup,
-        },
-        ...groups,
-      ]);
-    }
-  };
-
-  const updateGroup = async (group: Partial<Group>, id: string) => {
-    const _group = groups.find((i) => i.id === id);
-    const groupService = new GroupService();
-    await groupService.update({ ...group, id });
-    const index = groups.findIndex((i) => i.id === id);
-    if (index !== -1 && _group) {
-      groups[index] = _group;
-      setGroups([...groups]);
-    }
-  };
-
-  const deleteGroup = async (group: Group) => {
-    const groupService = new GroupService();
-    await groupService.delete(group.id);
-    const index = groups.findIndex((i) => i.id === group.id);
-    if (index !== -1) {
-      groups.splice(index, 1);
-      setGroups([...groups]);
-    }
-  };
-
-  const getFriends = async () => {
-    if (!user || !user.friends) {
-      return;
-    }
-
-    const friendsIds: string[] = user.friends.map((f) => f.id);
-
-    const userService = new UserService();
-
-    const data: AuthUser[] = await userService.findByFieldsArrayIn(
-      "id",
-      friendsIds
-    );
-
-    const _friends: Member[] = data.map((d) => {
-      return {
-        id: d.id,
-        name: d.name,
-        email: d.email,
-      };
-    });
-
-    setFriends(_friends);
   };
 
   const values: ContextProps = {
@@ -284,13 +242,9 @@ const AppContextProvider = ({ children, user }: AppContextProviderProps) => {
     deleteTag,
     sharedItems,
     updateItem,
+    settings,
     deleteItem,
-    groups,
-    createGroup,
-    updateGroup,
-    deleteGroup,
-    friends,
-    getFriends,
+    deleteAccount,
   };
 
   return <AuthContext.Provider value={values}>{children}</AuthContext.Provider>;

@@ -1,4 +1,4 @@
-import { Fragment, useMemo, useRef, useState } from "react";
+import React, { Fragment, useMemo, useRef, useState } from "react";
 import {
   IonButton,
   IonButtons,
@@ -20,26 +20,29 @@ import { add } from "ionicons/icons";
 import { getOrdinalSuffix } from "../utils/constant";
 import TagsFilter from "../components/TagsFilter";
 import ExpandedLogo from "../assets/svg/ExpandedLogo";
-
 import { addIcons } from "ionicons";
 import FilterSvg from "../assets/icons/filter-icon.svg";
 import CardSvg from "../assets/icons/card-icon.svg";
 import dayjs from "dayjs";
 import LinkEdit from "../components/LinkEdit";
 import { useTabIcon } from "../hooks/useTabIcon";
+import Fuse from "fuse.js";
 
 addIcons({
   "filter-icon": FilterSvg,
   "card-icon": CardSvg,
 });
 
+// Type definitions (or import these from your types file)
+
 type Props = {
   isSearch?: boolean;
+  onChangeSearch?: (text: string) => void;
+  searchText?: string;
 };
 
-const Home = ({ isSearch }: Props) => {
+const Home = ({ isSearch, onChangeSearch, searchText = "" }: Props) => {
   const { items, tags, sharedItems } = useAppContext();
-
   useTabIcon();
 
   const modal = useRef<HTMLIonModalElement>(null);
@@ -48,57 +51,124 @@ const Home = ({ isSearch }: Props) => {
   const [modelType, setModelType] = useState<"tag-filter" | "edit">(
     "tag-filter"
   );
-  const [selectedItem, setSelectedItem] = useState<SharedItem>();
+  const [selectedItem, setSelectedItem] = useState<SharedItem | null>(null);
 
+  // Helper: Count how many shared items have a given tag.
   const itemsCount = (tagId: string) => {
     return sharedItems.filter((item: SharedItem) =>
       (item.tags || []).includes(tagId)
     ).length;
   };
 
+  // Filter each group by selected tags. If none are selected, all items pass.
   const itemFilterByTags = (item: SharedItem) => {
     const selectedTagIds = selectedTags.map((tag) => tag.id);
-    const itemTagIds = (item.tags || []).map((tag) => tag);
-
-    if (selectedTagIds.length === 0) {
-      return true;
-    }
-
-    // Compare item tags with selected tags
-    if (!itemTagIds.some((tagId) => selectedTagIds.includes(tagId))) {
-      return false;
-    }
-
-    return true;
+    if (selectedTagIds.length === 0) return true;
+    return (item.tags || []).some((tagId) => selectedTagIds.includes(tagId));
   };
 
-  const listArray = useMemo(() => {
-    if (!selectedTags || selectedTags.length === 0) {
-      return items; // Return all items if no tags are selected
-    }
-
+  // First, filter the grouped items based on selected tags.
+  const filteredGroupedItems = useMemo(() => {
     return items
-      .map((item: GroupedSharedItem) => ({
-        ...item,
-        data: item.data
-          .filter(itemFilterByTags)
-          .sort(
-            (a: SharedItem, b: SharedItem) =>
-              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-          ),
+      .map((group: GroupedSharedItem) => ({
+        ...group,
+        data: group.data.filter(itemFilterByTags),
       }))
-      .filter((item) => item.data.length > 0);
+      .filter((group: GroupedSharedItem) => group.data.length > 0);
   }, [items, selectedTags]);
 
+  // Build a tag lookup map (id -> tag name) for enriching items.
+  const tagMap = useMemo(() => {
+    return tags.reduce((map: Record<string, string>, tag: Tag) => {
+      map[tag.id] = tag.name;
+      return map;
+    }, {});
+  }, [tags]);
+
+  // Flatten the filtered groups to a single array and add a "tagNames" string for Fuse.
+  const flattenedItems = useMemo(() => {
+    return filteredGroupedItems.flatMap((group: GroupedSharedItem) =>
+      group.data.map((item: SharedItem) => ({
+        ...item,
+        // Ensure these fields are strings so Fuse can search them
+        note: item.note || "",
+        metadata: {
+          ...item.metadata,
+          title: item.metadata?.title || "",
+          description: item.metadata?.description || "",
+          publisher: item.metadata?.publisher || "",
+          author: item.metadata?.author || "",
+        },
+        // Combine tag names into a single searchable string
+        tagNames: (item.tags || [])
+          .map((tagId) => tagMap[tagId] || "")
+          .join(" "),
+      }))
+    );
+  }, [filteredGroupedItems, tagMap]);
+
+  // Configure Fuse.js: specify which keys to search and the threshold for fuzzy matching.
+  const fuseOptions = {
+    keys: [
+      "note",
+      "metadata.title",
+      "metadata.description",
+      "metadata.publisher",
+      "metadata.author",
+      "tagNames",
+    ],
+    threshold: 0.3,
+  };
+
+  // Memoize the Fuse instance so it only re-creates when flattenedItems change.
+  const fuse = useMemo(
+    () => new Fuse(flattenedItems, fuseOptions),
+    [flattenedItems]
+  );
+
+  // If a search text exists, use Fuse to get matching items; otherwise, use all items.
+  const searchResults = useMemo(() => {
+    if (!searchText.trim()) {
+      return flattenedItems;
+    }
+    return fuse.search(searchText).map((result) => result.item);
+  }, [fuse, searchText, flattenedItems]);
+
+  // Re-group the search results by date (grouped by YYYY-MM-DD).
+  const groupedResults = useMemo(() => {
+    const groups: Record<string, SharedItem[]> = {};
+    searchResults.forEach((item: SharedItem) => {
+      const groupKey = dayjs(item.createdAt).format("YYYY-MM-DD");
+      if (!groups[groupKey]) {
+        groups[groupKey] = [];
+      }
+      groups[groupKey].push(item);
+    });
+    return Object.keys(groups)
+      .sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
+      .map((dateKey) => ({
+        createdAt: dateKey,
+        data: groups[dateKey].sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        ),
+      }));
+  }, [searchResults]);
+
+  // If a search is active, display the Fuse results; otherwise, show the filtered groups.
+  const finalList = useMemo(() => {
+    return searchText.trim() ? groupedResults : filteredGroupedItems;
+  }, [searchText, groupedResults, filteredGroupedItems]);
+
   const onClickTag = (tag: Tag) => {
-    setSelectedTags(
-      selectedTags.map((t) => t.id).includes(tag.id)
-        ? selectedTags.filter((t) => t.id !== tag.id)
-        : [...selectedTags, tag]
+    setSelectedTags((prev) =>
+      prev.find((t) => t.id === tag.id)
+        ? prev.filter((t) => t.id !== tag.id)
+        : [...prev, tag]
     );
   };
 
-  const searchByText = (e: any) => {
+  const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
   };
 
@@ -107,7 +177,7 @@ const Home = ({ isSearch }: Props) => {
       <IonHeader>
         <IonToolbar className="p-3 white-header">
           <ExpandedLogo />
-          <IonButtons slot="end">
+          {/* <IonButtons slot="end">
             <IonButton
               onClick={() => {
                 setShowAddForm(false);
@@ -117,22 +187,19 @@ const Home = ({ isSearch }: Props) => {
             >
               <IonIcon icon={"filter-icon"} />
             </IonButton>
-            {/* <IonButton
-              onClick={() => {
-                modal.current?.present();
-              }}
-            >
-              <IonIcon icon={"card-icon"} />
-            </IonButton> */}
-          </IonButtons>
+          </IonButtons> */}
         </IonToolbar>
-        {!!isSearch && (
+        {isSearch && (
           <IonToolbar className="white-header">
-            <form action="" onSubmit={searchByText}>
+            <form onSubmit={handleSearchSubmit}>
               <IonSearchbar
                 inputmode="search"
                 placeholder="Search"
-              ></IonSearchbar>
+                value={searchText}
+                onIonInput={(e) =>
+                  onChangeSearch && onChangeSearch(e.detail.value!)
+                }
+              />
             </form>
           </IonToolbar>
         )}
@@ -147,14 +214,12 @@ const Home = ({ isSearch }: Props) => {
               outline
               color="primary"
             >
-              <IonIcon icon={add} color="primary"></IonIcon>
+              <IonIcon icon={add} color="primary" />
               <IonLabel>Add New Tag</IonLabel>
             </IonChip>
             {sharedItems.length > 0 && (
               <IonChip
-                onClick={() => {
-                  setSelectedTags([]);
-                }}
+                onClick={() => setSelectedTags([])}
                 className="gap-4"
                 color={selectedTags.length === 0 ? "primary" : ""}
               >
@@ -177,25 +242,6 @@ const Home = ({ isSearch }: Props) => {
                 </span>
               </IonChip>
             )}
-            {/* <IonChip className="gap-4">
-              <IonLabel>Untagged</IonLabel>
-              <span
-                className="font-16 font-bold p-1"
-                style={{
-                  width: "1.4rem",
-                  height: "1.4rem",
-                  backgroundColor: "var(--ion-color-light)",
-                  borderRadius: "50%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  marginLeft: "10px",
-                  color: "var(--ion-color-primary)",
-                }}
-              >
-                1
-              </span>
-            </IonChip> */}
             {tags
               .sort((a, b) => a.name.localeCompare(b.name))
               .map((tag: Tag) => {
@@ -205,7 +251,9 @@ const Home = ({ isSearch }: Props) => {
                     key={tag.id}
                     className="gap-4"
                     onClick={() => onClickTag(tag)}
-                    color={selectedTags.includes(tag) ? "primary" : ""}
+                    color={
+                      selectedTags.find((t) => t.id === tag.id) ? "primary" : ""
+                    }
                   >
                     <IonLabel>{tag.name}</IonLabel>
                     {count > 0 && (
@@ -232,9 +280,10 @@ const Home = ({ isSearch }: Props) => {
           </div>
         </IonToolbar>
       </IonHeader>
-      <IonContent className="" style={{ position: "relative" }} fullscreen>
-        {listArray &&
-          listArray.map((item: GroupedSharedItem, index: number) => (
+      <IonContent fullscreen style={{ position: "relative" }}>
+        {finalList.map((group: GroupedSharedItem, index: number) => {
+          const createdAt = dayjs(group.data[0].createdAt);
+          return (
             <Fragment key={index}>
               <div className="flex flex-column">
                 <div
@@ -246,31 +295,29 @@ const Home = ({ isSearch }: Props) => {
                   }}
                 >
                   <div className="flex flex-column w-full">
-                    <IonText color="dark font-lg" style={{}}>
-                      {dayjs().isSame(item.createdAt, "day")
+                    <IonText color="dark" className="font-lg">
+                      {dayjs().isSame(createdAt, "day")
                         ? "Today"
-                        : dayjs()
-                            .subtract(1, "day")
-                            .isSame(item.createdAt, "day")
+                        : dayjs().subtract(1, "day").isSame(createdAt, "day")
                         ? "Yesterday"
-                        : dayjs(item.createdAt).format("MMMM, YYYY")}
+                        : dayjs(createdAt).format("MMMM, YYYY")}
                     </IonText>
-                    <IonText color="dark font-2xl font-bold" className="w-full">
-                      {dayjs(item.createdAt).format("DD")}
-                      {getOrdinalSuffix(dayjs(item.createdAt).date())},{" "}
-                      {dayjs(item.createdAt).format("dddd")}
+                    <IonText color="dark" className="font-2xl font-bold w-full">
+                      {dayjs(createdAt).format("DD")}
+                      {getOrdinalSuffix(dayjs(createdAt).date())},{" "}
+                      {dayjs(createdAt).format("dddd")}
                     </IonText>
                   </div>
                 </div>
                 <div className="ion-padding">
-                  {item.data.map((_d: any) => (
-                    <div key={_d.id} className="w-full">
+                  {group.data.map((item: SharedItem) => (
+                    <div key={item.id} className="w-full">
                       <LinkPreview
                         tags={tags}
                         selectedTags={selectedTags}
-                        item={_d}
+                        item={item}
                         onClickEdit={() => {
-                          setSelectedItem(_d);
+                          setSelectedItem(item);
                           setModelType("edit");
                           modal.current?.present();
                         }}
@@ -279,9 +326,10 @@ const Home = ({ isSearch }: Props) => {
                   ))}
                 </div>
               </div>
-              {index < listArray.length - 1 && <IonItemDivider />}
+              {index < finalList.length - 1 && <IonItemDivider />}
             </Fragment>
-          ))}
+          );
+        })}
         <div className="c-modal-container">
           <IonModal
             ref={modal}

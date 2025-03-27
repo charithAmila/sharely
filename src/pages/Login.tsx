@@ -1,25 +1,19 @@
 import {
   IonButton,
-  IonCol,
   IonContent,
   IonIcon,
   IonInput,
   IonItem,
   IonPage,
-  IonRow,
   IonSpinner,
   IonText,
   useIonToast,
 } from "@ionic/react";
 import { useState } from "react";
 import { useForm, Controller, SubmitHandler } from "react-hook-form";
-import { Link } from "react-router-dom";
 import { eye, eyeOff } from "ionicons/icons";
 import { useAuthContext } from "../context/AuthContext";
 import { EMAIL_REGEX } from "../utils/constant";
-import Logo from "../assets/svg/ExpandedLogo";
-import AppleLogin from "../components/AppleLogin";
-import GoogleLogin from "../components/GoogleLogin";
 import AuthHeader from "../components/auth/AuthHeader";
 import SocialAuth from "../components/auth/SocialAuth";
 
@@ -68,7 +62,12 @@ export default function Login() {
 
   return (
     <IonPage>
-      <IonContent className="ion-padding" scrollY={false} fullscreen>
+      <IonContent
+        className="ion-padding"
+        style={{ backgroundColor: "#f5f5f5" }}
+        scrollY={false}
+        fullscreen
+      >
         <div className="flex flex-column h-100vh">
           <AuthHeader title="Sign in to your Account" />
           <form className="pt-5" onSubmit={handleSubmit(onSubmit)}>
@@ -155,10 +154,14 @@ export default function Login() {
                 </>
               )}
             />
-            <IonText className="ion-text-end font-bold" color="primary">
-              <p>Forgot password?</p>
-            </IonText>
-            <div className="pt-4">
+            <div className="flex justify-content-end">
+              <div>
+                <IonButton fill="clear" routerLink="/forgot-password">
+                  Forgot password?
+                </IonButton>
+              </div>
+            </div>
+            <div className="pt-2">
               <IonButton type="submit" color={"primary"} expand="block">
                 {loading && <IonSpinner slot="start" name="lines-small" />}{" "}
                 <IonText color="light">Sign In</IonText>
@@ -166,13 +169,10 @@ export default function Login() {
             </div>
           </form>
           <SocialAuth />
-          <div className="flex flex-column justify-content-center align-items-center flex-grow-1">
-            <IonText className="pb-4 mt-auto">
-              <p className="ion-text-center">
-                Don't have an account?{" "}
-                <Link to="/sign-up">Create New Account</Link>
-              </p>
-            </IonText>
+          <div className="">
+            <IonButton expand="block" fill="outline" routerLink="/sign-up">
+              Create New Account
+            </IonButton>
           </div>
         </div>
       </IonContent>

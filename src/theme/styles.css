@@ -81,6 +81,21 @@
 .gap-5 {
   gap: 5px;
 }
+.gap-1rem {
+  gap: 1rem;
+}
+.gap-2rem {
+  gap: 2rem;
+}
+.gap-3rem {
+  gap: 3rem;
+}
+.gap-4rem {
+  gap: 4rem;
+}
+.gap-5rem {
+  gap: 5rem;
+}
 
 /* Height */
 .h-100 {

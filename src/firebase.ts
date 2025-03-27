@@ -8,21 +8,30 @@ import {
   initializeAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  getAuth,
+  deleteUser,
 } from "firebase/auth";
+import {
+  FIREBASE_API_KEY,
+  FIREBASE_APP_ID,
+  FIREBASE_AUTH_DOMAIN,
+  FIREBASE_MEASUREMENT_ID,
+  FIREBASE_MESSAGING_SENDER_ID,
+  FIREBASE_PROJECT_ID,
+  FIREBASE_STORAGE_BUCKET,
+} from "./utils/env";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyDs4DSPZfhBb85zA7GwU5hJZeYZ91cULSY",
-  authDomain: "snap-link-424d4.firebaseapp.com",
-  projectId: "snap-link-424d4",
-  storageBucket: "snap-link-424d4.appspot.com",
-  messagingSenderId: "427879207334",
-  appId: "1:427879207334:web:5eba226e877e5c37afff67",
-  measurementId: "G-W2E6WYRSVL",
+  apiKey: FIREBASE_API_KEY,
+  authDomain: FIREBASE_AUTH_DOMAIN,
+  projectId: FIREBASE_PROJECT_ID,
+  storageBucket: FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: FIREBASE_MESSAGING_SENDER_ID,
+  appId: FIREBASE_APP_ID,
+  measurementId: FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase
@@ -40,4 +49,5 @@ export {
   signInWithCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  deleteUser,
 };

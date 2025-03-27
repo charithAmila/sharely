@@ -1153,7 +1153,7 @@ PODS:
   - BoringSSL-GRPC/Interface (0.0.36)
   - Capacitor (6.1.1):
     - CapacitorCordova
-  - CapacitorApp (6.0.0):
+  - CapacitorApp (6.0.2):
     - Capacitor
   - CapacitorClipboard (6.0.1):
     - Capacitor
@@ -1394,7 +1394,13 @@ PODS:
   - nanopb/decode (3.30910.0)
   - nanopb/encode (3.30910.0)
   - PromisesObjC (2.4.0)
+  - PurchasesHybridCommon (13.8.0):
+    - RevenueCat (= 5.7.1)
   - RecaptchaInterop (100.0.0)
+  - RevenueCat (5.7.1)
+  - RevenuecatPurchasesCapacitor (9.0.6):
+    - Capacitor
+    - PurchasesHybridCommon (= 13.8.0)
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -1410,6 +1416,7 @@ DEPENDENCIES:
   - Firebase/Firestore
   - Firebase/Storage
   - FirebaseAuth
+  - "RevenuecatPurchasesCapacitor (from `../../node_modules/@revenuecat/purchases-capacitor`)"
 
 SPEC REPOS:
   trunk:
@@ -1436,7 +1443,9 @@ SPEC REPOS:
     - leveldb-library
     - nanopb
     - PromisesObjC
+    - PurchasesHybridCommon
     - RecaptchaInterop
+    - RevenueCat
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -1457,12 +1466,14 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/keyboard"
   CapacitorStatusBar:
     :path: "../../node_modules/@capacitor/status-bar"
+  RevenuecatPurchasesCapacitor:
+    :path: "../../node_modules/@revenuecat/purchases-capacitor"
 
 SPEC CHECKSUMS:
   abseil: d121da9ef7e2ff4cab7666e76c5a3e0915ae08c3
   BoringSSL-GRPC: ca6a8e5d04812fce8ffd6437810c2d46f925eaeb
   Capacitor: 8941aba4364ba9d1b22188569001f2ce45cc2b00
-  CapacitorApp: 9d53aec7101f7b030a950c5bdc4df8612576b279
+  CapacitorApp: 2a8c3a0b0814322e5e6e15fe595f02c3808f0f8b
   CapacitorClipboard: 756cd7e83e8d5d19b0c74f40b57517c287bd5fe2
   CapacitorCommunityAppleSignIn: c8bba4ca8ff6ff843367ece13ee8af24e9266eb9
   CapacitorCommunityContacts: 04d749aa9202f1ecedf64f51ecc599ac6aedcfde
@@ -1491,8 +1502,11 @@ SPEC CHECKSUMS:
   leveldb-library: e8eadf9008a61f9e1dde3978c086d2b6d9b9dc28
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
   PromisesObjC: f5707f49cb48b9636751c5b2e7d227e43fba9f47
+  PurchasesHybridCommon: bfd5bcf640a5c0a137d09287cdffcb4cf28fc12f
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
+  RevenueCat: fd13e14159aefb128a8e822451d08418e04fdda3
+  RevenuecatPurchasesCapacitor: 163e9a6631aff7df63836ee2dca0d71b0bb2cb8a
 
-PODFILE CHECKSUM: ce607e5547e70aacb32c11b48c8c7bc75a27e8c6
+PODFILE CHECKSUM: 4e3a8ca1b1456d439efa52bf31ff9b14be7d78c5
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.16.2

@@ -27,6 +27,7 @@ import dayjs from "dayjs";
 import { getOrdinalSuffix } from "../utils/constant";
 import ThinDivider from "../components/ThinDivider";
 import MediaPreview from "../components/MideaPreview";
+import _ from "lodash";
 
 type Params = {
   id: string;
@@ -115,13 +116,13 @@ const ItemDetail = () => {
         rel="noopener noreferrer"
         ref={linkRef}
         style={{ display: "none" }}
-      ></a>
+      />
     );
   };
 
   const metadata = useMemo(() => {
     if (!item) return;
-    if (item.metadata) {
+    if (!_.isEmpty(item.metadata)) {
       return {
         ...item.metadata,
         contentType: "image",
@@ -136,8 +137,24 @@ const ItemDetail = () => {
 
     metadata.contentType = item?.contentType || "image";
 
+    const isUrlYoutube = (url: string) => {
+      return url?.includes("youtube.com");
+    };
+
     if (item.contentType === "text") {
-      metadata.description = item.content;
+      if (isUrlYoutube(item.url || item.content || "")) {
+        metadata = {
+          ...metadata,
+          image: {
+            url: item.url || item.content,
+          },
+          contentType: "video",
+        };
+      }
+
+      if (!metadata.description) {
+        metadata.description = item.url || item.content;
+      }
     }
 
     return metadata;
@@ -183,14 +200,14 @@ const ItemDetail = () => {
           </IonButtons>
         </IonToolbar>
       </IonHeader>
-      <IonContent scrollY={true}>
+      <IonContent style={{ background: "#EEF0F5" }} fullscreen scrollY={true}>
         <IonCard className="main-card">
           <div
             style={{
               backgroundColor: "#EEF0F5",
             }}
           >
-            {metadata.image && (
+            {metadata?.image && (
               <div className="relative">
                 {metadata.logo && (
                   <div
@@ -216,6 +233,7 @@ const ItemDetail = () => {
                 <MediaPreview
                   url={metadata?.image?.url}
                   type={metadata.contentType}
+                  contentType={item?.contentType}
                 />
               </div>
             )}
@@ -232,36 +250,46 @@ const ItemDetail = () => {
             <IonText>{item?.metadata?.description}</IonText>
           </div>
         </div>
-        <div className="ion-padding">
-          <ThinDivider />
-        </div>
-        <div className="flex ion-padding flex-column gap-4">
-          <div className="flex-1 flex gap-5 align-items-center">
-            {item?.metadata?.logo && (
-              <IonAvatar style={{ width: "25px", height: "25px" }}>
-                <img
-                  alt="Silhouette of a person's head"
-                  src={item.metadata.logo.url}
-                />
-              </IonAvatar>
-            )}
-            {metadata.publisher && (
-              <IonText className="">{metadata.publisher}</IonText>
-            )}
-            <div style={{ marginLeft: "auto" }} className="font-bold">
-              <IonButton
-                className="font-bold"
-                fill="clear"
-                onClick={writeToClipboard}
-              >
-                Copy Link
-              </IonButton>
+
+        {item && item?.contentType !== "image" && (
+          <>
+            <div className="ion-padding">
+              <ThinDivider />
             </div>
-          </div>
-        </div>
-        <div className="ion-padding">
-          <IonText color={"primary"}>{item?.url || item?.content}</IonText>
-        </div>
+            <div className="flex ion-padding flex-column gap-4">
+              <div className="flex-1 flex gap-5 align-items-center">
+                {item?.metadata?.logo && (
+                  <IonAvatar style={{ width: "25px", height: "25px" }}>
+                    <img
+                      alt="Silhouette of a person's head"
+                      src={item.metadata.logo.url}
+                    />
+                  </IonAvatar>
+                )}
+                {metadata.publisher && (
+                  <IonText className="">{metadata.publisher}</IonText>
+                )}
+                <div style={{ marginLeft: "auto" }} className="font-bold">
+                  <IonButton
+                    className="font-bold"
+                    fill="clear"
+                    onClick={writeToClipboard}
+                  >
+                    Copy Link
+                  </IonButton>
+                </div>
+              </div>
+            </div>
+            <div className="ion-padding">
+              <IonText
+                onClick={() => linkRef?.current?.click()}
+                color={"primary"}
+              >
+                {item?.url || item?.content}
+              </IonText>
+            </div>
+          </>
+        )}
         <div className="ion-padding">
           <ThinDivider />
         </div>
@@ -339,6 +367,7 @@ const ItemDetail = () => {
           />
         )}
       </IonModal>
+      {renderLink()}
     </IonPage>
   );
 };

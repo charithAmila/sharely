@@ -4,8 +4,10 @@ type AuthUser = {
   email: string;
   photo?: string;
   phone?: string;
-  friends?: AuthUserFriend[];
-  createdAt?: string;
+  isOnBoarded: boolean;
+  userType?: "FREE" | "PRO";
+  maxTagCount?: number;
+  createdAt: string;
   updatedAt?: string;
 };
 
@@ -40,7 +42,14 @@ type SharedItem = {
   content?: string;
   tags: string[];
   userId: string;
-  metadata?: any;
+  type: "CONTENT" | "HOW_TO_USE";
+  metadata?: {
+    title?: string;
+    description?: string;
+    publisher?: string;
+    author?: string;
+    [key: string]: any;
+  };
   note?: string;
   fileURL?: string;
   contentType?: "url" | "text" | "image" | "video" | "pdf";
@@ -63,4 +72,23 @@ type Group = {
   tags?: Tag[];
   createdAt?: string;
   updatedAt?: string;
+};
+
+type Settings = {
+  id: string;
+  maxTagCount: number;
+  howToUse: HowToUse;
+};
+
+type HowToUse = {
+  title: string;
+  description: string;
+  image?: {
+    url: string;
+  };
+  video?: {
+    muted: boolean;
+    playing: boolean;
+    url: string;
+  };
 };

@@ -19,9 +19,9 @@ export default function SocialAuth() {
         </IonCol>
       </IonRow>
       <IonRow>
-        <IonCol>
+        {/* <IonCol>
           <GoogleLogin />
-        </IonCol>
+        </IonCol> */}
         <IonCol>
           <AppleLogin />
         </IonCol>

@@ -13,6 +13,8 @@ export const useTabIcon = () => {
       setActiveTab("home");
     } else if (location.pathname === "/tabs/search") {
       setActiveTab("search");
+    } else if (location.pathname === "/tabs/tags") {
+      setActiveTab("tags");
     }
   }, [location]);
 };
