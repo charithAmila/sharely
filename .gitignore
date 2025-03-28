@@ -30,3 +30,15 @@ yarn-error.log*
 
 # Optional eslint cache
 .eslintcache
+
+# Android (keep android/, but ignore build outputs & local configs)
+android/.gradle/
+android/.idea/
+android/app/build/
+android/local.properties
+android/captures/
+
+# Gradle
+.gradle/
+**/build/
+**/captures/

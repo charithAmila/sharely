@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "427879207334",
+    "project_id": "snap-link-424d4",
+    "storage_bucket": "snap-link-424d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:427879207334:android:ea48b62900f94224afff67",
+        "android_client_info": {
+          "package_name": "io.sharely.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "427879207334-kue0str6npv9mu586tr7sv98uiu9etdp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzynMgy6U8Cake4RFlDxIOWoboFBUw3I0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "427879207334-kue0str6npv9mu586tr7sv98uiu9etdp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "427879207334-g3s3b3l2j2hb5jq53g7q549if02rj3d2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "io.snaplink.share.app"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
