@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs you need
+// Import Firebase modules
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import {
@@ -10,6 +10,10 @@ import {
   signInWithEmailAndPassword,
   deleteUser,
 } from "firebase/auth";
+import { FirebaseAnalytics } from "@capacitor-community/firebase-analytics";
+import { Capacitor } from "@capacitor/core";
+
+// Import environment variables
 import {
   FIREBASE_API_KEY,
   FIREBASE_APP_ID,
@@ -19,11 +23,8 @@ import {
   FIREBASE_PROJECT_ID,
   FIREBASE_STORAGE_BUCKET,
 } from "./utils/env";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration
 const firebaseConfig = {
   apiKey: FIREBASE_API_KEY,
   authDomain: FIREBASE_AUTH_DOMAIN,
@@ -40,6 +41,25 @@ const db = getFirestore(app);
 const auth = initializeAuth(app, {
   persistence: indexedDBLocalPersistence,
 });
+
+// Initialize Firebase Analytics if running on a native device
+const initFirebaseAnalytics = async () => {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      await FirebaseAnalytics.initializeFirebase({
+        ...firebaseConfig,
+      });
+      console.log("🔥 Firebase Analytics Initialized");
+    } catch (error) {
+      console.error("❌ Error initializing Firebase Analytics:", error);
+    }
+  } else {
+    console.log("ℹ️ Firebase Analytics is only available on native platforms.");
+  }
+};
+
+// Call the function to initialize Firebase Analytics
+initFirebaseAnalytics();
 
 export {
   app,

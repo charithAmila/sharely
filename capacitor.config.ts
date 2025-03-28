@@ -10,6 +10,9 @@ const config: CapacitorConfig = {
       style: "DARK",
       backgroundColor: "#ffffffff",
     },
+    CapacitorFirebaseAnalytics: {
+      autoLogAppOpen: true,
+    },
   },
 };
 

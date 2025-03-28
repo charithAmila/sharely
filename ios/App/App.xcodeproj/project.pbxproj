@@ -29,6 +29,7 @@
 		CB779C8C2C61B7A70097B303 /* UserTagsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB779C8B2C61B7A70097B303 /* UserTagsViewModel.swift */; };
 		CB83FC1E2C5F0D6C00AAE326 /* EchoPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB83FC1D2C5F0D6C00AAE326 /* EchoPlugin.swift */; };
 		CB83FC242C5F181400AAE326 /* MyViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB83FC232C5F181400AAE326 /* MyViewController.swift */; };
+		CB9435DE2D82A17500E5265D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = CB9435DD2D82A17500E5265D /* GoogleService-Info.plist */; };
 		CBF3FF4D2CE9B8F4001ECDC2 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBF3FF4C2CE9B8F4001ECDC2 /* StoreKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -87,6 +88,7 @@
 		CB779C8B2C61B7A70097B303 /* UserTagsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserTagsViewModel.swift; sourceTree = "<group>"; };
 		CB83FC1D2C5F0D6C00AAE326 /* EchoPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EchoPlugin.swift; sourceTree = "<group>"; };
 		CB83FC232C5F181400AAE326 /* MyViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyViewController.swift; sourceTree = "<group>"; };
+		CB9435DD2D82A17500E5265D /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		CBF3FF4C2CE9B8F4001ECDC2 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		FC68EB0AF532CFC21C3344DD /* Pods-App.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-App.debug.xcconfig"; path = "Pods/Target Support Files/Pods-App/Pods-App.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -145,6 +147,7 @@
 		504EC3061FED79650016851F /* App */ = {
 			isa = PBXGroup;
 			children = (
+				CB9435DD2D82A17500E5265D /* GoogleService-Info.plist */,
 				CB5814B62C5EA96400BBD9C2 /* App.entitlements */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
@@ -298,6 +301,7 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				CB9435DE2D82A17500E5265D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
